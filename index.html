@@ -771,11 +771,13 @@
             </div>
           </div>
         </template>
-        <!-- Zona de perill -->
-        <div class="mt-6 pt-4" style="border-top:1px solid rgba(239,68,68,0.15)">
-          <button @click="resetAll()" class="btn-red">⚠ Esborrar totes les dades</button>
-          <p class="font-body text-xs mt-2" style="color:var(--faint)">Això eliminarà tots els equips, resultats i classificació.</p>
-        </div>
+        <!-- Zona de perill — només Rayan -->
+        <template x-if="isOwner">
+          <div class="mt-6 pt-4" style="border-top:1px solid rgba(239,68,68,0.15)">
+            <button @click="resetAll()" class="btn-red">⚠ Esborrar totes les dades</button>
+            <p class="font-body text-xs mt-2" style="color:var(--faint)">Això eliminarà tots els equips, resultats i classificació.</p>
+          </div>
+        </template>
       </div>
     </template>
   </div>
@@ -792,24 +794,38 @@
       <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(245,166,35,0.4),transparent);margin-left:8px;margin-top:20px"></div>
     </div>
 
-    <!-- Estadístiques d'activitat per membre -->
+    <!-- Rànquing d'activitat per membre — FIX: usem mètodes del pare per evitar scope de x-data -->
     <div class="card p-6 mb-6">
-      <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">📊 Activitat per membre</h3>
+      <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">📊 Rànquing d'activitat</h3>
       <template x-if="activityLog.length === 0">
         <p class="font-condensed" style="color:var(--faint)">Encara no hi ha activitat registrada</p>
       </template>
-      <div class="space-y-3">
-        <template x-for="memberKey in Object.keys(MEMBERS)" :key="memberKey">
-          <div x-data="{ count: activityLog.filter(a => a.user === MEMBERS[memberKey]?.name).length, last: activityLog.find(a => a.user === MEMBERS[memberKey]?.name) }">
-            <div class="flex items-center gap-3">
-              <span class="font-condensed text-sm flex-1" style="color:var(--cream)" x-text="memberKey === OWNER ? '👑 ' + MEMBERS[memberKey].name : MEMBERS[memberKey].name"></span>
-              <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange);border:1px solid rgba(245,166,35,0.2)" x-text="count + ' accions'"></span>
+      <!-- Ordenat per més actiu primer -->
+      <div class="space-y-4">
+        <template x-for="(mk, idx) in membersSortedByActivity()" :key="mk">
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <span class="font-condensed text-xs w-5 text-center" style="color:var(--faint)" x-text="idx+1"></span>
+              <span class="font-condensed text-sm flex-1" style="color:var(--cream)"
+                x-text="mk === OWNER ? '👑 ' + MEMBERS[mk].name.split(' ')[0] : MEMBERS[mk].name.split(' ')[0]"></span>
+              <!-- Comptadors per tipus -->
+              <span class="font-condensed text-xs px-1.5 py-0.5 rounded" style="background:rgba(48,209,88,0.12);color:var(--win)"
+                x-text="activityLog.filter(a => a.user === MEMBERS[mk].name && isCreate(a.action)).length + ' creats'"></span>
+              <span class="font-condensed text-xs px-1.5 py-0.5 rounded" style="background:rgba(245,166,35,0.12);color:var(--orange)"
+                x-text="activityLog.filter(a => a.user === MEMBERS[mk].name && isEdit(a.action)).length + ' editats'"></span>
+              <span class="font-condensed text-xs px-1.5 py-0.5 rounded" style="background:rgba(239,71,111,0.12);color:var(--loss)"
+                x-text="activityLog.filter(a => a.user === MEMBERS[mk].name && isDelete(a.action)).length + ' eliminats'"></span>
             </div>
-            <div class="mt-1 rounded-full overflow-hidden" style="height:4px;background:var(--bg-surface)">
-              <div class="h-full rounded-full transition-all" style="background:var(--orange)"
-                :style="'width:' + (activityLog.length ? Math.min(100, Math.round(count/activityLog.length*100)) : 0) + '%'"></div>
+            <!-- Barra de progrés reactiva -->
+            <div class="flex items-center gap-2">
+              <span class="font-condensed text-xs w-5"></span>
+              <div class="flex-1 rounded-full overflow-hidden" style="height:5px;background:var(--bg-surface)">
+                <div class="h-full rounded-full" style="background:var(--orange);transition:width .4s ease"
+                  :style="'width:' + memberActivityPct(mk) + '%'"></div>
+              </div>
+              <span class="font-condensed text-xs w-12 text-right" style="color:var(--muted)"
+                x-text="activityLog.filter(a => a.user === MEMBERS[mk].name).length + ' total'"></span>
             </div>
-            <p x-show="last" class="font-condensed text-xs mt-0.5" style="color:var(--faint)" x-text="last ? 'Última: ' + last.action + ' · ' + last.date : ''"></p>
           </div>
         </template>
       </div>
@@ -822,13 +838,16 @@
         <p class="font-condensed" style="color:var(--faint)">Encara no hi ha canvis registrats</p>
       </template>
       <div class="space-y-2">
-        <template x-for="entry in activityLog.slice(0,50)" :key="entry.id">
+        <template x-for="entry in activityLog.slice(0,100)" :key="entry.id">
           <div class="flex items-start gap-3 px-4 py-3 rounded-lg" style="background:var(--bg-surface)">
-            <div style="min-width:8px;height:8px;border-radius:50%;background:var(--orange);margin-top:5px;flex-shrink:0"></div>
+            <!-- Punt de color segons tipus d'acció -->
+            <div :style="'min-width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;background:' + (isCreate(entry.action) ? 'var(--win)' : isDelete(entry.action) ? 'var(--loss)' : 'var(--orange)')"></div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="entry.user.split(' ')[0]"></span>
-                <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:var(--bg-card-2);color:var(--muted)" x-text="entry.action"></span>
+                <span class="font-condensed text-sm font-600" style="color:var(--cream)" x-text="entry.user.split(' ')[0]"></span>
+                <span class="font-condensed text-xs px-2 py-0.5 rounded"
+                  :style="isCreate(entry.action) ? 'background:rgba(48,209,88,0.1);color:var(--win)' : isDelete(entry.action) ? 'background:rgba(239,71,111,0.1);color:var(--loss)' : 'background:rgba(245,166,35,0.1);color:var(--orange)'"
+                  x-text="entry.action"></span>
               </div>
               <p class="font-body text-sm mt-0.5" style="color:var(--cream)" x-text="entry.detail"></p>
               <p class="font-condensed text-xs mt-0.5" style="color:var(--faint)" x-text="entry.date"></p>
@@ -836,8 +855,8 @@
           </div>
         </template>
       </div>
-      <template x-if="activityLog.length > 50">
-        <p class="font-condensed text-xs mt-3 text-center" style="color:var(--faint)" x-text="'Mostrant els últims 50 de ' + activityLog.length + ' canvis'"></p>
+      <template x-if="activityLog.length > 100">
+        <p class="font-condensed text-xs mt-3 text-center" style="color:var(--faint)" x-text="'Mostrant els últims 100 de ' + activityLog.length + ' canvis'"></p>
       </template>
     </div>
   </div>
@@ -1527,7 +1546,32 @@ function app() {
       if (!confirm('Segur que vols esborrar TOTS els dades? Aquesta acció no es pot desfer.')) return;
       this.logActivity('⚠️ RESET TOTAL', 'Totes les dades han estat esborrades');
       window._set(window._ref(window._db, '/'), null);
-    }
+    },
+
+    // Helpers per classificar tipus d'acció
+    isCreate(action) {
+      return ['Resultat afegit','Equip afegit','Jugador afegit','Partit programat'].includes(action);
+    },
+    isDelete(action) {
+      return action.includes('eliminat') || action.includes('RESET');
+    },
+    isEdit(action) {
+      return action.includes('editat');
+    },
+    membersSortedByActivity() {
+      return Object.keys(this.MEMBERS).sort((a, b) => {
+        const ca = this.activityLog.filter(x => x.user === this.MEMBERS[a].name).length;
+        const cb = this.activityLog.filter(x => x.user === this.MEMBERS[b].name).length;
+        return cb - ca;
+      });
+    },
+    memberActivityPct(mk) {
+      const max = Math.max(...Object.keys(this.MEMBERS).map(k =>
+        this.activityLog.filter(x => x.user === this.MEMBERS[k].name).length
+      ), 1);
+      const count = this.activityLog.filter(x => x.user === this.MEMBERS[mk].name).length;
+      return Math.round(count / max * 100);
+    },
   }
 }
 </script>
