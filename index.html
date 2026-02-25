@@ -252,25 +252,28 @@
 </header>
 
 <!-- LOGIN MODAL -->
-<div x-show="showAdminLogin" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,10,.85);backdrop-filter:blur(8px)">
-  <div class="card p-8 w-full max-w-sm mx-4" style="background:var(--bg-card-2);border-color:var(--border-mid)">
+<div x-show="showAdminLogin" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,10,.88);backdrop-filter:blur(10px)">
+  <div class="card p-8 w-full max-w-sm mx-4 text-center" style="background:var(--bg-card-2);border-color:var(--border-mid)">
     <h2 class="font-display text-4xl mb-1" style="color:var(--orange)">ACCÉS</h2>
-    <p class="font-condensed text-sm mb-5" style="color:var(--muted)">Introdueix les teves credencials</p>
-    <div class="space-y-3 mb-2">
-      <div>
-        <label class="font-condensed text-xs uppercase tracking-widest mb-1 block" style="color:var(--muted)">Usuari</label>
-        <input type="text" x-model="loginUser" @keydown.enter="$refs.passInput.focus()" placeholder="Usuari" autocomplete="username" autocapitalize="none"/>
-      </div>
-      <div>
-        <label class="font-condensed text-xs uppercase tracking-widest mb-1 block" style="color:var(--muted)">Contrasenya</label>
-        <input type="password" x-model="loginPass" x-ref="passInput" @keydown.enter="tryLogin()" placeholder="••••••••" autocomplete="current-password"/>
-      </div>
-    </div>
-    <p x-show="loginError" class="font-condensed text-sm mb-3" style="color:var(--loss)" x-text="loginError"></p>
-    <div class="flex gap-3 mt-4">
-      <button @click="tryLogin()" class="btn-orange flex-1">Entrar</button>
-      <button @click="showAdminLogin=false; loginError=''" class="btn-ghost">Cancel·lar</button>
-    </div>
+    <p class="font-condensed text-sm mb-6" style="color:var(--muted)">Entra amb el teu compte de Google de l'institut</p>
+
+    <!-- Botó Google -->
+    <button @click="tryLogin()" :disabled="loginLoading"
+      class="w-full flex items-center justify-center gap-3 px-5 py-3 rounded-lg font-condensed font-600 text-base transition-all"
+      style="background:#fff;color:#1a1a1a;letter-spacing:0.03em;border:none;cursor:pointer"
+      onmouseover="this.style.background='#f0f0f0'" onmouseout="this.style.background='#fff'">
+      <svg width="20" height="20" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.36-8.16 2.36-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      <span x-text="loginLoading ? 'Connectant...' : 'Continuar amb Google'"></span>
+    </button>
+
+    <p x-show="loginError" class="font-condensed text-sm mt-4" style="color:var(--loss)" x-text="loginError"></p>
+    <p class="font-condensed text-xs mt-5" style="color:var(--faint)">Només els membres organitzadors poden accedir</p>
+    <button @click="showAdminLogin=false; loginError=''" class="btn-ghost mt-3 w-full">Cancel·lar</button>
   </div>
 </div>
 
@@ -802,29 +805,27 @@
       </template>
       <!-- Ordenat per més actiu primer -->
       <div class="space-y-4">
-        <template x-for="(mk, idx) in membersSortedByActivity()" :key="mk">
+        <template x-for="(email, idx) in membersSortedByActivity()" :key="email">
           <div>
             <div class="flex items-center gap-3 mb-1">
               <span class="font-condensed text-xs w-5 text-center" style="color:var(--faint)" x-text="idx+1"></span>
               <span class="font-condensed text-sm flex-1" style="color:var(--cream)"
-                x-text="mk === OWNER ? '👑 ' + MEMBERS[mk].name.split(' ')[0] : MEMBERS[mk].name.split(' ')[0]"></span>
-              <!-- Comptadors per tipus -->
+                x-text="email === OWNER_EMAIL ? '👑 ' + MEMBERS[email].name.split(' ')[0] : MEMBERS[email].name.split(' ')[0]"></span>
               <span class="font-condensed text-xs px-1.5 py-0.5 rounded" style="background:rgba(48,209,88,0.12);color:var(--win)"
-                x-text="activityLog.filter(a => a.user === MEMBERS[mk].name && isCreate(a.action)).length + ' creats'"></span>
+                x-text="activityLog.filter(a => a.user === MEMBERS[email].name && isCreate(a.action)).length + ' creats'"></span>
               <span class="font-condensed text-xs px-1.5 py-0.5 rounded" style="background:rgba(245,166,35,0.12);color:var(--orange)"
-                x-text="activityLog.filter(a => a.user === MEMBERS[mk].name && isEdit(a.action)).length + ' editats'"></span>
+                x-text="activityLog.filter(a => a.user === MEMBERS[email].name && isEdit(a.action)).length + ' editats'"></span>
               <span class="font-condensed text-xs px-1.5 py-0.5 rounded" style="background:rgba(239,71,111,0.12);color:var(--loss)"
-                x-text="activityLog.filter(a => a.user === MEMBERS[mk].name && isDelete(a.action)).length + ' eliminats'"></span>
+                x-text="activityLog.filter(a => a.user === MEMBERS[email].name && isDelete(a.action)).length + ' eliminats'"></span>
             </div>
-            <!-- Barra de progrés reactiva -->
             <div class="flex items-center gap-2">
               <span class="font-condensed text-xs w-5"></span>
               <div class="flex-1 rounded-full overflow-hidden" style="height:5px;background:var(--bg-surface)">
                 <div class="h-full rounded-full" style="background:var(--orange);transition:width .4s ease"
-                  :style="'width:' + memberActivityPct(mk) + '%'"></div>
+                  :style="'width:' + memberActivityPct(email) + '%'"></div>
               </div>
               <span class="font-condensed text-xs w-12 text-right" style="color:var(--muted)"
-                x-text="activityLog.filter(a => a.user === MEMBERS[mk].name).length + ' total'"></span>
+                x-text="activityLog.filter(a => a.user === MEMBERS[email].name).length + ' total'"></span>
             </div>
           </div>
         </template>
@@ -1061,6 +1062,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, onValue, remove, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAfWt3oh1EqLjsOiiqVRjTY2WN6GHOvB_w",
@@ -1074,12 +1076,20 @@
 
   const firebaseApp = initializeApp(firebaseConfig);
   const db = getDatabase(firebaseApp);
+  const auth = getAuth(firebaseApp);
+  const googleProvider = new GoogleAuthProvider();
+
   window._db = db;
   window._ref = ref;
   window._set = set;
   window._onValue = onValue;
   window._remove = remove;
   window._push = push;
+
+  window._signInGoogle = () => signInWithPopup(auth, googleProvider);
+  window._signOut = () => signOut(auth);
+  window._onAuthStateChanged = (cb) => onAuthStateChanged(auth, cb);
+
   window.dispatchEvent(new Event('firebaseReady'));
 </script>
 
@@ -1095,21 +1105,24 @@ function app() {
     ADMIN_PASSWORD: '',
     activityLog: [],
 
+    // Mapeig email → nom complet — només aquests emails poden entrar
     MEMBERS: {
-      'rayan':    { name: 'Rayan El Qoraychy El Meskini',  pass: 'kxbp4729' },
-      'didac':    { name: 'Didac Fernández Ruiz',           pass: 'mwqz8315' },
-      'pere':     { name: 'Pere Nolasc Luis Roselló',       pass: 'jtfn6204' },
-      'thibault': { name: 'Thibault Ferrari Catalá',        pass: 'rvsh9471' },
-      'joel':     { name: 'Joel Rohra Kelani',              pass: 'czgm5083' },
-      'sergio':   { name: 'Sergio Ferrer Chaler',           pass: 'bnkp7152' },
-      'raul':     { name: 'Raúl Castillo Benito',           pass: 'xqtf3896' },
-      'lluc':     { name: 'Lluc Cardona Marí',              pass: 'dwmj6540' },
-      'carlos':   { name: 'Carlos Planells Planells',       pass: 'phvz2618' },
+      'z118324@iesxarc.es': { name: 'Rayan El Qoraychy El Meskini' },
+      'z201085@iesxarc.es': { name: 'Thibault Ferrari Catalá' },
+      'z133120@iesxarc.es': { name: 'Lluc Cardona Marí' },
+      'z133138@iesxarc.es': { name: 'Pere Nolasc Luis Roselló' },
+      'z131932@iesxarc.es': { name: 'Raúl Castillo Benito' },
+      'z168689@iesxarc.es': { name: 'Didac Fernández Ruiz' },
+      'z133122@iesxarc.es': { name: 'Sergio Ferrer Chaler' },
+      'z118343@iesxarc.es': { name: 'Joel Rohra Kelani' },
+      'z133143@iesxarc.es': { name: 'Carlos Planells Planells' },
     },
+    OWNER_EMAIL: 'z118324@iesxarc.es',
     OWNER: 'rayan',
     loginUser: '',
     loginPass: '',
     loginError: '',
+    loginLoading: false,
 
     teams: [],
     results: [],
@@ -1135,10 +1148,6 @@ function app() {
     init() {
       const setup = () => {
         const { _db: db, _ref: ref, _onValue: onValue } = window;
-        // Load password from Firebase
-        onValue(ref(db, 'adminPassword'), (snap) => {
-          if (snap.val()) this.ADMIN_PASSWORD = snap.val();
-        });
         onValue(ref(db, 'teams'), (snap) => {
           const val = snap.val();
           this.teams = val ? Object.entries(val).map(([id, t]) => ({ ...t, id })) : [];
@@ -1158,29 +1167,56 @@ function app() {
           const val = snap.val();
           this.activityLog = val ? Object.entries(val).map(([id, a]) => ({ ...a, id })).sort((a,b) => b.ts - a.ts) : [];
         });
+
+        // Escoltar canvis d'autenticació Firebase
+        window._onAuthStateChanged((firebaseUser) => {
+          if (firebaseUser) {
+            const email = firebaseUser.email;
+            const member = this.MEMBERS[email];
+            if (member) {
+              this.currentUser = email;
+              this.isAdmin = true;
+              this.isOwner = (email === this.OWNER_EMAIL);
+              this.showAdminLogin = false;
+              this.loginError = '';
+              if (this.isOwner && !this.publicTabs.find(t => t.id === 'owner')) {
+                this.publicTabs.push({ id: 'owner', label: '👑 Rayan' });
+              }
+            } else {
+              // Email no autoritzat — tanca sessió i mostra error
+              window._signOut();
+              this.loginError = firebaseUser.email + ' no està autoritzat per accedir.';
+            }
+          } else {
+            this.currentUser = null;
+            this.isAdmin = false;
+            this.isOwner = false;
+            this.publicTabs = this.publicTabs.filter(t => t.id !== 'owner');
+          }
+        });
       };
       if (window._db) { setup(); }
       else { window.addEventListener('firebaseReady', setup, { once: true }); }
     },
 
-    tryLogin() {
-      const user = this.loginUser.trim().toLowerCase();
-      const pass = this.loginPass.trim();
-      const member = this.MEMBERS[user];
-      if (!member) { this.loginError = 'Usuari no trobat'; return; }
-      if (member.pass !== pass) { this.loginError = 'Contrasenya incorrecta'; return; }
-      this.currentUser = user;
-      this.isAdmin = true;
-      this.isOwner = (user === this.OWNER);
-      this.showAdminLogin = false;
-      this.loginUser = '';
-      this.loginPass = '';
+    async tryLogin() {
       this.loginError = '';
-      if (this.isOwner && !this.publicTabs.find(t => t.id === 'owner')) {
-        this.publicTabs.push({ id: 'owner', label: '👑 Rayan' });
+      this.loginLoading = true;
+      try {
+        await window._signInGoogle();
+        // onAuthStateChanged s'encarrega de validar i configurar l'usuari
+      } catch (e) {
+        if (e.code === 'auth/popup-closed-by-user') {
+          this.loginError = '';
+        } else {
+          this.loginError = 'Error en iniciar sessió. Torna-ho a intentar.';
+        }
+      } finally {
+        this.loginLoading = false;
       }
     },
     logout() {
+      window._signOut();
       this.currentUser = null;
       this.isAdmin = false;
       this.isOwner = false;
@@ -1565,11 +1601,11 @@ function app() {
         return cb - ca;
       });
     },
-    memberActivityPct(mk) {
+    memberActivityPct(email) {
       const max = Math.max(...Object.keys(this.MEMBERS).map(k =>
         this.activityLog.filter(x => x.user === this.MEMBERS[k].name).length
       ), 1);
-      const count = this.activityLog.filter(x => x.user === this.MEMBERS[mk].name).length;
+      const count = this.activityLog.filter(x => x.user === this.MEMBERS[email].name).length;
       return Math.round(count / max * 100);
     },
   }
