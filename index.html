@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TORNEIG BÀSQUET — Institut</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Ops+One&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Black Ops One', 'cursive'],
+          score: ['Bebas Neue', 'cursive'],
+          condensed: ['Oswald', 'sans-serif'],
+          body: ['Barlow', 'sans-serif'],
+        },
+        colors: {
+          orange: { 400:'#FF8C00', 500:'#FF6B00', 600:'#E55A00' },
+          court: { 900:'#080808', 800:'#111111', 700:'#181818', 600:'#1E1E1E', 500:'#252525' },
+        }
+      }
+    }
+  }
+</script>
+<style>
+  :root {
+    /* Paleta NBA Arena: blau fosc profund + or/daurat + blanc brillant */
+    --bg-base:    #0A1628;   /* blau nit profund — com les grades de l'arena */
+    --bg-card:    #0F1F3D;   /* blau mig — targetes */
+    --bg-card-2:  #162848;   /* blau més clar — capes */
+    --bg-surface: #1E3358;   /* superfícies interactives */
+    --border:     #1F3A6B;   /* vores blaves subtils */
+    --border-mid: #2A4E8A;   /* vores més visibles */
+
+    --orange:     #F5A623;   /* or NBA — el color de la pilota i els trofeus */
+    --orange-dim: #C4821A;   /* or apagat per accents secundaris */
+    --amber:      #FFD166;   /* groc daurat per al 1r lloc */
+    --cream:      #E8F0FF;   /* blanc blavós — molt llegible sobre blau */
+    --muted:      #7A9CC8;   /* blau clar — text secundari */
+    --faint:      #2A4E8A;   /* blau fosc — text apagat */
+
+    --win:        #06D6A0;   /* verd menta NBA — victòries */
+    --loss:       #EF476F;   /* vermell fort — derrotes */
+
+    --shadow-card: 0 4px 20px rgba(0,0,0,0.5);
+    --shadow-glow: 0 0 40px rgba(245,166,35,0.2);
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg-base); color: var(--cream); font-family:'Barlow',sans-serif; }
+
+  /* GRAIN */
+  .grain::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity:.3;
+  }
+
+  /* NAV TABS */
+  .tab-active {
+    color: var(--orange);
+    background: rgba(249,115,22,0.07);
+    border-bottom: 2px solid var(--orange);
+  }
+  .tab-inactive { border-bottom: 2px solid transparent; color: var(--muted); }
+  .tab-inactive:hover { color: var(--cream); background: rgba(255,255,255,0.03); }
+
+  /* STANDING ROWS */
+  .standing-row { transition: background .15s; border-bottom: 1px solid var(--border); }
+  .standing-row:last-child { border-bottom: none; }
+  .standing-row:hover { background: rgba(245,166,35,0.06) !important; }
+  /* Top 3 amb gradient càlid discret */
+  .standing-first  { background: linear-gradient(90deg, rgba(255,209,102,0.12) 0%, rgba(245,166,35,0.04) 40%, transparent 100%) !important; }
+  .standing-second { background: linear-gradient(90deg, rgba(122,156,200,0.1) 0%, transparent 60%) !important; }
+  .standing-third  { background: linear-gradient(90deg, rgba(196,130,26,0.1) 0%, transparent 60%) !important; }
+
+  /* BADGE positions */
+  .badge-pos {
+    width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+    font-family:'Oswald'; font-size:14px; font-weight:700;
+    border-radius:5px; letter-spacing:0;
+  }
+  .badge-1 { background: linear-gradient(145deg, #FFD166, #F5A623); color:#0A1628; font-weight:800; box-shadow: 0 2px 12px rgba(245,166,35,0.5); }
+  .badge-2 { background: var(--bg-surface); color: var(--cream); border: 1px solid var(--border-mid); }
+  .badge-3 { background: linear-gradient(145deg, #1A2A1A, #1E3320); color: #06D6A0; border: 1px solid rgba(6,214,160,0.2); }
+  .badge-other { background: var(--bg-card-2); color: var(--faint); border: 1px solid var(--border); }
+
+  /* CARDS */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius:12px; }
+
+  .card-match {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all .2s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+  .card-match::after {
+    content:'';
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, rgba(245,166,35,0.05) 0%, transparent 50%);
+    opacity: 0; transition: opacity .25s;
+  }
+  .card-match:hover {
+    border-color: rgba(245,166,35,0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,166,35,0.15);
+  }
+  .card-match:hover::after { opacity: 1; }
+
+  .card-upcoming {
+    background: linear-gradient(90deg, rgba(245,166,35,0.07) 0%, var(--bg-card) 20%);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--orange);
+    border-radius: 12px;
+    transition: all .2s ease;
+    box-shadow: var(--shadow-card);
+  }
+  .card-upcoming:hover {
+    border-color: rgba(245,166,35,0.35);
+    border-left-color: var(--orange);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+
+  /* JORNADA HEADER */
+  .jornada-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 10px;
+    padding: 8px 14px;
+    background: var(--bg-card-2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  /* SCROLLBAR */
+  .scrollbar-hide::-webkit-scrollbar { display:none; }
+
+  /* INPUTS */
+  input, select {
+    background: var(--bg-card-2); border: 1px solid var(--border-mid); color: var(--cream);
+    border-radius: 6px; padding: 8px 12px; outline: none; width: 100%;
+    font-family: 'Barlow', sans-serif; transition: border-color .2s, background .2s;
+  }
+  input:focus, select:focus { border-color: var(--orange); background: var(--bg-surface); }
+
+  /* BUTTONS */
+  .btn-orange {
+    background: var(--orange);
+    color: #fff; font-family:'Oswald'; font-weight:600; letter-spacing:.08em;
+    text-transform:uppercase; padding:9px 22px; border-radius:7px; border:none;
+    cursor:pointer; transition:all .2s;
+    box-shadow: 0 2px 8px rgba(245,166,35,0.3);
+  }
+  .btn-orange:hover { background: #E09520; box-shadow: 0 4px 14px rgba(245,166,35,0.5); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border-mid); color: var(--muted);
+    font-family:'Oswald'; font-weight:500; letter-spacing:.06em;
+    text-transform:uppercase; padding:7px 18px; border-radius:7px;
+    cursor:pointer; transition:all .2s;
+  }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--cream); background: rgba(255,255,255,0.04); }
+  .btn-red {
+    background: rgba(127,29,29,0.5); color: #FCA5A5;
+    font-family:'Oswald'; font-weight:600; letter-spacing:.05em;
+    text-transform:uppercase; padding:6px 14px; border-radius:7px;
+    border: 1px solid rgba(239,68,68,0.2); cursor:pointer;
+    transition:all .2s; font-size:13px;
+  }
+  .btn-red:hover { background:#991b1b; }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in { animation: fadeIn .3s ease forwards; }
+
+  .scoreboard { font-family:'Bebas Neue'; letter-spacing:.05em; }
+  .divider-orange { width:36px; height:2px; background: var(--orange); border-radius:2px; opacity:0.7; }
+
+  /* HOOP DECORATION */
+  .hoop-ring {
+    position:absolute; border-radius:50%;
+    border: 1px solid rgba(245,166,35,0.1);
+    pointer-events: none;
+  }
+
+  /* COURT LINES */
+  .court-lines { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .court-lines::before {
+    content: '';
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 300px; height: 150px;
+    border: 1px solid rgba(245,166,35,0.07);
+    border-bottom: none;
+    border-radius: 150px 150px 0 0;
+  }
+
+  /* LIVE BADGE */
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .live-dot { animation: pulse-dot 1.4s infinite; }
+</style>
+</head>
+<body class="grain min-h-screen" x-data="app()" x-init="init()">
+
+<!-- HEADER -->
+<header class="relative overflow-hidden" style="background: linear-gradient(160deg, #08142A 0%, #0D1E42 50%, #071228 100%); border-bottom: 1px solid rgba(245,166,35,0.2);">
+  <!-- Decorative court rings -->
+  <div class="court-lines"></div>
+  <div class="hoop-ring" style="width:320px;height:320px;right:-80px;top:50%;transform:translateY(-50%)"></div>
+  <div class="hoop-ring" style="width:200px;height:200px;right:-20px;top:50%;transform:translateY(-50%);border-color:rgba(255,107,0,0.09)"></div>
+  <div class="hoop-ring" style="width:100px;height:100px;right:30px;top:50%;transform:translateY(-50%);border-color:rgba(255,107,0,0.12)"></div>
+  <!-- Glow blob -->
+  <div style="position:absolute;right:0;top:0;width:400px;height:100%;background:radial-gradient(ellipse at 80% 50%, rgba(245,166,35,0.08) 0%, transparent 70%);pointer-events:none"></div>
+
+  <div class="max-w-5xl mx-auto px-4 py-7 relative">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <!-- Top label -->
+        <div class="flex items-center gap-2 mb-2">
+          <div style="width:6px;height:6px;background:var(--orange);border-radius:50%;box-shadow:0 0 6px var(--orange)"></div>
+          <span class="font-condensed text-xs uppercase tracking-[0.2em]" style="color:rgba(249,115,22,0.7)">IES Xarc · Temporada 2025–26</span>
+        </div>
+        <!-- Main title -->
+        <div class="flex items-baseline gap-3">
+          <h1 class="font-display leading-none" style="font-size:clamp(48px,8vw,80px);color:#F97316;text-shadow:0 0 60px rgba(249,115,22,0.25);letter-spacing:0.02em">TORNEIG</h1>
+          <span class="font-display text-white/10" style="font-size:clamp(28px,5vw,52px);letter-spacing:0.05em">BÀSQUET</span>
+        </div>
+        <!-- Subtitle -->
+        <p class="font-condensed text-white/25 text-sm mt-1 italic" style="letter-spacing:0.05em">"Si pots imaginar-ho, pots encistellar-ho"</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <template x-if="!isAdmin">
+          <button @click="showAdminLogin=true" class="btn-ghost text-sm">👤 Iniciar sessió</button>
+        </template>
+        <template x-if="isAdmin">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full" style="background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.25)">
+              <div class="live-dot" style="width:6px;height:6px;background:var(--orange);border-radius:50%"></div>
+              <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--orange)" x-text="MEMBERS[currentUser]?.name.split(' ')[0] || currentUser"></span>
+            </div>
+            <button @click="logout()" class="btn-red">Sortir</button>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- LOGIN MODAL -->
+<div x-show="showAdminLogin" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,10,.85);backdrop-filter:blur(8px)">
+  <div class="card p-8 w-full max-w-sm mx-4" style="background:var(--bg-card-2);border-color:var(--border-mid)">
+    <h2 class="font-display text-4xl mb-1" style="color:var(--orange)">ACCÉS</h2>
+    <p class="font-condensed text-sm mb-5" style="color:var(--muted)">Introdueix les teves credencials</p>
+    <div class="space-y-3 mb-2">
+      <div>
+        <label class="font-condensed text-xs uppercase tracking-widest mb-1 block" style="color:var(--muted)">Usuari</label>
+        <input type="text" x-model="loginUser" @keydown.enter="$refs.passInput.focus()" placeholder="Usuari" autocomplete="username" autocapitalize="none"/>
+      </div>
+      <div>
+        <label class="font-condensed text-xs uppercase tracking-widest mb-1 block" style="color:var(--muted)">Contrasenya</label>
+        <input type="password" x-model="loginPass" x-ref="passInput" @keydown.enter="tryLogin()" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+    </div>
+    <p x-show="loginError" class="font-condensed text-sm mb-3" style="color:var(--loss)" x-text="loginError"></p>
+    <div class="flex gap-3 mt-4">
+      <button @click="tryLogin()" class="btn-orange flex-1">Entrar</button>
+      <button @click="showAdminLogin=false; loginError=''" class="btn-ghost">Cancel·lar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN NAV TABS -->
+<nav class="sticky top-0 z-40 scrollbar-hide overflow-x-auto" style="background:rgba(8,18,38,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);">
+  <div class="max-w-5xl mx-auto px-4 flex gap-0">
+    <template x-for="tab in publicTabs" :key="tab.id">
+      <button @click="activeTab=tab.id"
+        :class="activeTab===tab.id ? 'tab-active' : 'tab-inactive'"
+        class="font-condensed uppercase tracking-widest text-sm px-6 py-4 whitespace-nowrap transition-all"
+        style="font-weight:600;font-size:13px;letter-spacing:0.12em">
+        <span x-text="tab.label"></span>
+      </button>
+    </template>
+
+  </div>
+</nav>
+
+<main class="max-w-5xl mx-auto px-4 py-8" style="min-height:60vh">
+
+  <!-- ======================== CLASSIFICACIÓ ======================== -->
+  <div x-show="activeTab==='standings'" class="fade-in">
+    <!-- Section header -->
+    <div class="flex items-center gap-4 mb-6">
+      <div>
+        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(249,115,22,0.6)">Temporada 2025–26</p>
+        <h2 class="font-display text-5xl leading-none" style="color:var(--cream);letter-spacing:0.02em">CLASSIFICACIÓ</h2>
+      </div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(249,115,22,0.3),transparent);margin-left:8px;margin-top:20px"></div>
+    </div>
+
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+      <!-- Table header -->
+      <div class="grid grid-cols-12 px-5 py-3" style="background:linear-gradient(90deg,rgba(249,115,22,0.06),transparent);border-bottom:1px solid var(--border)">
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">#</span>
+        <span class="col-span-5 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PJ</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PG</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PP</span>
+        <span class="col-span-2 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">+/-</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--orange);opacity:0.8">PTS</span>
+      </div>
+      <template x-if="standings.length===0">
+        <div class="px-5 py-12 text-center font-condensed" style="color:#333">Encara no hi ha equips registrats</div>
+      </template>
+      <template x-for="(team, idx) in standings" :key="team.id">
+        <div class="grid grid-cols-12 px-5 py-4 items-center standing-row"
+          :class="idx===0?'standing-first':idx===1?'standing-second':idx===2?'standing-third':''">
+          <div class="col-span-1">
+            <div class="badge-pos" :class="idx===0?'badge-1':idx===1?'badge-2':idx===2?'badge-3':'badge-other'">
+              <span x-text="idx+1"></span>
+            </div>
+          </div>
+          <div class="col-span-5 flex items-center gap-3">
+            <span class="text-2xl" x-text="team.emoji||'🏀'"></span>
+            <div>
+              <span class="font-condensed font-600 text-white uppercase" style="font-size:15px;letter-spacing:0.05em" x-text="team.name"></span>
+              <template x-if="idx===0">
+                <span class="ml-2 font-condensed text-xs px-2 py-0.5 rounded-sm" style="background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.2);letter-spacing:0.08em">LÍDER</span>
+              </template>
+            </div>
+          </div>
+          <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="team.pj||0"></span>
+          <span class="col-span-1 font-body text-sm text-center font-medium" style="color:var(--win)" x-text="team.pg||0"></span>
+          <span class="col-span-1 font-body text-sm text-center" style="color:var(--loss)" x-text="team.pp||0"></span>
+          <span class="col-span-2 font-body text-sm text-center" style="color:var(--muted)" x-text="(team.pf||0)-(team.pc||0)>0?'+'+(team.pf-team.pc):(team.pf||0)-(team.pc||0)"></span>
+          <div class="col-span-1 text-center">
+            <span class="font-score text-2xl" style="color:var(--orange)" x-text="team.pts||0"></span>
+          </div>
+        </div>
+      </template>
+    </div>
+    <p class="font-condensed text-xs mt-3" style="color:var(--faint);letter-spacing:0.06em">PJ · PG · PP · +/- · PTS</p>
+  </div>
+
+  <!-- ======================== PARTITS (RESULTATS + PRÒXIMS) ======================== -->
+  <div x-show="activeTab==='partits'" class="fade-in">
+    <div class="flex items-center gap-4 mb-6">
+      <div>
+        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(249,115,22,0.6)">Temporada 2025–26</p>
+        <h2 class="font-display text-5xl leading-none" style="color:var(--cream);letter-spacing:0.02em">PARTITS</h2>
+      </div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(249,115,22,0.3),transparent);margin-left:8px;margin-top:20px"></div>
+    </div>
+    <template x-if="results.length===0 && upcoming.length===0">
+      <div class="card px-6 py-12 text-center font-condensed text-lg" style="color:#333">Encara no hi ha partits registrats</div>
+    </template>
+    <template x-for="(jornada, ji) in allMatchesByJornada()" :key="ji">
+      <div class="mb-8">
+        <!-- Jornada header NBA-style -->
+        <div class="jornada-header">
+          <span class="font-display text-2xl leading-none" style="color:var(--orange);letter-spacing:0.04em;font-size:1.4rem" x-text="'JORNADA ' + jornada.num"></span>
+          <div style="width:1px;height:20px;background:rgba(255,107,0,0.3)"></div>
+          <span class="font-condensed uppercase tracking-[0.15em] text-sm" style="color:var(--muted)" x-text="jornada.dateLabel"></span>
+        </div>
+        <div class="space-y-2">
+          <!-- Partits jugats -->
+          <template x-for="match in jornada.results" :key="'r-'+match.id">
+            <div>
+              <!-- Vista normal -->
+              <template x-if="editingResult !== match.id">
+                <div class="card-match px-6 py-5 cursor-pointer" @click="openMatchModal(match, 'result')">
+                  <div class="flex items-center gap-4">
+                    <div class="flex-1 flex items-center justify-end gap-3">
+                      <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team1"></span>
+                      <span class="text-xl" x-text="getTeamEmoji(match.team1)"></span>
+                    </div>
+                    <div class="flex items-center gap-0 min-w-[110px] justify-center">
+                      <span class="font-score text-4xl leading-none" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--muted)'" x-text="match.score1"></span>
+                      <span class="font-score text-2xl mx-2" style="color:var(--border-mid)">:</span>
+                      <span class="font-score text-4xl leading-none" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--muted)'" x-text="match.score2"></span>
+                    </div>
+                    <div class="flex-1 flex items-center gap-3">
+                      <span class="text-xl" x-text="getTeamEmoji(match.team2)"></span>
+                      <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team2"></span>
+                    </div>
+                    <!-- Llapis admin -->
+                    <template x-if="isAdmin">
+                      <button @click.stop="startEditResult(match)" class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all" style="color:var(--faint);border:1px solid var(--border)" onmouseover="this.style.color='var(--orange)';this.style.borderColor='var(--orange)'" onmouseout="this.style.color='var(--faint)';this.style.borderColor='var(--border)'">✏</button>
+                    </template>
+                  </div>
+                  <div class="flex justify-center mt-2">
+                    <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint);letter-spacing:0.12em">toca per detalls</span>
+                  </div>
+                </div>
+              </template>
+              <!-- Formulari d'edició inline -->
+              <template x-if="editingResult === match.id">
+                <div class="card p-4 space-y-3" style="border:1px dashed var(--orange)">
+                  <div class="grid grid-cols-2 md:grid-cols-5 gap-2 items-end">
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Local</label>
+                      <select x-model="editResultData.team1">
+                        <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
+                      <input type="number" x-model.number="editResultData.score1" min="0"/>
+                    </div>
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
+                      <input type="number" x-model.number="editResultData.score2" min="0"/>
+                    </div>
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Visitant</label>
+                      <select x-model="editResultData.team2">
+                        <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+                      <input type="date" x-model="editResultData.date"/>
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
+                    <button @click="saveEditResult(match.id)" class="btn-orange text-sm px-4">✓ Guardar</button>
+                    <button @click="editingResult=null" class="btn-ghost text-sm px-3">Cancel·lar</button>
+                    <button @click="deleteResult(match.id)" class="btn-red text-sm px-3 ml-auto">✕ Eliminar</button>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+          <!-- Pròxims partits -->
+          <template x-for="match in jornada.upcoming" :key="'u-'+match.id">
+            <div>
+              <!-- Vista normal -->
+              <template x-if="editingUpcoming !== match.id">
+                <div class="card-upcoming px-6 py-5 flex items-center gap-4 cursor-pointer" @click="openMatchModal(match, 'upcoming')">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:42px">
+                    <span style="font-size:22px">🗓</span>
+                    <span class="font-condensed text-xs uppercase" style="color:var(--orange-dim);letter-spacing:0.1em;font-size:9px">PRÒXIM</span>
+                  </div>
+                  <div class="flex-1">
+                    <div class="font-condensed font-600 uppercase" style="color:var(--cream);font-size:16px;letter-spacing:0.05em">
+                      <span x-text="match.team1"></span>
+                      <span style="color:var(--border-mid);margin:0 8px;font-weight:400">VS</span>
+                      <span x-text="match.team2"></span>
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap mt-1.5">
+                      <span class="font-condensed text-sm" style="color:var(--muted)" x-text="match.date"></span>
+                      <template x-if="match.time">
+                        <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="match.time"></span>
+                      </template>
+                      <template x-if="match.location">
+                        <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--muted)" x-text="match.location"></span>
+                      </template>
+                    </div>
+                  </div>
+                  <!-- Llapis admin -->
+                  <template x-if="isAdmin">
+                    <button @click.stop="startEditUpcoming(match)" class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all" style="color:var(--faint);border:1px solid var(--border)" onmouseover="this.style.color='var(--orange)';this.style.borderColor='var(--orange)'" onmouseout="this.style.color='var(--faint)';this.style.borderColor='var(--border)'">✏</button>
+                  </template>
+                </div>
+              </template>
+              <!-- Formulari d'edició inline -->
+              <template x-if="editingUpcoming === match.id">
+                <div class="card p-4 space-y-3" style="border:1px dashed var(--win)">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip 1</label>
+                      <select x-model="editUpcomingData.team1">
+                        <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip 2</label>
+                      <select x-model="editUpcomingData.team2">
+                        <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+                      <input type="date" x-model="editUpcomingData.date"/>
+                    </div>
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Hora</label>
+                      <input type="time" x-model="editUpcomingData.time"/>
+                    </div>
+                    <div>
+                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Lloc</label>
+                      <input type="text" x-model="editUpcomingData.location" placeholder="Pavelló..."/>
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
+                    <button @click="saveEditUpcoming(match.id)" class="btn-orange text-sm px-4">✓ Guardar</button>
+                    <button @click="editingUpcoming=null" class="btn-ghost text-sm px-3">Cancel·lar</button>
+                    <button @click="removeUpcoming(match.id)" class="btn-red text-sm px-3 ml-auto">✕ Eliminar</button>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <!-- ADMIN: controls de partits -->
+    <template x-if="isAdmin">
+      <div class="mt-8 space-y-4">
+
+        <!-- Registrar resultat -->
+        <div class="card p-6">
+          <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">➕ Registrar Resultat</h3>
+          <template x-if="teams.length < 2">
+            <p class="font-condensed" style="color:var(--muted)">Necessites almenys 2 equips per registrar partits</p>
+          </template>
+          <template x-if="teams.length >= 2">
+            <div class="space-y-3">
+              <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip Local</label>
+                  <select x-model="newResult.team1">
+                    <option value="">Selecciona equip</option>
+                    <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
+                  </select>
+                </div>
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
+                  <input type="number" x-model.number="newResult.score1" min="0" placeholder="0"/>
+                </div>
+                <div class="flex items-end justify-center pb-2">
+                  <span class="font-display text-2xl" style="color:var(--faint)">VS</span>
+                </div>
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
+                  <input type="number" x-model.number="newResult.score2" min="0" placeholder="0"/>
+                </div>
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip Visitant</label>
+                  <select x-model="newResult.team2">
+                    <option value="">Selecciona equip</option>
+                    <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+                  <input type="date" x-model="newResult.date"/>
+                </div>
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Jornada</label>
+                  <select x-model.number="newResult.jornada">
+                    <option value="">Automàtica (per data)</option>
+                    <template x-for="n in 20" :key="n"><option :value="n" x-text="'Jornada ' + n"></option></template>
+                  </select>
+                </div>
+              </div>
+              <button @click="addResult()" class="btn-orange">Registrar Resultat</button>
+              <p x-show="resultMsg" class="font-condensed text-sm" style="color:var(--win)" x-text="resultMsg"></p>
+              <p x-show="resultErr" class="font-condensed text-sm" style="color:var(--loss)" x-text="resultErr"></p>
+            </div>
+          </template>
+        </div>
+
+        <!-- Programar pròxim partit -->
+        <div class="card p-6">
+          <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">🗓 Programar Pròxim Partit</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip 1</label>
+              <select x-model="newUpcoming.team1">
+                <option value="">Selecciona equip</option>
+                <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
+              </select>
+            </div>
+            <div>
+              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip 2</label>
+              <select x-model="newUpcoming.team2">
+                <option value="">Selecciona equip</option>
+                <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
+              </select>
+            </div>
+            <div>
+              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+              <input type="date" x-model="newUpcoming.date"/>
+            </div>
+            <div>
+              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Hora</label>
+              <input type="time" x-model="newUpcoming.time"/>
+            </div>
+            <div>
+              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Jornada</label>
+              <select x-model.number="newUpcoming.jornada">
+                <option value="">Sense jornada</option>
+                <template x-for="n in 20" :key="n"><option :value="n" x-text="'Jornada ' + n"></option></template>
+              </select>
+            </div>
+            <div>
+              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Lloc</label>
+              <input type="text" x-model="newUpcoming.location" placeholder="Pavelló, pista..."/>
+            </div>
+          </div>
+          <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
+        </div>
+
+
+      </div>
+    </template>
+  </div>
+
+  <!-- ======================== EQUIPS ======================== -->
+  <div x-show="activeTab==='teams'" class="fade-in">
+    <div class="flex items-center gap-4 mb-6">
+      <div>
+        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(249,115,22,0.6)">Temporada 2025–26</p>
+        <h2 class="font-display text-5xl leading-none" style="color:var(--cream);letter-spacing:0.02em">EQUIPS</h2>
+      </div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(249,115,22,0.3),transparent);margin-left:8px;margin-top:20px"></div>
+    </div>
+    <template x-if="teams.length===0">
+      <div class="card px-6 py-12 text-center text-white/30 font-condensed text-lg">Encara no hi ha equips registrats</div>
+    </template>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <template x-for="team in teams" :key="team.id">
+        <div class="card p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl" x-text="team.emoji||'🏀'"></span>
+              <h3 class="font-display text-2xl" style="color:var(--orange)" x-text="team.name"></h3>
+            </div>
+          </div>
+          <div class="divider-orange mb-3"></div>
+          <div class="space-y-1">
+            <p class="font-condensed text-xs text-white/40 uppercase tracking-widest mb-2">Jugadors</p>
+            <template x-if="!team.players || team.players.length===0">
+              <p class="font-body text-white/30 text-sm">Sense jugadors registrats</p>
+            </template>
+            <template x-for="(player, pi) in team.players||[]" :key="pi">
+              <div>
+                <!-- Mode visualització -->
+                <template x-if="!editingPlayer || editingPlayer.teamId !== team.id || editingPlayer.playerIdx !== pi">
+                  <div class="flex items-center justify-between py-1 rounded px-2 -mx-2 group" style="transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background=''">
+                    <div class="flex items-center gap-2">
+                      <span class="font-condensed text-sm" style="color:var(--cream)" x-text="player.name"></span>
+                      <span x-show="player.number" class="font-condensed text-xs px-2 py-0 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange);border:1px solid rgba(245,166,35,0.2)" x-text="player.number"></span>
+                    </div>
+                    <template x-if="isAdmin">
+                      <div class="flex items-center gap-2">
+                        <button @click="startEditPlayer(team.id, pi, player)" class="font-condensed text-xs px-2 py-0.5 rounded transition-colors" style="color:var(--muted);border:1px solid var(--border)">&#9998; editar</button>
+                        <button @click="removePlayer(team.id, pi)" class="font-condensed text-xs transition-colors" style="color:var(--faint)">✕</button>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+                <!-- Mode edició inline -->
+                <template x-if="editingPlayer && editingPlayer.teamId === team.id && editingPlayer.playerIdx === pi">
+                  <div class="flex gap-2 items-center flex-wrap py-2 px-3 rounded-lg my-1" style="background:var(--bg-surface);border:1px dashed var(--orange)">
+                    <input type="text" x-model="editPlayerData.name" @keydown.enter="saveEditPlayer()" @keydown.escape="editingPlayer=null" placeholder="Nom" class="text-sm" style="padding:4px 8px;min-width:80px;flex:1"/>
+                    <select x-model="editPlayerData.number" class="text-sm" style="padding:4px 8px;min-width:100px">
+                      <option value="">Classe</option>
+                      <optgroup label="ESO">
+                        <option value="1r ESO A">1r ESO A</option>
+                        <option value="1r ESO B">1r ESO B</option>
+                        <option value="1r ESO C">1r ESO C</option>
+                        <option value="1r ESO D">1r ESO D</option>
+                        <option value="2n ESO A">2n ESO A</option>
+                        <option value="2n ESO B">2n ESO B</option>
+                        <option value="2n ESO C">2n ESO C</option>
+                        <option value="2n ESO D">2n ESO D</option>
+                        <option value="3r ESO A">3r ESO A</option>
+                        <option value="3r ESO B">3r ESO B</option>
+                        <option value="3r ESO C">3r ESO C</option>
+                        <option value="3r ESO D">3r ESO D</option>
+                        <option value="4t ESO A">4t ESO A</option>
+                        <option value="4t ESO B">4t ESO B</option>
+                        <option value="4t ESO C">4t ESO C</option>
+                        <option value="4t ESO D">4t ESO D</option>
+                      </optgroup>
+                      <optgroup label="Batxillerat">
+                        <option value="1r Batx A">1r Batx A</option>
+                        <option value="1r Batx B">1r Batx B</option>
+                        <option value="2n Batx A">2n Batx A</option>
+                        <option value="2n Batx B">2n Batx B</option>
+                      </optgroup>
+                    </select>
+                    <button @click="saveEditPlayer()" class="btn-orange text-xs px-3 py-1">✓ Guardar</button>
+                    <button @click="editingPlayer=null" class="btn-ghost text-xs px-2 py-1">✕</button>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+          <template x-if="isAdmin">
+            <div class="mt-4 pt-3 border-t border-white/5">
+              <div class="flex gap-2 flex-wrap">
+                <input type="text" x-model="newPlayerNames[team.id]" placeholder="Nom jugador" class="text-sm" style="padding:6px 10px;min-width:120px;flex:1"/>
+                <select x-model="newPlayerNums[team.id]" class="text-sm" style="padding:6px 10px;min-width:110px">
+                  <option value="">Classe</option>
+                  <optgroup label="ESO">
+                    <option value="1r ESO A">1r ESO A</option>
+                    <option value="1r ESO B">1r ESO B</option>
+                    <option value="1r ESO C">1r ESO C</option>
+                    <option value="1r ESO D">1r ESO D</option>
+                    <option value="2n ESO A">2n ESO A</option>
+                    <option value="2n ESO B">2n ESO B</option>
+                    <option value="2n ESO C">2n ESO C</option>
+                    <option value="2n ESO D">2n ESO D</option>
+                    <option value="3r ESO A">3r ESO A</option>
+                    <option value="3r ESO B">3r ESO B</option>
+                    <option value="3r ESO C">3r ESO C</option>
+                    <option value="3r ESO D">3r ESO D</option>
+                    <option value="4t ESO A">4t ESO A</option>
+                    <option value="4t ESO B">4t ESO B</option>
+                    <option value="4t ESO C">4t ESO C</option>
+                    <option value="4t ESO D">4t ESO D</option>
+                  </optgroup>
+                  <optgroup label="Batxillerat">
+                    <option value="1r Batx A">1r Batx A</option>
+                    <option value="1r Batx B">1r Batx B</option>
+                    <option value="2n Batx A">2n Batx A</option>
+                    <option value="2n Batx B">2n Batx B</option>
+                  </optgroup>
+                </select>
+                <button @click="addPlayer(team.id)" class="btn-orange text-sm px-3">+</button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+
+    <!-- ADMIN: Afegir equip -->
+    <template x-if="isAdmin">
+      <div class="mt-8 card p-6">
+        <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">➕ Afegir Equip</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <input type="text" x-model="newTeam.name" placeholder="Nom de l'equip"/>
+          <input type="text" x-model="newTeam.emoji" placeholder="Emoji (p.ex. 🔥)"/>
+          <button @click="addTeam()" class="btn-orange">Afegir Equip</button>
+        </div>
+        <template x-if="teams.length > 0">
+          <div class="mt-5">
+            <p class="font-condensed text-xs uppercase tracking-widest mb-3" style="color:var(--muted)">Gestionar equips</p>
+            <div class="space-y-2">
+              <template x-for="team in teams" :key="team.id">
+                <div class="flex items-center gap-2">
+                  <template x-if="editingTeam !== team.id">
+                    <div class="flex items-center gap-2 rounded-lg px-3 py-2 flex-1" style="background:var(--bg-surface)">
+                      <span x-text="team.emoji||'🏀'"></span>
+                      <span class="font-condensed text-sm flex-1" style="color:var(--cream)" x-text="team.name"></span>
+                      <button @click="startEditTeam(team)" class="font-condensed text-xs px-2 py-0.5 rounded transition-colors" style="color:var(--muted);border:1px solid var(--border)">✏ editar</button>
+                      <button @click="removeTeam(team.id)" class="font-condensed text-xs transition-colors ml-1" style="color:var(--faint)">✕</button>
+                    </div>
+                  </template>
+                  <template x-if="editingTeam === team.id">
+                    <div class="flex items-center gap-2 flex-1">
+                      <input type="text" x-model="editTeamEmoji" placeholder="🏀" style="width:60px;padding:6px 8px;text-align:center"/>
+                      <input type="text" x-model="editTeamName" placeholder="Nom de l'equip" style="padding:6px 10px"/>
+                      <button @click="saveEditTeam(team.id)" class="btn-orange text-sm px-3">✓</button>
+                      <button @click="editingTeam=null" class="btn-ghost text-sm px-3">✕</button>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+        </template>
+        <!-- Zona de perill -->
+        <div class="mt-6 pt-4" style="border-top:1px solid rgba(239,68,68,0.15)">
+          <button @click="resetAll()" class="btn-red">⚠ Esborrar totes les dades</button>
+          <p class="font-body text-xs mt-2" style="color:var(--faint)">Això eliminarà tots els equips, resultats i classificació.</p>
+        </div>
+      </div>
+    </template>
+  </div>
+
+
+
+  <!-- ======================== PESTANYA PROPIETARI (RAYAN) ======================== -->
+  <div x-show="activeTab==='owner' && isOwner" class="fade-in">
+    <div class="flex items-center gap-4 mb-6">
+      <div>
+        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(245,166,35,0.7)">Accés exclusiu</p>
+        <h2 class="font-display text-5xl leading-none" style="color:var(--cream)">TAULER 👑</h2>
+      </div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(245,166,35,0.4),transparent);margin-left:8px;margin-top:20px"></div>
+    </div>
+
+    <!-- Estadístiques d'activitat per membre -->
+    <div class="card p-6 mb-6">
+      <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">📊 Activitat per membre</h3>
+      <template x-if="activityLog.length === 0">
+        <p class="font-condensed" style="color:var(--faint)">Encara no hi ha activitat registrada</p>
+      </template>
+      <div class="space-y-3">
+        <template x-for="memberKey in Object.keys(MEMBERS)" :key="memberKey">
+          <div x-data="{ count: activityLog.filter(a => a.user === MEMBERS[memberKey]?.name).length, last: activityLog.find(a => a.user === MEMBERS[memberKey]?.name) }">
+            <div class="flex items-center gap-3">
+              <span class="font-condensed text-sm flex-1" style="color:var(--cream)" x-text="memberKey === OWNER ? '👑 ' + MEMBERS[memberKey].name : MEMBERS[memberKey].name"></span>
+              <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange);border:1px solid rgba(245,166,35,0.2)" x-text="count + ' accions'"></span>
+            </div>
+            <div class="mt-1 rounded-full overflow-hidden" style="height:4px;background:var(--bg-surface)">
+              <div class="h-full rounded-full transition-all" style="background:var(--orange)"
+                :style="'width:' + (activityLog.length ? Math.min(100, Math.round(count/activityLog.length*100)) : 0) + '%'"></div>
+            </div>
+            <p x-show="last" class="font-condensed text-xs mt-0.5" style="color:var(--faint)" x-text="last ? 'Última: ' + last.action + ' · ' + last.date : ''"></p>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Historial complet -->
+    <div class="card p-6">
+      <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">📋 Historial de canvis</h3>
+      <template x-if="activityLog.length === 0">
+        <p class="font-condensed" style="color:var(--faint)">Encara no hi ha canvis registrats</p>
+      </template>
+      <div class="space-y-2">
+        <template x-for="entry in activityLog.slice(0,50)" :key="entry.id">
+          <div class="flex items-start gap-3 px-4 py-3 rounded-lg" style="background:var(--bg-surface)">
+            <div style="min-width:8px;height:8px;border-radius:50%;background:var(--orange);margin-top:5px;flex-shrink:0"></div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="entry.user.split(' ')[0]"></span>
+                <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:var(--bg-card-2);color:var(--muted)" x-text="entry.action"></span>
+              </div>
+              <p class="font-body text-sm mt-0.5" style="color:var(--cream)" x-text="entry.detail"></p>
+              <p class="font-condensed text-xs mt-0.5" style="color:var(--faint)" x-text="entry.date"></p>
+            </div>
+          </div>
+        </template>
+      </div>
+      <template x-if="activityLog.length > 50">
+        <p class="font-condensed text-xs mt-3 text-center" style="color:var(--faint)" x-text="'Mostrant els últims 50 de ' + activityLog.length + ' canvis'"></p>
+      </template>
+    </div>
+  </div>
+
+<!-- MATCH DETAIL MODAL -->
+<div x-show="matchModal" x-transition class="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto" style="background:rgba(0,0,0,.88)" @click.self="matchModal=false">
+  <div class="card w-full max-w-2xl mx-auto overflow-hidden my-4" x-show="matchModal" x-transition>
+
+    <!-- Header -->
+    <div class="px-6 pt-5 pb-5 border-b border-white/5" style="background:linear-gradient(135deg,#111 60%,#1a0a00)">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <span class="font-condensed text-xs text-white/40 uppercase tracking-widest" x-text="modalMatch.date"></span>
+          <template x-if="modalMatch.jornada">
+            <span class="font-condensed text-xs px-2 py-1 rounded" style="background:rgba(249,115,22,0.1);color:var(--orange)">Jornada <span x-text="modalMatch.jornada"></span></span>
+          </template>
+        </div>
+        <button @click="matchModal=false" class="text-white/30 hover:text-white transition-colors text-xl leading-none">✕</button>
+      </div>
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex-1 text-right">
+          <div class="font-display text-2xl md:text-4xl leading-none" :style="modalMatch.type==='result' && Number(modalMatch.score1)>Number(modalMatch.score2) ? 'color:var(--orange)' : 'color:#fff'" x-text="modalMatch.team1"></div>
+          <div class="text-2xl mt-1" x-text="getTeamEmoji(modalMatch.team1)"></div>
+        </div>
+        <div class="text-center px-2">
+          <template x-if="modalMatch.type==='result'">
+            <div class="font-display text-4xl md:text-5xl tracking-wider" style="color:var(--orange)">
+              <span x-text="modalMatch.score1"></span>
+              <span class="text-white/20 mx-1 text-3xl">-</span>
+              <span x-text="modalMatch.score2"></span>
+            </div>
+          </template>
+          <template x-if="modalMatch.type==='upcoming'">
+            <div>
+              <div class="font-display text-3xl text-white/30">VS</div>
+              <template x-if="modalMatch.time">
+                <div class="font-condensed text-orange-400 text-sm mt-1" x-text="modalMatch.time"></div>
+              </template>
+              <template x-if="modalMatch.location">
+                <div class="font-condensed text-white/40 text-xs mt-1" x-text="modalMatch.location"></div>
+              </template>
+            </div>
+          </template>
+        </div>
+        <div class="flex-1 text-left">
+          <div class="font-display text-2xl md:text-4xl leading-none" :style="modalMatch.type==='result' && Number(modalMatch.score2)>Number(modalMatch.score1) ? 'color:var(--orange)' : 'color:#fff'" x-text="modalMatch.team2"></div>
+          <div class="text-2xl mt-1" x-text="getTeamEmoji(modalMatch.team2)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS SECTION -->
+    <template x-if="getMatchStats(modalMatch).hasEnoughData">
+      <div class="px-6 py-5 border-b border-white/5">
+        <p class="font-condensed text-xs text-white/40 uppercase tracking-widest mb-4">Estadístiques comparades</p>
+        <div x-data="{ stats: getMatchStats(modalMatch) }">
+
+          <!-- Win % bar -->
+          <div class="mb-4">
+            <div class="flex justify-between mb-1">
+              <span class="font-condensed text-sm text-white/70" x-text="stats.t1.name"></span>
+              <span class="font-condensed text-xs text-white/30 uppercase tracking-widest">% Victòries</span>
+              <span class="font-condensed text-sm text-white/70" x-text="stats.t2.name"></span>
+            </div>
+            <div class="flex rounded-full overflow-hidden h-6">
+              <div class="flex items-center justify-center font-display text-sm transition-all" :style="'width:'+stats.t1.winPct+'%;background:var(--orange)'" x-text="stats.t1.winPct+'%'"></div>
+              <div class="flex items-center justify-center font-display text-sm transition-all" :style="'width:'+stats.t2.winPct+'%;background:#333'" x-text="stats.t2.winPct+'%'"></div>
+            </div>
+          </div>
+
+          <!-- Avg points bar -->
+          <div class="mb-4">
+            <div class="flex justify-between mb-1">
+              <span class="font-condensed text-sm" :style="stats.t1.avgPts >= stats.t2.avgPts ? 'color:var(--orange)' : 'color:#aaa'" x-text="stats.t1.avgPts + ' pts'"></span>
+              <span class="font-condensed text-xs text-white/30 uppercase tracking-widest">Punts per partit</span>
+              <span class="font-condensed text-sm" :style="stats.t2.avgPts >= stats.t1.avgPts ? 'color:var(--orange)' : 'color:#aaa'" x-text="stats.t2.avgPts + ' pts'"></span>
+            </div>
+            <div class="flex rounded-full overflow-hidden h-5">
+              <template x-if="stats.t1.avgPts + stats.t2.avgPts > 0">
+                <div class="flex items-center justify-center font-condensed text-xs transition-all" :style="'width:'+(stats.t1.avgPts/(stats.t1.avgPts+stats.t2.avgPts)*100).toFixed(0)+'%;background:var(--orange)'"></div>
+              </template>
+              <template x-if="stats.t1.avgPts + stats.t2.avgPts > 0">
+                <div class="flex items-center justify-center font-condensed text-xs transition-all" :style="'width:'+(stats.t2.avgPts/(stats.t1.avgPts+stats.t2.avgPts)*100).toFixed(0)+'%;background:#333'"></div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Win probability (only upcoming) -->
+          <template x-if="modalMatch.type==='upcoming' && stats.hasProb">
+            <div class="mt-5 p-4 rounded-lg" style="background:rgba(6,214,160,0.05);border:1px solid rgba(6,214,160,0.2)">
+              <p class="font-condensed text-xs" style="color:rgba(74,222,128,0.6)" x-ignore=" uppercase tracking-widest mb-3">Probabilitat de victòria</p>
+              <div class="flex rounded-full overflow-hidden h-8 mb-2">
+                <div class="flex items-center justify-center font-display text-sm transition-all" :style="'width:'+stats.prob1+'%;background:var(--orange)'" x-text="stats.prob1+'%'"></div>
+                <div class="flex items-center justify-center font-display text-sm transition-all" :style="'width:'+stats.prob2+'%;background:#1e3a1e;color:#4ade80'" x-text="stats.prob2+'%'"></div>
+              </div>
+              <div class="flex justify-between">
+                <span class="font-condensed text-xs text-white/50" x-text="stats.t1.name"></span>
+                <span class="font-condensed text-xs text-white/30">Basat en resultats anteriors</span>
+                <span class="font-condensed text-xs text-white/50" x-text="stats.t2.name"></span>
+              </div>
+            </div>
+          </template>
+
+          <!-- Mini stats grid -->
+          <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-3 text-center gap-1">
+              <div class="p-2 rounded" style="background:var(--bg-surface)">
+                <div class="font-display text-xl" style="color:var(--win)" x-text="stats.t1.pg"></div>
+                <div class="font-condensed text-xs text-white/30">PG</div>
+              </div>
+              <div class="p-2 rounded" style="background:var(--bg-surface)">
+                <div class="font-display text-xl text-white/60" x-text="stats.t1.pj"></div>
+                <div class="font-condensed text-xs text-white/30">PJ</div>
+              </div>
+              <div class="p-2 rounded" style="background:var(--bg-surface)">
+                <div class="font-display text-xl" style="color:var(--loss)" x-text="stats.t1.pp"></div>
+                <div class="font-condensed text-xs text-white/30">PP</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 text-center gap-1">
+              <div class="p-2 rounded" style="background:var(--bg-surface)">
+                <div class="font-display text-xl" style="color:var(--win)" x-text="stats.t2.pg"></div>
+                <div class="font-condensed text-xs text-white/30">PG</div>
+              </div>
+              <div class="p-2 rounded" style="background:var(--bg-surface)">
+                <div class="font-display text-xl text-white/60" x-text="stats.t2.pj"></div>
+                <div class="font-condensed text-xs text-white/30">PJ</div>
+              </div>
+              <div class="p-2 rounded" style="background:var(--bg-surface)">
+                <div class="font-display text-xl" style="color:var(--loss)" x-text="stats.t2.pp"></div>
+                <div class="font-condensed text-xs text-white/30">PP</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Head to head -->
+          <template x-if="stats.h2h.length > 0">
+            <div class="mt-4">
+              <p class="font-condensed text-xs text-white/30 uppercase tracking-widest mb-2">Enfrontaments directes</p>
+              <template x-for="(h, i) in stats.h2h" :key="i">
+                <div class="flex items-center justify-between text-sm py-1 border-b border-white/5">
+                  <span class="font-condensed" :style="Number(h.score1)>Number(h.score2)?'color:var(--orange)':'color:#aaa'" x-text="h.team1"></span>
+                  <span class="font-display text-base mx-3" style="color:var(--orange)" x-text="h.score1 + ' - ' + h.score2"></span>
+                  <span class="font-condensed" :style="Number(h.score2)>Number(h.score1)?'color:var(--orange)':'color:#aaa'" x-text="h.team2"></span>
+                  <span class="font-body text-white/20 text-xs ml-2" x-text="h.date"></span>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+    </template>
+    <template x-if="!getMatchStats(modalMatch).hasEnoughData && modalMatch.type==='upcoming'">
+      <div class="px-6 py-4 border-b border-white/5">
+        <p class="font-condensed text-xs text-white/20 uppercase tracking-widest">Les estadístiques i probabilitats apareixeran a partir del 3r partit de cada equip</p>
+      </div>
+    </template>
+
+    <!-- Players -->
+    <div class="grid grid-cols-2 gap-0 divide-x divide-white/5">
+      <div class="p-5">
+        <p class="font-condensed text-xs text-white/40 uppercase tracking-widest mb-3" x-text="modalMatch.team1"></p>
+        <template x-if="getTeamPlayers(modalMatch.team1).length === 0">
+          <p class="font-body text-white/20 text-sm">Sense jugadors</p>
+        </template>
+        <template x-for="(p, i) in getTeamPlayers(modalMatch.team1)" :key="i">
+          <div class="flex items-center justify-between py-1 border-b border-white/5">
+            <span class="font-condensed text-white text-sm" x-text="p.name"></span>
+            <span class="font-condensed text-xs px-2 rounded" style="background:rgba(249,115,22,0.1);color:var(--orange);font-size:10px" x-text="p.number||''"></span>
+          </div>
+        </template>
+      </div>
+      <div class="p-5">
+        <p class="font-condensed text-xs text-white/40 uppercase tracking-widest mb-3" x-text="modalMatch.team2"></p>
+        <template x-if="getTeamPlayers(modalMatch.team2).length === 0">
+          <p class="font-body text-white/20 text-sm">Sense jugadors</p>
+        </template>
+        <template x-for="(p, i) in getTeamPlayers(modalMatch.team2)" :key="i">
+          <div class="flex items-center justify-between py-1 border-b border-white/5">
+            <span class="font-condensed text-white text-sm" x-text="p.name"></span>
+            <span class="font-condensed text-xs px-2 rounded" style="background:rgba(249,115,22,0.1);color:var(--orange);font-size:10px" x-text="p.number||''"></span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="mt-16 py-8" style="border-top:1px solid #141414">
+  <div class="max-w-5xl mx-auto px-4 flex items-center justify-between flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <div style="width:4px;height:4px;background:var(--orange);border-radius:50%;opacity:0.4"></div>
+      <p class="font-condensed text-xs uppercase tracking-[0.15em]" style="color:var(--faint)">Torneig Bàsquet IES Xarc · 2025–26</p>
+    </div>
+    <p class="font-condensed italic text-xs" style="color:var(--faint)">"Si pots imaginar-ho, pots encistellar-ho"</p>
+  </div>
+</footer>
+
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue, remove, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAfWt3oh1EqLjsOiiqVRjTY2WN6GHOvB_w",
+    authDomain: "torneig-iesxarc.firebaseapp.com",
+    databaseURL: "https://torneig-iesxarc-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "torneig-iesxarc",
+    storageBucket: "torneig-iesxarc.firebasestorage.app",
+    messagingSenderId: "464612692781",
+    appId: "1:464612692781:web:61288b8e100af55a54b9a4"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const db = getDatabase(firebaseApp);
+  window._db = db;
+  window._ref = ref;
+  window._set = set;
+  window._onValue = onValue;
+  window._remove = remove;
+  window._push = push;
+  window.dispatchEvent(new Event('firebaseReady'));
+</script>
+
+<script>
+function app() {
+  return {
+    activeTab: 'standings',
+    isAdmin: false,
+    isOwner: false,
+    showAdminLogin: false,
+    currentUser: null,
+    loading: true,
+    ADMIN_PASSWORD: '',
+    activityLog: [],
+
+    MEMBERS: {
+      'rayan':    { name: 'Rayan El Qoraychy El Meskini',  pass: 'kxbp4729' },
+      'didac':    { name: 'Didac Fernández Ruiz',           pass: 'mwqz8315' },
+      'pere':     { name: 'Pere Nolasc Luis Roselló',       pass: 'jtfn6204' },
+      'thibault': { name: 'Thibault Ferrari Catalá',        pass: 'rvsh9471' },
+      'joel':     { name: 'Joel Rohra Kelani',              pass: 'czgm5083' },
+      'sergio':   { name: 'Sergio Ferrer Chaler',           pass: 'bnkp7152' },
+      'raul':     { name: 'Raúl Castillo Benito',           pass: 'xqtf3896' },
+      'lluc':     { name: 'Lluc Cardona Marí',              pass: 'dwmj6540' },
+      'carlos':   { name: 'Carlos Planells Planells',       pass: 'phvz2618' },
+    },
+    OWNER: 'rayan',
+    loginUser: '',
+    loginPass: '',
+    loginError: '',
+
+    teams: [],
+    results: [],
+    upcoming: [],
+    standings: [],
+
+    newTeam: { name:'', emoji:'' },
+    newResult: { team1:'', team2:'', score1:0, score2:0, date: new Date().toISOString().slice(0,10), jornada:'' },
+    newUpcoming: { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'' },
+    newPlayerNames: {},
+    newPlayerNums: {},
+    editingPlayer: null, // { teamId, playerIdx }
+    editPlayerData: { name: '', number: '' },
+    resultMsg: '',
+    resultErr: '',
+
+    publicTabs: [
+      { id:'standings', label:'Classificació' },
+      { id:'partits', label:'Partits' },
+      { id:'teams', label:'Equips' },
+    ],
+
+    init() {
+      const setup = () => {
+        const { _db: db, _ref: ref, _onValue: onValue } = window;
+        // Load password from Firebase
+        onValue(ref(db, 'adminPassword'), (snap) => {
+          if (snap.val()) this.ADMIN_PASSWORD = snap.val();
+        });
+        onValue(ref(db, 'teams'), (snap) => {
+          const val = snap.val();
+          this.teams = val ? Object.entries(val).map(([id, t]) => ({ ...t, id })) : [];
+          this.recalcStandings();
+          this.loading = false;
+        });
+        onValue(ref(db, 'results'), (snap) => {
+          const val = snap.val();
+          this.results = val ? Object.entries(val).map(([id, r]) => ({ ...r, id })) : [];
+          this.recalcStandings();
+        });
+        onValue(ref(db, 'upcoming'), (snap) => {
+          const val = snap.val();
+          this.upcoming = val ? Object.entries(val).map(([id, u]) => ({ ...u, id })) : [];
+        });
+        onValue(ref(db, 'activityLog'), (snap) => {
+          const val = snap.val();
+          this.activityLog = val ? Object.entries(val).map(([id, a]) => ({ ...a, id })).sort((a,b) => b.ts - a.ts) : [];
+        });
+      };
+      if (window._db) { setup(); }
+      else { window.addEventListener('firebaseReady', setup, { once: true }); }
+    },
+
+    tryLogin() {
+      const user = this.loginUser.trim().toLowerCase();
+      const pass = this.loginPass.trim();
+      const member = this.MEMBERS[user];
+      if (!member) { this.loginError = 'Usuari no trobat'; return; }
+      if (member.pass !== pass) { this.loginError = 'Contrasenya incorrecta'; return; }
+      this.currentUser = user;
+      this.isAdmin = true;
+      this.isOwner = (user === this.OWNER);
+      this.showAdminLogin = false;
+      this.loginUser = '';
+      this.loginPass = '';
+      this.loginError = '';
+      if (this.isOwner && !this.publicTabs.find(t => t.id === 'owner')) {
+        this.publicTabs.push({ id: 'owner', label: '👑 Rayan' });
+      }
+    },
+    logout() {
+      this.currentUser = null;
+      this.isAdmin = false;
+      this.isOwner = false;
+      this.loginUser = '';
+      this.loginPass = '';
+      this.loginError = '';
+      this.publicTabs = this.publicTabs.filter(t => t.id !== 'owner');
+    },
+    logActivity(action, detail) {
+      if (!this.currentUser) return;
+      const displayName = this.MEMBERS[this.currentUser]?.name || this.currentUser;
+      const entry = { user: displayName, action, detail, ts: Date.now(), date: new Date().toLocaleString('ca-ES') };
+      window._push(window._ref(window._db, 'activityLog'), entry);
+    },
+
+    syncing: false,
+    syncMsg: '',
+    syncOk: false,
+    SHEETS_URL: 'https://script.google.com/macros/s/AKfycbz-5OJCvtXcZkNjlTxyLrro4XVI43sg6UgiJ0DBhCX8MtMaE9aZGwpPak8YrAfdeaEU/exec',
+
+    async syncSheets() {
+      this.syncing = true;
+      this.syncMsg = '';
+      try {
+        const payload = {
+          standings: this.standings,
+          results: this.results
+        };
+        await fetch(this.SHEETS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        this.syncOk = true;
+        this.syncMsg = '✓ Sincronitzat correctament amb Google Sheets!';
+      } catch(e) {
+        this.syncOk = false;
+        this.syncMsg = '✕ Error en sincronitzar. Comprova la connexió.';
+      }
+      this.syncing = false;
+      setTimeout(() => this.syncMsg = '', 5000);
+    },
+
+    editingTeam: null,
+    editTeamName: '',
+    editTeamEmoji: '',
+
+    startEditTeam(team) {
+      this.editingTeam = team.id;
+      this.editTeamName = team.name;
+      this.editTeamEmoji = team.emoji || '🏀';
+    },
+    saveEditTeam(teamId) {
+      const name = this.editTeamName.trim();
+      if (!name) return;
+      const oldName = this.teams.find(t => t.id === teamId)?.name;
+      // Update team in Firebase
+      window._set(window._ref(window._db, `teams/${teamId}/name`), name);
+      window._set(window._ref(window._db, `teams/${teamId}/emoji`), this.editTeamEmoji || '🏀');
+      // Update results that reference old name
+      if (oldName && oldName !== name) {
+        this.results.forEach(r => {
+          if (r.team1 === oldName) window._set(window._ref(window._db, `results/${r.id}/team1`), name);
+          if (r.team2 === oldName) window._set(window._ref(window._db, `results/${r.id}/team2`), name);
+        });
+        this.upcoming.forEach(u => {
+          if (u.team1 === oldName) window._set(window._ref(window._db, `upcoming/${u.id}/team1`), name);
+          if (u.team2 === oldName) window._set(window._ref(window._db, `upcoming/${u.id}/team2`), name);
+        });
+      }
+      this.editingTeam = null;
+    },
+
+    addTeam() {
+      const name = this.newTeam.name.trim();
+      if (!name) return;
+      if (this.teams.find(t => t.name.toLowerCase() === name.toLowerCase())) return;
+      window._push(window._ref(window._db, 'teams'), { name, emoji: this.newTeam.emoji||'🏀', players:[] });
+      this.newTeam = { name:'', emoji:'' };
+    },
+    removeTeam(id) {
+      if (!confirm('Eliminar aquest equip?')) return;
+      const teamName = this.teams.find(t => t.id === id)?.name;
+      window._remove(window._ref(window._db, `teams/${id}`));
+      if (teamName) {
+        this.results.filter(r => r.team1 === teamName || r.team2 === teamName)
+          .forEach(r => window._remove(window._ref(window._db, `results/${r.id}`)));
+      }
+    },
+
+    addPlayer(teamId) {
+      const name = (this.newPlayerNames[teamId]||'').trim();
+      if (!name) return;
+      const team = this.teams.find(t => t.id === teamId);
+      if (!team) return;
+      const players = [...(team.players||[]), { name, number: (this.newPlayerNums[teamId]||'').trim() }];
+      const tname = this.teams.find(t=>t.id===teamId)?.name||teamId;
+      window._set(window._ref(window._db, `teams/${teamId}/players`), players);
+      this.logActivity('Jugador afegit', `${name} → ${tname}`);
+      this.newPlayerNames[teamId] = '';
+      this.newPlayerNums[teamId] = '';
+    },
+    removePlayer(teamId, playerIdx) {
+      const team = this.teams.find(t => t.id === teamId);
+      if (!team) return;
+      const players = [...(team.players||[])];
+      players.splice(playerIdx, 1);
+      window._set(window._ref(window._db, `teams/${teamId}/players`), players.length ? players : null);
+    },
+    startEditPlayer(teamId, playerIdx, player) {
+      this.editingPlayer = { teamId, playerIdx };
+      this.editPlayerData = { name: player.name, number: player.number || '' };
+    },
+    saveEditPlayer() {
+      if (!this.editingPlayer) return;
+      const { teamId, playerIdx } = this.editingPlayer;
+      const name = this.editPlayerData.name.trim();
+      if (!name) return;
+      const team = this.teams.find(t => t.id === teamId);
+      if (!team) return;
+      const players = [...(team.players||[])];
+      players[playerIdx] = { name, number: this.editPlayerData.number };
+      window._set(window._ref(window._db, `teams/${teamId}/players`), players);
+      this.editingPlayer = null;
+    },
+
+    addResult() {
+      this.resultMsg = ''; this.resultErr = '';
+      const { team1, team2, score1, score2, date } = this.newResult;
+      if (!team1 || !team2) { this.resultErr = 'Selecciona els dos equips'; return; }
+      if (team1 === team2) { this.resultErr = "L'equip no pot jugar contra ell mateix"; return; }
+      
+      const jornada = this.newResult.jornada || null;
+      window._push(window._ref(window._db, 'results'), { team1, team2, score1: Number(score1), score2: Number(score2), date, ...(jornada ? {jornada} : {}) });
+      this.logActivity('Resultat afegit', `${team1} ${score1}-${score2} ${team2} (${date})`);
+      this.resultMsg = '✓ Resultat registrat i classificació actualitzada!';
+      this.newResult = { team1:'', team2:'', score1:0, score2:0, date: new Date().toISOString().slice(0,10), jornada:'' };
+      setTimeout(() => this.resultMsg = '', 4000);
+    },
+
+    recalcStandings() {
+      const stats = {};
+      this.teams.forEach(t => { stats[t.name] = { ...t, pj:0, pg:0, pp:0, pf:0, pc:0, pts:0 }; });
+      this.results.forEach(r => {
+        if (!stats[r.team1] || !stats[r.team2]) return;
+        const s1 = Number(r.score1), s2 = Number(r.score2);
+        stats[r.team1].pj++; stats[r.team2].pj++;
+        stats[r.team1].pf += s1; stats[r.team1].pc += s2;
+        stats[r.team2].pf += s2; stats[r.team2].pc += s1;
+        if (s1 > s2) { stats[r.team1].pg++; stats[r.team1].pts+=3; stats[r.team2].pp++; stats[r.team2].pts+=0; }
+        else if (s2 > s1) { stats[r.team2].pg++; stats[r.team2].pts+=3; stats[r.team1].pp++; stats[r.team1].pts+=0; }
+        else { stats[r.team1].pts+=1; stats[r.team2].pts+=1; }
+      });
+      this.standings = Object.values(stats).sort((a,b) => b.pts !== a.pts ? b.pts-a.pts : (b.pf-b.pc)-(a.pf-a.pc));
+    },
+
+    matchModal: false,
+    modalMatch: {},
+
+    openMatchModal(match, type) {
+      // Find jornada number for this match
+      let jornadaNum = null;
+      if (type === 'result') {
+        const sorted = [...this.results].sort((a,b) => a.date > b.date ? 1 : -1);
+        let num = 0, lastDate = null;
+        sorted.forEach(r => {
+          if (r.date !== lastDate) { num++; lastDate = r.date; }
+          if (r.id === match.id) jornadaNum = num;
+        });
+      }
+      this.modalMatch = { ...match, type, jornada: jornadaNum };
+      this.matchModal = true;
+    },
+    getTeamPlayers(teamName) {
+      const team = this.teams.find(t => t.name === teamName);
+      return team?.players || [];
+    },
+    getTeamEmoji(teamName) {
+      const team = this.teams.find(t => t.name === teamName);
+      return team?.emoji || '🏀';
+    },
+
+    editingResult: null,
+    editResultData: {},
+    editingUpcoming: null,
+    editUpcomingData: {},
+
+    startEditResult(r) {
+      this.editingResult = r.id;
+      this.editResultData = { team1: r.team1, team2: r.team2, score1: r.score1, score2: r.score2, date: r.date };
+    },
+    saveEditResult(id) {
+      const { team1, team2, score1, score2, date } = this.editResultData;
+      if (!team1 || !team2 || team1 === team2) return;
+      window._set(window._ref(window._db, `results/${id}`), { team1, team2, score1: Number(score1), score2: Number(score2), date });
+      this.logActivity('Resultat editat', `${team1} ${score1}-${score2} ${team2}`);
+      this.editingResult = null;
+    },
+    deleteResult(id) {
+      if (!confirm('Eliminar aquest resultat?')) return;
+      window._remove(window._ref(window._db, `results/${id}`));
+    },
+
+    startEditUpcoming(u) {
+      this.editingUpcoming = u.id;
+      this.editUpcomingData = { team1: u.team1, team2: u.team2, date: u.date, time: u.time||'', location: u.location||'' };
+    },
+    saveEditUpcoming(id) {
+      const { team1, team2, date, time, location } = this.editUpcomingData;
+      if (!team1 || !team2 || !date || team1 === team2) return;
+      window._set(window._ref(window._db, `upcoming/${id}`), { team1, team2, date, time, location });
+      this.editingUpcoming = null;
+    },
+
+    addUpcoming() {
+      const { team1, team2, date, time, location } = this.newUpcoming;
+      if (!team1 || !team2 || !date || team1 === team2) return;
+      const upcomingJornada = this.newUpcoming.jornada || null;
+      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location, ...(upcomingJornada ? {jornada: upcomingJornada} : {}) });
+      this.logActivity('Partit programat', `${team1} vs ${team2} (${date} ${time})`);
+      this.newUpcoming = { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'' };
+    },
+    removeUpcoming(id) {
+      this.logActivity('Partit eliminat', `ID: ${id}`);
+      window._remove(window._ref(window._db, `upcoming/${id}`));
+    },
+
+    resultsByJornada() {
+      const sorted = [...this.results].sort((a,b) => {
+        // Sort by explicit jornada first, then by date
+        const ja = a.jornada || 999, jb = b.jornada || 999;
+        if (ja !== jb) return ja - jb;
+        return a.date > b.date ? 1 : -1;
+      });
+      const jornadaMap = {};
+      sorted.forEach(r => {
+        // Use explicit jornada if set, else group by date
+        let key = r.jornada ? 'J' + r.jornada : 'D' + r.date;
+        if (!jornadaMap[key]) {
+          jornadaMap[key] = {
+            num: r.jornada || null,
+            dateLabel: r.date,
+            key,
+            matches: []
+          };
+        }
+        jornadaMap[key].matches.push(r);
+      });
+      // Assign auto numbers to date-grouped jornadas
+      let autoNum = 0;
+      const usedNums = Object.values(jornadaMap).filter(j => j.num).map(j => j.num);
+      const maxUsed = usedNums.length ? Math.max(...usedNums) : 0;
+      Object.values(jornadaMap).forEach(j => {
+        if (!j.num) { autoNum++; j.num = maxUsed + autoNum; }
+      });
+      return Object.values(jornadaMap).sort((a,b) => b.num - a.num);
+    },
+
+    allMatchesByJornada() {
+      // Combine results and upcoming into jornada groups, sorted by date/jornada
+      const jornadaMap = {};
+
+      const getOrCreate = (key, num, dateLabel) => {
+        if (!jornadaMap[key]) jornadaMap[key] = { num, dateLabel, key, results: [], upcoming: [] };
+        return jornadaMap[key];
+      };
+
+      // Add results
+      const sortedResults = [...this.results].sort((a,b) => {
+        const ja = a.jornada || 999, jb = b.jornada || 999;
+        if (ja !== jb) return ja - jb;
+        return a.date > b.date ? 1 : -1;
+      });
+      // First pass: assign jornada numbers to date-grouped results
+      let autoNum = 0;
+      const usedNums = sortedResults.filter(r => r.jornada).map(r => r.jornada);
+      const maxUsed = usedNums.length ? Math.max(...usedNums) : 0;
+      const dateToJornada = {};
+      sortedResults.forEach(r => {
+        if (r.jornada) {
+          const key = 'J' + r.jornada;
+          getOrCreate(key, r.jornada, r.date).results.push(r);
+        } else {
+          if (!dateToJornada[r.date]) { autoNum++; dateToJornada[r.date] = maxUsed + autoNum; }
+          const key = 'D' + r.date;
+          getOrCreate(key, dateToJornada[r.date], r.date).results.push(r);
+        }
+      });
+
+      // Add upcoming
+      this.upcoming.forEach(u => {
+        const jNum = u.jornada || null;
+        if (jNum) {
+          const key = 'J' + jNum;
+          getOrCreate(key, jNum, u.date).upcoming.push(u);
+        } else {
+          // Group by date, reuse existing date jornada if exists
+          const key = 'D' + u.date;
+          if (!jornadaMap[key]) { autoNum++; getOrCreate(key, maxUsed + autoNum, u.date); }
+          jornadaMap[key].upcoming.push(u);
+        }
+      });
+
+      return Object.values(jornadaMap).sort((a,b) => {
+        // Sort by dateLabel descending (most recent first)
+        if (b.dateLabel > a.dateLabel) return 1;
+        if (b.dateLabel < a.dateLabel) return -1;
+        return b.num - a.num;
+      });
+    },
+
+    getMatchStats(match) {
+      const t1name = match.team1;
+      const t2name = match.team2;
+      if (!t1name || !t2name) return { hasEnoughData: false };
+
+      const getStats = (name) => {
+        const played = this.results.filter(r => r.team1 === name || r.team2 === name);
+        const pg = played.filter(r => (r.team1===name && Number(r.score1)>Number(r.score2)) || (r.team2===name && Number(r.score2)>Number(r.score1))).length;
+        const pp = played.filter(r => (r.team1===name && Number(r.score1)<Number(r.score2)) || (r.team2===name && Number(r.score2)<Number(r.score1))).length;
+        const pj = played.length;
+        const totalPts = played.reduce((acc, r) => acc + (r.team1===name ? Number(r.score1) : Number(r.score2)), 0);
+        const avgPts = pj > 0 ? Math.round(totalPts / pj) : 0;
+        const winPct = pj > 0 ? Math.round((pg/pj)*100) : 0;
+        return { name, pj, pg, pp, avgPts, winPct };
+      };
+
+      const t1 = getStats(t1name);
+      const t2 = getStats(t2name);
+      const hasEnoughData = t1.pj >= 3 && t2.pj >= 3;
+
+      // Head to head
+      const h2h = this.results.filter(r =>
+        (r.team1===t1name && r.team2===t2name) || (r.team1===t2name && r.team2===t1name)
+      ).slice(-3);
+
+      // Probability based on win% + avg pts
+      let prob1 = 50, prob2 = 50;
+      const hasProb = hasEnoughData;
+      if (hasProb) {
+        const score1 = (t1.winPct * 0.6) + (t1.avgPts / (t1.avgPts + t2.avgPts + 0.001) * 100 * 0.4);
+        const score2 = (t2.winPct * 0.6) + (t2.avgPts / (t1.avgPts + t2.avgPts + 0.001) * 100 * 0.4);
+        const total = score1 + score2;
+        prob1 = Math.round(score1 / total * 100);
+        prob2 = 100 - prob1;
+      }
+
+      return { hasEnoughData, t1, t2, h2h, prob1, prob2, hasProb };
+    },
+
+    resetAll() {
+      if (!confirm('Segur que vols esborrar TOTS els dades? Aquesta acció no es pot desfer.')) return;
+      window._set(window._ref(window._db, '/'), null);
+    }
+  }
+}
+</script>
+</body>
+</html>
