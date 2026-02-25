@@ -1234,6 +1234,7 @@ function app() {
         });
       }
       this.editingTeam = null;
+      this.logActivity('Equip editat', `${oldName || name} → ${name}`);
     },
 
     addTeam() {
@@ -1241,12 +1242,14 @@ function app() {
       if (!name) return;
       if (this.teams.find(t => t.name.toLowerCase() === name.toLowerCase())) return;
       window._push(window._ref(window._db, 'teams'), { name, emoji: this.newTeam.emoji||'🏀', players:[] });
+      this.logActivity('Equip afegit', name);
       this.newTeam = { name:'', emoji:'' };
     },
     removeTeam(id) {
       if (!confirm('Eliminar aquest equip?')) return;
       const teamName = this.teams.find(t => t.id === id)?.name;
       window._remove(window._ref(window._db, `teams/${id}`));
+      this.logActivity('Equip eliminat', teamName || id);
       if (teamName) {
         this.results.filter(r => r.team1 === teamName || r.team2 === teamName)
           .forEach(r => window._remove(window._ref(window._db, `results/${r.id}`)));
@@ -1270,7 +1273,9 @@ function app() {
       if (!team) return;
       const players = [...(team.players||[])];
       players.splice(playerIdx, 1);
+      const removedName = (team.players||[])[playerIdx]?.name || '';
       window._set(window._ref(window._db, `teams/${teamId}/players`), players.length ? players : null);
+      this.logActivity('Jugador eliminat', `${removedName} → ${team.name}`);
     },
     startEditPlayer(teamId, playerIdx, player) {
       this.editingPlayer = { teamId, playerIdx };
@@ -1286,6 +1291,7 @@ function app() {
       const players = [...(team.players||[])];
       players[playerIdx] = { name, number: this.editPlayerData.number };
       window._set(window._ref(window._db, `teams/${teamId}/players`), players);
+      this.logActivity('Jugador editat', `${players[playerIdx].name} → ${this.teams.find(t=>t.id===teamId)?.name||teamId}`);
       this.editingPlayer = null;
     },
 
@@ -1363,6 +1369,8 @@ function app() {
     },
     deleteResult(id) {
       if (!confirm('Eliminar aquest resultat?')) return;
+      const r = this.results.find(r => r.id === id);
+      if (r) this.logActivity('Resultat eliminat', `${r.team1} ${r.score1}-${r.score2} ${r.team2}`);
       window._remove(window._ref(window._db, `results/${id}`));
     },
 
@@ -1374,6 +1382,7 @@ function app() {
       const { team1, team2, date, time, location } = this.editUpcomingData;
       if (!team1 || !team2 || !date || team1 === team2) return;
       window._set(window._ref(window._db, `upcoming/${id}`), { team1, team2, date, time, location });
+      this.logActivity('Pròxim partit editat', `${team1} vs ${team2} (${date} ${time})`);
       this.editingUpcoming = null;
     },
 
@@ -1386,7 +1395,8 @@ function app() {
       this.newUpcoming = { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'' };
     },
     removeUpcoming(id) {
-      this.logActivity('Partit eliminat', `ID: ${id}`);
+      const u = this.upcoming.find(u => u.id === id);
+      this.logActivity('Pròxim partit eliminat', u ? `${u.team1} vs ${u.team2} (${u.date})` : id);
       window._remove(window._ref(window._db, `upcoming/${id}`));
     },
 
@@ -1515,6 +1525,7 @@ function app() {
 
     resetAll() {
       if (!confirm('Segur que vols esborrar TOTS els dades? Aquesta acció no es pot desfer.')) return;
+      this.logActivity('⚠️ RESET TOTAL', 'Totes les dades han estat esborrades');
       window._set(window._ref(window._db, '/'), null);
     }
   }
