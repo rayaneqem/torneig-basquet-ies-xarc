@@ -133,7 +133,7 @@ function buildEliminationHtml(teamName, noShows) {
         <div style="color:#8b949e;font-size:14px">Ha acumulat <strong style="color:#EF476F">${noShows} no presentacions</strong> i queda eliminat del torneig.</div>
       </div>
       <div style="text-align:center;margin:24px 0">
-        <a href="${WEB_URL}" style="background:#F97316;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block">Veure classificacio actualitzada</a>
+        <a href="${WEB_URL}" style="background:#F97316;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block">Veure classificació actualitzada</a>
       </div>
       <div style="border-top:1px solid #21262d;padding-top:16px;font-size:11px;color:#484f58;text-align:center">
         Aquest correu es automatic. Si us plau, no responguis.<br>
