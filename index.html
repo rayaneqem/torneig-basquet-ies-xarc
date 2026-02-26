@@ -331,9 +331,11 @@
           </div>
           <div class="col-span-5 flex items-center gap-3">
             <span class="text-2xl" x-text="team.emoji||'🏀'"></span>
-            <div>
-              <span class="font-condensed font-600 text-white uppercase" style="font-size:15px;letter-spacing:0.05em" x-text="team.name"></span>
-
+            <div class="flex flex-col gap-1">
+              <span class="font-condensed font-600 uppercase" :style="(team.noShows||0)>=3?'color:#EF476F;font-size:15px;letter-spacing:0.05em':'color:white;font-size:15px;letter-spacing:0.05em'" x-text="team.name"></span>
+              <template x-if="(team.noShows||0)>=3">
+                <span class="font-condensed uppercase font-700" style="color:#EF476F;font-size:10px;letter-spacing:0.15em">⛔ ELIMINAT</span>
+              </template>
             </div>
           </div>
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="team.pj||0"></span>
@@ -1454,7 +1456,12 @@ function app() {
           else { stats[r.team1].pts+=1; stats[r.team2].pts+=1; }
         }
       });
-      this.standings = Object.values(stats).sort((a,b) => b.pts !== a.pts ? b.pts-a.pts : (b.pf-b.pc)-(a.pf-a.pc));
+      this.standings = Object.values(stats).sort((a,b) => {
+        const elimA = (a.noShows||0) >= 3, elimB = (b.noShows||0) >= 3;
+        if (elimA && !elimB) return 1;
+        if (!elimA && elimB) return -1;
+        return b.pts !== a.pts ? b.pts-a.pts : (b.pf-b.pc)-(a.pf-a.pc);
+      });
     },
 
     matchModal: false,
