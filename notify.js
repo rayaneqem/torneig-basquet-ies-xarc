@@ -42,6 +42,13 @@ function getTomorrowDate() {
   return d.toISOString().slice(0, 10);
 }
 
+// Converteix "2026-02-27" → "27/02/2026"
+function formatDate(dateStr) {
+  if (!dateStr) return dateStr;
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+}
+
 function unique(arr) {
   return [...new Set(arr.filter(Boolean))];
 }
@@ -91,6 +98,7 @@ async function sendEmail(to, subject, html) {
 }
 
 function buildReminderHtml(team1, team2, date, time, location, refereeStr, rolText, refBadge) {
+  const dateFormatted = formatDate(date);
   return `<!DOCTYPE html>
 <html lang="ca">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
@@ -130,7 +138,7 @@ function buildReminderHtml(team1, team2, date, time, location, refereeStr, rolTe
         <table style="width:100%;font-size:14px;text-align:left;border-collapse:collapse">
           <tr>
             <td style="padding:8px 12px;color:#7A9CC8;font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:1px;width:100px">📅 Data</td>
-            <td style="padding:8px 12px;color:#E8F0FF;font-weight:700">${date}</td>
+            <td style="padding:8px 12px;color:#E8F0FF;font-weight:700">${dateFormatted}</td>
           </tr>
           <tr style="background:rgba(245,166,35,0.04);border-radius:6px">
             <td style="padding:8px 12px;color:#7A9CC8;font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:1px">⏰ Hora</td>
@@ -237,7 +245,7 @@ async function main() {
     const refereeEmails = getRefereeEmails(referee, emailMap);
     const allEmails     = unique([...playerEmails, ...refereeEmails]);
     const refereeStr    = resolveRefereeNames(referee);
-    const subject       = `🏀 Recordatori: ${team1} vs ${team2} — Demà ${date}`;
+    const subject       = `🏀 Recordatori: ${team1} vs ${team2} — Demà ${formatDate(date)}`;
 
     for (const email of allEmails) {
       const isRef    = refereeEmails.includes(email);
