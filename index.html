@@ -372,140 +372,56 @@
         <div class="space-y-2">
           <!-- Partits jugats -->
           <template x-for="match in jornada.results" :key="'r-'+match.id">
-            <div>
-              <!-- Vista normal -->
-              <template x-if="editingResult !== match.id">
-                <div class="card-match px-6 py-5 cursor-pointer" @click="openMatchModal(match, 'result')">
-                  <div class="flex items-center gap-4">
-                    <div class="flex-1 flex items-center justify-end gap-3">
-                      <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team1"></span>
-                      <span class="text-xl" x-text="getTeamEmoji(match.team1)"></span>
-                    </div>
-                    <div class="flex items-center gap-0 min-w-[110px] justify-center">
-                      <span class="font-score text-4xl leading-none" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--muted)'" x-text="match.score1"></span>
-                      <span class="font-score text-2xl mx-2" style="color:var(--border-mid)">:</span>
-                      <span class="font-score text-4xl leading-none" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--muted)'" x-text="match.score2"></span>
-                    </div>
-                    <div class="flex-1 flex items-center gap-3">
-                      <span class="text-xl" x-text="getTeamEmoji(match.team2)"></span>
-                      <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team2"></span>
-                    </div>
-                    <!-- Llapis admin -->
-                    <template x-if="isAdmin">
-                      <button @click.stop="startEditResult(match)" class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all" style="color:var(--faint);border:1px solid var(--border)" onmouseover="this.style.color='var(--orange)';this.style.borderColor='var(--orange)'" onmouseout="this.style.color='var(--faint)';this.style.borderColor='var(--border)'">✏</button>
-                    </template>
-                  </div>
-                  <div class="flex justify-center mt-2">
-                    <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint);letter-spacing:0.12em">toca per detalls</span>
-                  </div>
+            <div class="card-match px-6 py-5 cursor-pointer" @click="openMatchModal(match, 'result')">
+              <div class="flex items-center gap-4">
+                <div class="flex-1 flex items-center justify-end gap-3">
+                  <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team1"></span>
+                  <span class="text-xl" x-text="getTeamEmoji(match.team1)"></span>
                 </div>
-              </template>
-              <!-- Formulari d'edició inline -->
-              <template x-if="editingResult === match.id">
-                <div class="card p-4 space-y-3" style="border:1px dashed var(--orange)">
-                  <div class="grid grid-cols-2 md:grid-cols-5 gap-2 items-end">
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Local</label>
-                      <select x-model="editResultData.team1">
-                        <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
-                      <input type="number" x-model.number="editResultData.score1" min="0"/>
-                    </div>
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
-                      <input type="number" x-model.number="editResultData.score2" min="0"/>
-                    </div>
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Visitant</label>
-                      <select x-model="editResultData.team2">
-                        <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
-                      <input type="date" x-model="editResultData.date"/>
-                    </div>
-                  </div>
-                  <div class="flex gap-2">
-                    <button @click="saveEditResult(match.id)" class="btn-orange text-sm px-4">✓ Guardar</button>
-                    <button @click="editingResult=null" class="btn-ghost text-sm px-3">Cancel·lar</button>
-                    <button @click="deleteResult(match.id)" class="btn-red text-sm px-3 ml-auto">✕ Eliminar</button>
-                  </div>
+                <div class="flex items-center gap-0 min-w-[110px] justify-center">
+                  <span class="font-score text-4xl leading-none" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--muted)'" x-text="match.noShow1 ? 'NP' : match.score1"></span>
+                  <span class="font-score text-2xl mx-2" style="color:var(--border-mid)">:</span>
+                  <span class="font-score text-4xl leading-none" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--muted)'" x-text="match.noShow2 ? 'NP' : match.score2"></span>
                 </div>
-              </template>
+                <div class="flex-1 flex items-center gap-3">
+                  <span class="text-xl" x-text="getTeamEmoji(match.team2)"></span>
+                  <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team2"></span>
+                </div>
+              </div>
+              <div class="flex justify-center items-center gap-3 mt-2">
+                <template x-if="match.referee">
+                  <span class="font-condensed text-xs" style="color:var(--muted)">🏁 <span x-text="match.referee"></span></span>
+                </template>
+                <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">toca per detalls</span>
+              </div>
             </div>
           </template>
           <!-- Pròxims partits -->
           <template x-for="match in jornada.upcoming" :key="'u-'+match.id">
-            <div>
-              <!-- Vista normal -->
-              <template x-if="editingUpcoming !== match.id">
-                <div class="card-upcoming px-6 py-5 flex items-center gap-4 cursor-pointer" @click="openMatchModal(match, 'upcoming')">
-                  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:42px">
-                    <span style="font-size:22px">🗓</span>
-                    <span class="font-condensed text-xs uppercase" style="color:var(--orange-dim);letter-spacing:0.1em;font-size:9px">PRÒXIM</span>
-                  </div>
-                  <div class="flex-1">
-                    <div class="font-condensed font-600 uppercase" style="color:var(--cream);font-size:16px;letter-spacing:0.05em">
-                      <span x-text="match.team1"></span>
-                      <span style="color:var(--border-mid);margin:0 8px;font-weight:400">VS</span>
-                      <span x-text="match.team2"></span>
-                    </div>
-                    <div class="flex items-center gap-3 flex-wrap mt-1.5">
-                      <span class="font-condensed text-sm" style="color:var(--muted)" x-text="match.date"></span>
-                      <template x-if="match.time">
-                        <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="match.time"></span>
-                      </template>
-                      <template x-if="match.location">
-                        <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--muted)" x-text="match.location"></span>
-                      </template>
-                    </div>
-                  </div>
-                  <!-- Llapis admin -->
-                  <template x-if="isAdmin">
-                    <button @click.stop="startEditUpcoming(match)" class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg transition-all" style="color:var(--faint);border:1px solid var(--border)" onmouseover="this.style.color='var(--orange)';this.style.borderColor='var(--orange)'" onmouseout="this.style.color='var(--faint)';this.style.borderColor='var(--border)'">✏</button>
+            <div class="card-upcoming px-6 py-5 flex items-center gap-4 cursor-pointer" @click="openMatchModal(match, 'upcoming')">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:42px">
+                <span style="font-size:22px">🗓</span>
+                <span class="font-condensed text-xs uppercase" style="color:var(--orange-dim);letter-spacing:0.1em;font-size:9px">PRÒXIM</span>
+              </div>
+              <div class="flex-1">
+                <div class="font-condensed font-600 uppercase" style="color:var(--cream);font-size:16px;letter-spacing:0.05em">
+                  <span x-text="match.team1"></span>
+                  <span style="color:var(--border-mid);margin:0 8px;font-weight:400">VS</span>
+                  <span x-text="match.team2"></span>
+                </div>
+                <div class="flex items-center gap-3 flex-wrap mt-1.5">
+                  <span class="font-condensed text-sm" style="color:var(--muted)" x-text="match.date"></span>
+                  <template x-if="match.time">
+                    <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="match.time"></span>
+                  </template>
+                  <template x-if="match.location">
+                    <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--muted)" x-text="match.location"></span>
+                  </template>
+                  <template x-if="match.referee">
+                    <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="match.referee"></span></span>
                   </template>
                 </div>
-              </template>
-              <!-- Formulari d'edició inline -->
-              <template x-if="editingUpcoming === match.id">
-                <div class="card p-4 space-y-3" style="border:1px dashed var(--win)">
-                  <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip 1</label>
-                      <select x-model="editUpcomingData.team1">
-                        <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip 2</label>
-                      <select x-model="editUpcomingData.team2">
-                        <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
-                      <input type="date" x-model="editUpcomingData.date"/>
-                    </div>
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Hora</label>
-                      <input type="time" x-model="editUpcomingData.time"/>
-                    </div>
-                    <div>
-                      <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Lloc</label>
-                      <input type="text" x-model="editUpcomingData.location" placeholder="Pavelló..."/>
-                    </div>
-                  </div>
-                  <div class="flex gap-2">
-                    <button @click="saveEditUpcoming(match.id)" class="btn-orange text-sm px-4">✓ Guardar</button>
-                    <button @click="editingUpcoming=null" class="btn-ghost text-sm px-3">Cancel·lar</button>
-                    <button @click="removeUpcoming(match.id)" class="btn-red text-sm px-3 ml-auto">✕ Eliminar</button>
-                  </div>
-                </div>
-              </template>
+              </div>
             </div>
           </template>
         </div>
@@ -515,98 +431,6 @@
     <!-- ADMIN: controls de partits -->
     <template x-if="isAdmin">
       <div class="mt-8 space-y-4">
-
-        <!-- Registrar resultat -->
-        <div class="card p-6">
-          <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">➕ Registrar Resultat</h3>
-          <template x-if="teams.length < 2">
-            <p class="font-condensed" style="color:var(--muted)">Necessites almenys 2 equips per registrar partits</p>
-          </template>
-          <template x-if="teams.length >= 2">
-            <div class="space-y-3">
-              <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
-                <div>
-                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip Local</label>
-                  <select x-model="newResult.team1">
-                    <option value="">Selecciona equip</option>
-                    <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
-                  </select>
-                  <label class="flex items-center gap-2 mt-1 cursor-pointer">
-                    <input type="checkbox" x-model="newResult.noShow1" @change="if(newResult.noShow1){newResult.score1=0}"/>
-                    <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
-                  </label>
-                </div>
-                <div>
-                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
-                  <input type="number" x-model.number="newResult.score1" min="0" placeholder="0" :disabled="newResult.noShow1" :style="newResult.noShow1 ? 'opacity:0.4' : ''"/>
-                </div>
-                <div class="flex items-end justify-center pb-2">
-                  <span class="font-display text-2xl" style="color:var(--faint)">VS</span>
-                </div>
-                <div>
-                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
-                  <input type="number" x-model.number="newResult.score2" min="0" placeholder="0" :disabled="newResult.noShow2" :style="newResult.noShow2 ? 'opacity:0.4' : ''"/>
-                </div>
-                <div>
-                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip Visitant</label>
-                  <select x-model="newResult.team2">
-                    <option value="">Selecciona equip</option>
-                    <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
-                  </select>
-                  <label class="flex items-center gap-2 mt-1 cursor-pointer">
-                    <input type="checkbox" x-model="newResult.noShow2" @change="if(newResult.noShow2){newResult.score2=0}"/>
-                    <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
-                  </label>
-                </div>
-              </div>
-              <!-- No presentat warning -->
-              <template x-if="newResult.noShow1 || newResult.noShow2">
-                <div class="px-4 py-2 rounded-lg font-condensed text-sm" style="background:rgba(239,71,111,0.1);border:1px solid rgba(239,71,111,0.3);color:var(--loss)">
-                  <template x-if="newResult.noShow1 && newResult.noShow2">
-                    ⚠ Els dos equips no presentats → 0 punts per a tots dos
-                  </template>
-                  <template x-if="newResult.noShow1 && !newResult.noShow2">
-                    ⚠ <span x-text="newResult.team1 || 'Equip Local'"></span> no presentat → victòria per a <span x-text="newResult.team2 || 'Equip Visitant'"></span>
-                    <template x-if="newResult.team1">
-                      <span x-text="' · Faltes: ' + noShowCount(newResult.team1) + '/3'"></span>
-                    </template>
-                  </template>
-                  <template x-if="!newResult.noShow1 && newResult.noShow2">
-                    ⚠ <span x-text="newResult.team2 || 'Equip Visitant'"></span> no presentat → victòria per a <span x-text="newResult.team1 || 'Equip Local'"></span>
-                    <template x-if="newResult.team2">
-                      <span x-text="' · Faltes: ' + noShowCount(newResult.team2) + '/3'"></span>
-                    </template>
-                  </template>
-                </div>
-              </template>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
-                  <input type="date" x-model="newResult.date"/>
-                </div>
-                <div>
-                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Jornada</label>
-                  <select x-model.number="newResult.jornada">
-                    <option value="">Automàtica (per data)</option>
-                    <template x-for="n in 20" :key="n"><option :value="n" x-text="'Jornada ' + n"></option></template>
-                  </select>
-                </div>
-                <div>
-                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Àrbitres</label>
-                  <select x-model="newResult.referee">
-                    <option value="">Sense àrbitres</option>
-                    <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                      <option :value="g.label" x-text="g.label + ': ' + g.members.map(m => m.split(' ')[0]).join(', ')"></option>
-                    </template>
-                  </select>
-                </div>
-              </div>
-              <button @click="addResult()" class="btn-orange">Registrar Resultat</button>
-              <p x-show="resultMsg" class="font-condensed text-sm" style="color:var(--win)" x-text="resultMsg"></p>
-              <p x-show="resultErr" class="font-condensed text-sm" style="color:var(--loss)" x-text="resultErr"></p>
-            </div>
-          </template>
-        </div>
 
         <!-- Programar pròxim partit -->
         <div class="card p-6">
@@ -645,10 +469,18 @@
               <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Lloc</label>
               <input type="text" x-model="newUpcoming.location" placeholder="Pavelló, pista..."/>
             </div>
+            <div class="md:col-span-2">
+              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Àrbitres</label>
+              <select x-model="newUpcoming.referee">
+                <option value="">Sense àrbitres assignats</option>
+                <template x-for="g in REFEREE_GROUPS" :key="g.label">
+                  <option :value="g.label" x-text="g.label + ': ' + g.members.map(m => m.split(' ')[0]).join(', ')"></option>
+                </template>
+              </select>
+            </div>
           </div>
           <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
         </div>
-
 
       </div>
     </template>
@@ -901,188 +733,186 @@
 
 <!-- MATCH DETAIL MODAL -->
 <div x-show="matchModal" x-transition class="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto" style="background:rgba(0,0,0,.88)" @click.self="matchModal=false">
-  <div class="card w-full max-w-2xl mx-auto overflow-hidden my-4" x-show="matchModal" x-transition>
+  <div class="card w-full max-w-xl mx-auto overflow-hidden my-4">
 
-    <!-- Header -->
-    <div class="px-6 pt-5 pb-5 border-b border-white/5" style="background:linear-gradient(135deg,#111 60%,#1a0a00)">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-3">
-          <span class="font-condensed text-xs text-white/40 uppercase tracking-widest" x-text="modalMatch.date"></span>
+    <!-- Header amb equips i marcador -->
+    <div class="px-6 pt-5 pb-5 border-b border-white/5" style="background:linear-gradient(135deg,var(--bg-card-2) 0%,var(--bg-card) 100%)">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)" x-text="modalMatch.date"></span>
           <template x-if="modalMatch.jornada">
-            <span class="font-condensed text-xs px-2 py-1 rounded" style="background:rgba(249,115,22,0.1);color:var(--orange)">Jornada <span x-text="modalMatch.jornada"></span></span>
+            <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange)">J<span x-text="modalMatch.jornada"></span></span>
+          </template>
+          <template x-if="modalMatch.referee">
+            <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="modalMatch.referee"></span></span>
           </template>
         </div>
-        <button @click="matchModal=false" class="text-white/30 hover:text-white transition-colors text-xl leading-none">✕</button>
+        <button @click="matchModal=false" class="text-white/30 hover:text-white text-xl leading-none">✕</button>
       </div>
       <div class="flex items-center justify-between gap-2">
-        <div class="flex-1 text-right">
-          <div class="font-display text-2xl md:text-4xl leading-none" :style="modalMatch.type==='result' && Number(modalMatch.score1)>Number(modalMatch.score2) ? 'color:var(--orange)' : 'color:#fff'" x-text="modalMatch.team1"></div>
-          <div class="text-2xl mt-1" x-text="getTeamEmoji(modalMatch.team1)"></div>
+        <div class="flex-1 text-center">
+          <div class="text-2xl mb-1" x-text="getTeamEmoji(modalMatch.team1)"></div>
+          <div class="font-display text-lg leading-tight" :style="modalMatch.type==='result' && Number(modalMatch.score1)>Number(modalMatch.score2)?'color:var(--orange)':'color:var(--cream)'" x-text="modalMatch.team1"></div>
+          <template x-if="modalMatch.noShow1">
+            <span class="font-condensed text-xs mt-1 block" style="color:var(--loss)">NO PRESENTAT</span>
+          </template>
         </div>
-        <div class="text-center px-2">
+        <div class="text-center px-4 flex-shrink-0">
           <template x-if="modalMatch.type==='result'">
-            <div class="font-display text-4xl md:text-5xl tracking-wider" style="color:var(--orange)">
-              <span x-text="modalMatch.score1"></span>
-              <span class="text-white/20 mx-1 text-3xl">-</span>
-              <span x-text="modalMatch.score2"></span>
+            <div class="font-display text-4xl tracking-wider" style="color:var(--orange)">
+              <span x-text="modalMatch.noShow1 ? 'NP' : modalMatch.score1"></span>
+              <span style="color:var(--faint);margin:0 4px">-</span>
+              <span x-text="modalMatch.noShow2 ? 'NP' : modalMatch.score2"></span>
             </div>
           </template>
           <template x-if="modalMatch.type==='upcoming'">
             <div>
-              <div class="font-display text-3xl text-white/30">VS</div>
+              <div class="font-display text-3xl" style="color:var(--faint)">VS</div>
               <template x-if="modalMatch.time">
-                <div class="font-condensed text-orange-400 text-sm mt-1" x-text="modalMatch.time"></div>
+                <div class="font-condensed font-600 mt-1" style="color:var(--orange)" x-text="modalMatch.time"></div>
               </template>
               <template x-if="modalMatch.location">
-                <div class="font-condensed text-white/40 text-xs mt-1" x-text="modalMatch.location"></div>
+                <div class="font-condensed text-xs mt-0.5" style="color:var(--muted)" x-text="modalMatch.location"></div>
               </template>
             </div>
           </template>
         </div>
-        <div class="flex-1 text-left">
-          <div class="font-display text-2xl md:text-4xl leading-none" :style="modalMatch.type==='result' && Number(modalMatch.score2)>Number(modalMatch.score1) ? 'color:var(--orange)' : 'color:#fff'" x-text="modalMatch.team2"></div>
-          <div class="text-2xl mt-1" x-text="getTeamEmoji(modalMatch.team2)"></div>
+        <div class="flex-1 text-center">
+          <div class="text-2xl mb-1" x-text="getTeamEmoji(modalMatch.team2)"></div>
+          <div class="font-display text-lg leading-tight" :style="modalMatch.type==='result' && Number(modalMatch.score2)>Number(modalMatch.score1)?'color:var(--orange)':'color:var(--cream)'" x-text="modalMatch.team2"></div>
+          <template x-if="modalMatch.noShow2">
+            <span class="font-condensed text-xs mt-1 block" style="color:var(--loss)">NO PRESENTAT</span>
+          </template>
         </div>
       </div>
     </div>
 
-    <!-- STATS SECTION -->
-    <template x-if="getMatchStats(modalMatch).hasEnoughData">
-      <div class="px-6 py-5 border-b border-white/5">
-        <p class="font-condensed text-xs text-white/40 uppercase tracking-widest mb-4">Estadístiques comparades</p>
-        <div x-data="{ stats: getMatchStats(modalMatch) }">
+    <!-- PANEL ADMIN — només visible si isAdmin -->
+    <template x-if="isAdmin">
+      <div class="px-6 py-5 border-b border-white/5" style="background:rgba(245,166,35,0.03)">
 
-          <!-- Win % bar -->
-          <div class="mb-4">
-            <div class="flex justify-between mb-1">
-              <span class="font-condensed text-sm text-white/70" x-text="stats.t1.name"></span>
-              <span class="font-condensed text-xs text-white/30 uppercase tracking-widest">% Victòries</span>
-              <span class="font-condensed text-sm text-white/70" x-text="stats.t2.name"></span>
+        <!-- Upcoming: formulari per posar resultat -->
+        <template x-if="modalMatch.type==='upcoming'">
+          <div>
+            <p class="font-condensed text-xs uppercase tracking-widest mb-3" style="color:var(--orange)">Registrar resultat</p>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)" x-text="modalMatch.team1 || 'Equip 1'"></label>
+                <input type="number" x-model.number="modalResultData.score1" min="0" placeholder="0" :disabled="modalResultData.noShow1" :style="modalResultData.noShow1?'opacity:0.4':''"/>
+                <label class="flex items-center gap-2 mt-1 cursor-pointer">
+                  <input type="checkbox" x-model="modalResultData.noShow1" @change="if(modalResultData.noShow1)modalResultData.score1=0"/>
+                  <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
+                </label>
+              </div>
+              <div>
+                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)" x-text="modalMatch.team2 || 'Equip 2'"></label>
+                <input type="number" x-model.number="modalResultData.score2" min="0" placeholder="0" :disabled="modalResultData.noShow2" :style="modalResultData.noShow2?'opacity:0.4':''"/>
+                <label class="flex items-center gap-2 mt-1 cursor-pointer">
+                  <input type="checkbox" x-model="modalResultData.noShow2" @change="if(modalResultData.noShow2)modalResultData.score2=0"/>
+                  <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
+                </label>
+              </div>
             </div>
-            <div class="flex rounded-full overflow-hidden h-6">
-              <div class="flex items-center justify-center font-display text-sm transition-all" :style="'width:'+stats.t1.winPct+'%;background:var(--orange)'" x-text="stats.t1.winPct+'%'"></div>
-              <div class="flex items-center justify-center font-display text-sm transition-all" :style="'width:'+stats.t2.winPct+'%;background:#333'" x-text="stats.t2.winPct+'%'"></div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+                <input type="date" x-model="modalResultData.date"/>
+              </div>
+              <div>
+                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Àrbitres</label>
+                <select x-model="modalResultData.referee">
+                  <option value="">Sense àrbitres</option>
+                  <template x-for="g in REFEREE_GROUPS" :key="g.label">
+                    <option :value="g.label" x-text="g.label + ': ' + g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
+                  </template>
+                </select>
+              </div>
             </div>
+            <div class="flex gap-2 flex-wrap">
+              <button @click="submitModalResult()" class="btn-orange flex-1">✓ Confirmar Resultat</button>
+              <button @click="deleteUpcomingFromModal()" class="btn-red px-4">✕ Eliminar Partit</button>
+            </div>
+            <p x-show="modalMsg" class="font-condensed text-sm mt-2" :style="modalErr?'color:var(--loss)':'color:var(--win)'" x-text="modalMsg"></p>
           </div>
-
-          <!-- Avg points bar -->
-          <div class="mb-4">
-            <div class="flex justify-between mb-1">
-              <span class="font-condensed text-sm" :style="stats.t1.avgPts >= stats.t2.avgPts ? 'color:var(--orange)' : 'color:#aaa'" x-text="stats.t1.avgPts + ' pts'"></span>
-              <span class="font-condensed text-xs text-white/30 uppercase tracking-widest">Punts per partit</span>
-              <span class="font-condensed text-sm" :style="stats.t2.avgPts >= stats.t1.avgPts ? 'color:var(--orange)' : 'color:#aaa'" x-text="stats.t2.avgPts + ' pts'"></span>
-            </div>
-            <div class="flex rounded-full overflow-hidden h-5">
-              <template x-if="stats.t1.avgPts + stats.t2.avgPts > 0">
-                <div class="flex items-center justify-center font-condensed text-xs transition-all" :style="'width:'+(stats.t1.avgPts/(stats.t1.avgPts+stats.t2.avgPts)*100).toFixed(0)+'%;background:var(--orange)'"></div>
-              </template>
-              <template x-if="stats.t1.avgPts + stats.t2.avgPts > 0">
-                <div class="flex items-center justify-center font-condensed text-xs transition-all" :style="'width:'+(stats.t2.avgPts/(stats.t1.avgPts+stats.t2.avgPts)*100).toFixed(0)+'%;background:#333'"></div>
-              </template>
-            </div>
-          </div>
-
-          <!-- Win probability (only upcoming) -->
-          <template x-if="modalMatch.type==='upcoming' && stats.hasProb">
-            <div class="mt-5 p-4 rounded-lg" style="background:rgba(6,214,160,0.05);border:1px solid rgba(6,214,160,0.2)">
-              <p class="font-condensed text-xs" style="color:rgba(74,222,128,0.6)" x-ignore=" uppercase tracking-widest mb-3">Probabilitat de victòria</p>
-              <div class="flex rounded-full overflow-hidden h-8 mb-2">
-                <div class="flex items-center justify-center font-display text-sm transition-all" :style="'width:'+stats.prob1+'%;background:var(--orange)'" x-text="stats.prob1+'%'"></div>
-                <div class="flex items-center justify-center font-display text-sm transition-all" :style="'width:'+stats.prob2+'%;background:#1e3a1e;color:#4ade80'" x-text="stats.prob2+'%'"></div>
-              </div>
-              <div class="flex justify-between">
-                <span class="font-condensed text-xs text-white/50" x-text="stats.t1.name"></span>
-                <span class="font-condensed text-xs text-white/30">Basat en resultats anteriors</span>
-                <span class="font-condensed text-xs text-white/50" x-text="stats.t2.name"></span>
-              </div>
-            </div>
-          </template>
-
-          <!-- Mini stats grid -->
-          <div class="grid grid-cols-2 gap-3 mt-4">
-            <div class="grid grid-cols-3 text-center gap-1">
-              <div class="p-2 rounded" style="background:var(--bg-surface)">
-                <div class="font-display text-xl" style="color:var(--win)" x-text="stats.t1.pg"></div>
-                <div class="font-condensed text-xs text-white/30">PG</div>
-              </div>
-              <div class="p-2 rounded" style="background:var(--bg-surface)">
-                <div class="font-display text-xl text-white/60" x-text="stats.t1.pj"></div>
-                <div class="font-condensed text-xs text-white/30">PJ</div>
-              </div>
-              <div class="p-2 rounded" style="background:var(--bg-surface)">
-                <div class="font-display text-xl" style="color:var(--loss)" x-text="stats.t1.pp"></div>
-                <div class="font-condensed text-xs text-white/30">PP</div>
-              </div>
-            </div>
-            <div class="grid grid-cols-3 text-center gap-1">
-              <div class="p-2 rounded" style="background:var(--bg-surface)">
-                <div class="font-display text-xl" style="color:var(--win)" x-text="stats.t2.pg"></div>
-                <div class="font-condensed text-xs text-white/30">PG</div>
-              </div>
-              <div class="p-2 rounded" style="background:var(--bg-surface)">
-                <div class="font-display text-xl text-white/60" x-text="stats.t2.pj"></div>
-                <div class="font-condensed text-xs text-white/30">PJ</div>
-              </div>
-              <div class="p-2 rounded" style="background:var(--bg-surface)">
-                <div class="font-display text-xl" style="color:var(--loss)" x-text="stats.t2.pp"></div>
-                <div class="font-condensed text-xs text-white/30">PP</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Head to head -->
-          <template x-if="stats.h2h.length > 0">
-            <div class="mt-4">
-              <p class="font-condensed text-xs text-white/30 uppercase tracking-widest mb-2">Enfrontaments directes</p>
-              <template x-for="(h, i) in stats.h2h" :key="i">
-                <div class="flex items-center justify-between text-sm py-1 border-b border-white/5">
-                  <span class="font-condensed" :style="Number(h.score1)>Number(h.score2)?'color:var(--orange)':'color:#aaa'" x-text="h.team1"></span>
-                  <span class="font-display text-base mx-3" style="color:var(--orange)" x-text="h.score1 + ' - ' + h.score2"></span>
-                  <span class="font-condensed" :style="Number(h.score2)>Number(h.score1)?'color:var(--orange)':'color:#aaa'" x-text="h.team2"></span>
-                  <span class="font-body text-white/20 text-xs ml-2" x-text="h.date"></span>
-                </div>
-              </template>
-            </div>
-          </template>
-        </div>
-      </div>
-    </template>
-    <template x-if="!getMatchStats(modalMatch).hasEnoughData && modalMatch.type==='upcoming'">
-      <div class="px-6 py-4 border-b border-white/5">
-        <p class="font-condensed text-xs text-white/20 uppercase tracking-widest">Les estadístiques i probabilitats apareixeran a partir del 3r partit de cada equip</p>
-      </div>
-    </template>
-
-    <!-- Players -->
-    <div class="grid grid-cols-2 gap-0 divide-x divide-white/5">
-      <div class="p-5">
-        <p class="font-condensed text-xs text-white/40 uppercase tracking-widest mb-3" x-text="modalMatch.team1"></p>
-        <template x-if="getTeamPlayers(modalMatch.team1).length === 0">
-          <p class="font-body text-white/20 text-sm">Sense jugadors</p>
         </template>
-        <template x-for="(p, i) in getTeamPlayers(modalMatch.team1)" :key="i">
+
+        <!-- Result: editar resultat existent -->
+        <template x-if="modalMatch.type==='result'">
+          <div>
+            <p class="font-condensed text-xs uppercase tracking-widest mb-3" style="color:var(--orange)">Editar resultat</p>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)" x-text="modalMatch.team1"></label>
+                <input type="number" x-model.number="modalResultData.score1" min="0" :disabled="modalResultData.noShow1" :style="modalResultData.noShow1?'opacity:0.4':''"/>
+                <label class="flex items-center gap-2 mt-1 cursor-pointer">
+                  <input type="checkbox" x-model="modalResultData.noShow1" @change="if(modalResultData.noShow1)modalResultData.score1=0"/>
+                  <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
+                </label>
+              </div>
+              <div>
+                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)" x-text="modalMatch.team2"></label>
+                <input type="number" x-model.number="modalResultData.score2" min="0" :disabled="modalResultData.noShow2" :style="modalResultData.noShow2?'opacity:0.4':''"/>
+                <label class="flex items-center gap-2 mt-1 cursor-pointer">
+                  <input type="checkbox" x-model="modalResultData.noShow2" @change="if(modalResultData.noShow2)modalResultData.score2=0"/>
+                  <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
+                </label>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+                <input type="date" x-model="modalResultData.date"/>
+              </div>
+              <div>
+                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Àrbitres</label>
+                <select x-model="modalResultData.referee">
+                  <option value="">Sense àrbitres</option>
+                  <template x-for="g in REFEREE_GROUPS" :key="g.label">
+                    <option :value="g.label" x-text="g.label + ': ' + g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
+                  </template>
+                </select>
+              </div>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+              <button @click="saveModalResult()" class="btn-orange flex-1">✓ Guardar Canvis</button>
+              <button @click="deleteResultFromModal()" class="btn-red px-4">✕ Eliminar</button>
+            </div>
+            <p x-show="modalMsg" class="font-condensed text-sm mt-2" :style="modalErr?'color:var(--loss)':'color:var(--win)'" x-text="modalMsg"></p>
+          </div>
+        </template>
+      </div>
+    </template>
+
+    <!-- Jugadors -->
+    <div class="grid grid-cols-2 divide-x divide-white/5">
+      <div class="p-5">
+        <p class="font-condensed text-xs uppercase tracking-widest mb-3" style="color:var(--faint)" x-text="modalMatch.team1"></p>
+        <template x-if="getTeamPlayers(modalMatch.team1).length===0">
+          <p class="font-body text-sm" style="color:var(--faint)">Sense jugadors</p>
+        </template>
+        <template x-for="(p,i) in getTeamPlayers(modalMatch.team1)" :key="i">
           <div class="flex items-center justify-between py-1 border-b border-white/5">
-            <span class="font-condensed text-white text-sm" x-text="p.name"></span>
-            <span class="font-condensed text-xs px-2 rounded" style="background:rgba(249,115,22,0.1);color:var(--orange);font-size:10px" x-text="p.number||''"></span>
+            <span class="font-condensed text-sm" style="color:var(--cream)" x-text="p.name"></span>
+            <span class="font-condensed text-xs px-2 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange)" x-text="p.number||''"></span>
           </div>
         </template>
       </div>
       <div class="p-5">
-        <p class="font-condensed text-xs text-white/40 uppercase tracking-widest mb-3" x-text="modalMatch.team2"></p>
-        <template x-if="getTeamPlayers(modalMatch.team2).length === 0">
-          <p class="font-body text-white/20 text-sm">Sense jugadors</p>
+        <p class="font-condensed text-xs uppercase tracking-widest mb-3" style="color:var(--faint)" x-text="modalMatch.team2"></p>
+        <template x-if="getTeamPlayers(modalMatch.team2).length===0">
+          <p class="font-body text-sm" style="color:var(--faint)">Sense jugadors</p>
         </template>
-        <template x-for="(p, i) in getTeamPlayers(modalMatch.team2)" :key="i">
+        <template x-for="(p,i) in getTeamPlayers(modalMatch.team2)" :key="i">
           <div class="flex items-center justify-between py-1 border-b border-white/5">
-            <span class="font-condensed text-white text-sm" x-text="p.name"></span>
-            <span class="font-condensed text-xs px-2 rounded" style="background:rgba(249,115,22,0.1);color:var(--orange);font-size:10px" x-text="p.number||''"></span>
+            <span class="font-condensed text-sm" style="color:var(--cream)" x-text="p.name"></span>
+            <span class="font-condensed text-xs px-2 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange)" x-text="p.number||''"></span>
           </div>
         </template>
       </div>
     </div>
+
   </div>
 </div>
-
 </main>
 
 <footer class="mt-16 py-8" style="border-top:1px solid #141414">
@@ -1153,7 +983,7 @@ function app() {
       'z133122@iesxarc.es': { name: 'Sergio Ferrer Chaler' },
       'z118343@iesxarc.es': { name: 'Joel Rohra Kelani' },
       'z133143@iesxarc.es': { name: 'Carlos Planells Planells' },
-      'ecanovas@iesxarc.es': { name: 'E. Canovas' },
+      'ecanovas@iesxarc.es': { name: 'Esteve Cánovas Mas' },
     },
     OWNER_EMAIL: 'z118324@iesxarc.es',
     OWNER: 'rayan',
@@ -1491,20 +1321,114 @@ function app() {
 
     matchModal: false,
     modalMatch: {},
+    modalResultData: {},
+    modalMsg: '',
+    modalErr: false,
 
     openMatchModal(match, type) {
-      // Find jornada number for this match
-      let jornadaNum = null;
+      this.modalMatch = { ...match, type };
+      this.modalMsg = '';
+      this.modalErr = false;
       if (type === 'result') {
-        const sorted = [...this.results].sort((a,b) => a.date > b.date ? 1 : -1);
-        let num = 0, lastDate = null;
-        sorted.forEach(r => {
-          if (r.date !== lastDate) { num++; lastDate = r.date; }
-          if (r.id === match.id) jornadaNum = num;
-        });
+        this.modalResultData = {
+          score1: match.score1,
+          score2: match.score2,
+          date: match.date,
+          noShow1: match.noShow1 || false,
+          noShow2: match.noShow2 || false,
+          referee: match.referee || '',
+        };
+      } else {
+        this.modalResultData = {
+          score1: 0, score2: 0,
+          date: match.date || new Date().toISOString().slice(0,10),
+          noShow1: false, noShow2: false,
+          referee: match.referee || '',
+        };
       }
-      this.modalMatch = { ...match, type, jornada: jornadaNum };
       this.matchModal = true;
+    },
+
+    // Posar resultat a un partit programat
+    submitModalResult() {
+      const { score1, score2, date, noShow1, noShow2, referee } = this.modalResultData;
+      const { team1, team2, id: upcomingId, jornada } = this.modalMatch;
+      if (!team1 || !team2) { this.modalMsg = 'Error: equips no definits'; this.modalErr = true; return; }
+
+      let s1, s2;
+      if (noShow1 && noShow2) { s1 = 0; s2 = 0; }
+      else if (noShow1) { s1 = 0; s2 = 3; }
+      else if (noShow2) { s1 = 3; s2 = 0; }
+      else { s1 = Number(score1); s2 = Number(score2); }
+
+      const entry = { team1, team2, score1: s1, score2: s2, date,
+        ...(jornada ? {jornada} : {}),
+        ...(noShow1 ? {noShow1: true} : {}),
+        ...(noShow2 ? {noShow2: true} : {}),
+        ...(referee ? {referee} : {}),
+      };
+      window._push(window._ref(window._db, 'results'), entry);
+
+      // Eliminar de upcoming
+      window._remove(window._ref(window._db, `upcoming/${upcomingId}`));
+
+      let logDetail = `${team1} ${s1}-${s2} ${team2}`;
+      if (noShow1) logDetail += ` (${team1} NP)`;
+      if (noShow2) logDetail += ` (${team2} NP)`;
+      this.logActivity('Resultat afegit', logDetail);
+
+      // Check 3 NP
+      if (noShow1 && !noShow2) {
+        const count = this.noShowCount(team1) + 1;
+        if (count >= 3) { this.logActivity('Equip eliminat automàticament', `${team1} — 3 NP`); }
+      }
+      if (noShow2 && !noShow1) {
+        const count = this.noShowCount(team2) + 1;
+        if (count >= 3) { this.logActivity('Equip eliminat automàticament', `${team2} — 3 NP`); }
+      }
+
+      this.modalMsg = '✓ Resultat registrat!';
+      this.modalErr = false;
+      setTimeout(() => { this.matchModal = false; this.modalMsg = ''; }, 1500);
+    },
+
+    // Guardar edició d'un resultat existent
+    saveModalResult() {
+      const { score1, score2, date, noShow1, noShow2, referee } = this.modalResultData;
+      const { id, team1, team2 } = this.modalMatch;
+      if (!id) return;
+
+      let s1, s2;
+      if (noShow1 && noShow2) { s1 = 0; s2 = 0; }
+      else if (noShow1) { s1 = 0; s2 = 3; }
+      else if (noShow2) { s1 = 3; s2 = 0; }
+      else { s1 = Number(score1); s2 = Number(score2); }
+
+      window._set(window._ref(window._db, `results/${id}`), { team1, team2, score1: s1, score2: s2, date,
+        ...(noShow1 ? {noShow1: true} : {}),
+        ...(noShow2 ? {noShow2: true} : {}),
+        ...(referee ? {referee} : {}),
+      });
+      this.logActivity('Resultat editat', `${team1} ${s1}-${s2} ${team2}`);
+      this.modalMsg = '✓ Guardat!';
+      this.modalErr = false;
+      setTimeout(() => { this.matchModal = false; this.modalMsg = ''; }, 1500);
+    },
+
+    deleteResultFromModal() {
+      const { id, team1, score1, score2, team2 } = this.modalMatch;
+      if (!confirm('Eliminar aquest resultat?')) return;
+      this.logActivity('Resultat eliminat', `${team1} ${score1}-${score2} ${team2}`);
+      window._remove(window._ref(window._db, `results/${id}`));
+      this.matchModal = false;
+    },
+
+    deleteUpcomingFromModal() {
+      const { id, team1, team2, date } = this.modalMatch;
+      if (!confirm('Eliminar aquest partit programat?')) return;
+      this.logActivity('Pròxim partit eliminat', `${team1} vs ${team2} (${date})`);
+      window._remove(window._ref(window._db, `upcoming/${id}`));
+      this.matchModal = false;
     },
     getTeamPlayers(teamName) {
       const team = this.teams.find(t => t.name === teamName);
@@ -1551,12 +1475,15 @@ function app() {
     },
 
     addUpcoming() {
-      const { team1, team2, date, time, location } = this.newUpcoming;
+      const { team1, team2, date, time, location, referee } = this.newUpcoming;
       if (!team1 || !team2 || !date || team1 === team2) return;
       const upcomingJornada = this.newUpcoming.jornada || null;
-      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location, ...(upcomingJornada ? {jornada: upcomingJornada} : {}) });
+      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location,
+        ...(upcomingJornada ? {jornada: upcomingJornada} : {}),
+        ...(referee ? {referee} : {}),
+      });
       this.logActivity('Partit programat', `${team1} vs ${team2} (${date} ${time})`);
-      this.newUpcoming = { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'' };
+      this.newUpcoming = { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'', referee:'' };
     },
     removeUpcoming(id) {
       const u = this.upcoming.find(u => u.id === id);
