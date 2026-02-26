@@ -391,7 +391,7 @@
               </div>
               <div class="flex justify-center items-center gap-3 mt-2">
                 <template x-if="match.referee">
-                  <span class="font-condensed text-xs" style="color:var(--muted)">🏁 <span x-text="match.referee"></span></span>
+                  <span class="font-condensed text-xs" style="color:var(--muted)">🏁 <span x-text="refereeDisplay(match.referee)"></span></span>
                 </template>
                 <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">toca per detalls</span>
               </div>
@@ -419,7 +419,7 @@
                     <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--muted)" x-text="match.location"></span>
                   </template>
                   <template x-if="match.referee">
-                    <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="match.referee"></span></span>
+                    <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="refereeDisplay(match.referee)"></span></span>
                   </template>
                 </div>
               </div>
@@ -475,7 +475,7 @@
               <select x-model="newUpcoming.referee">
                 <option value="">Sense àrbitres assignats</option>
                 <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                  <option :value="g.label" x-text="g.members.map(m => m.split(' ')[0]).join(', ')"></option>
+                  <option :value="g.members.map(m=>m.split(' ')[0]).join(', ')" x-text="g.members.map(m => m.split(' ')[0]).join(', ')"></option>
                 </template>
               </select>
             </div>
@@ -751,7 +751,7 @@
             <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange)">J<span x-text="modalMatch.jornada"></span></span>
           </template>
           <template x-if="modalMatch.referee">
-            <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="modalMatch.referee"></span></span>
+            <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="refereeDisplay(modalMatch.referee)"></span></span>
           </template>
         </div>
         <button @click="matchModal=false" class="text-white/30 hover:text-white text-xl leading-none">✕</button>
@@ -830,7 +830,7 @@
                 <select x-model="modalResultData.referee">
                   <option value="">Sense àrbitres</option>
                   <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                    <option :value="g.label" x-text="g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
+                    <option :value="g.members.map(m=>m.split(' ')[0]).join(', ')" x-text="g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
                   </template>
                 </select>
               </div>
@@ -875,7 +875,7 @@
                 <select x-model="modalResultData.referee">
                   <option value="">Sense àrbitres</option>
                   <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                    <option :value="g.label" x-text="g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
+                    <option :value="g.members.map(m=>m.split(' ')[0]).join(', ')" x-text="g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
                   </template>
                 </select>
               </div>
@@ -891,11 +891,11 @@
     </template>
 
     <!-- Confirmació d'àrbitres — visible per àrbitres del partit -->
-    <template x-if="modalMatch.type==='result' && modalMatch.referee && isRefereeOfMatch(modalMatch)">
+    <template x-if="modalMatch.referee && isRefereeOfMatch(modalMatch)">
       <div class="px-6 py-4 border-b border-white/5" style="background:rgba(48,209,88,0.04)">
         <p class="font-condensed text-xs uppercase tracking-widest mb-2" style="color:var(--win)">✓ Confirmació d'àrbitre</p>
         <p class="font-condensed text-sm mb-3" style="color:var(--muted)">
-          Àrbitres: <span x-text="modalMatch.referee"></span>
+          Àrbitres: <span x-text="refereeDisplay(modalMatch.referee)"></span>
         </p>
         <template x-if="!hasConfirmedReferee()">
           <button @click="confirmAsReferee()" class="font-condensed text-sm px-4 py-2 rounded-lg" style="background:rgba(48,209,88,0.15);color:var(--win);border:1px solid rgba(48,209,88,0.3)">
@@ -1647,15 +1647,25 @@ function app() {
       return { hasEnoughData, t1, t2, h2h, prob1, prob2, hasProb };
     },
 
+    // Tradueix "Grup 1" → noms reals (compatibilitat amb dades antigues)
+    refereeDisplay(val) {
+      if (!val) return '';
+      const map = {};
+      this.REFEREE_GROUPS.forEach(g => { map[g.label] = g.members.map(m => m.split(' ')[0]).join(', '); });
+      return map[val] || val;
+    },
+
     isRefereeOfMatch(match) {
       if (!match.referee || !this.currentUser) return false;
-      const myFirstName = this.MEMBERS[this.currentUser]?.name.split(' ')[0] || '';
-      return match.referee.includes(myFirstName);
+      const myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0].toLowerCase();
+      if (!myFirstName) return false;
+      const displayNames = this.refereeDisplay(match.referee).toLowerCase();
+      return displayNames.split(/[,\s]+/).some(n => n === myFirstName);
     },
     hasConfirmedReferee() {
-      if (!this.modalMatch.refereeConfirmed) return false;
-      const myFirstName = this.MEMBERS[this.currentUser]?.name.split(' ')[0] || '';
-      return Object.values(this.modalMatch.refereeConfirmed).includes(myFirstName);
+      const confirmed = this.modalMatch.refereeConfirmed || {};
+      const myKey = (this.currentUser || '').replace(/[@.]/g, '_');
+      return !!confirmed[myKey];
     },
     confirmAsReferee() {
       const id = this.modalMatch.id;
@@ -1663,7 +1673,7 @@ function app() {
       const myFirstName = this.MEMBERS[this.currentUser]?.name.split(' ')[0] || '';
       const key = `results/${id}/refereeConfirmed/${this.currentUser.replace(/[@.]/g, '_')}`;
       window._set(window._ref(window._db, key), myFirstName);
-      this.logActivity('Àrbitre confirmat', `${myFirstName} confirma el partit ${this.modalMatch.team1} vs ${this.modalMatch.team2}`);
+      this.logActivity('Àrbitre confirmat', `${myFirstName} · ${this.modalMatch.team1} vs ${this.modalMatch.team2}`);
       // Update local modal match
       if (!this.modalMatch.refereeConfirmed) this.modalMatch.refereeConfirmed = {};
       this.modalMatch.refereeConfirmed[this.currentUser.replace(/[@.]/g, '_')] = myFirstName;
