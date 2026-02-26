@@ -73,8 +73,9 @@
   .standing-row:last-child { border-bottom: none; }
   .standing-row:hover { background: rgba(245,166,35,0.06) !important; }
   /* Top 3 amb gradient càlid discret */
-  .standing-first  { background: linear-gradient(90deg, rgba(255,209,102,0.12) 0%, rgba(245,166,35,0.04) 40%, transparent 100%) !important; }
-  .standing-second { background: linear-gradient(90deg, rgba(122,156,200,0.1) 0%, transparent 60%) !important; }
+  .standing-first  { background: linear-gradient(90deg, rgba(255,215,0,0.13) 0%, rgba(245,166,35,0.04) 40%, transparent 100%) !important; }
+  .standing-second { background: linear-gradient(90deg, rgba(192,192,220,0.10) 0%, transparent 60%) !important; }
+  .standing-third  { background: linear-gradient(90deg, rgba(205,127,50,0.10) 0%, transparent 60%) !important; }
   .standing-third  { background: linear-gradient(90deg, rgba(196,130,26,0.1) 0%, transparent 60%) !important; }
 
   /* BADGE positions */
@@ -83,9 +84,9 @@
     font-family:'Oswald'; font-size:14px; font-weight:700;
     border-radius:5px; letter-spacing:0;
   }
-  .badge-1 { background: linear-gradient(145deg, #FFD166, #F5A623); color:#0A1628; font-weight:800; box-shadow: 0 2px 12px rgba(245,166,35,0.5); }
-  .badge-2 { background: var(--bg-surface); color: var(--cream); border: 1px solid var(--border-mid); }
-  .badge-3 { background: linear-gradient(145deg, #1A2A1A, #1E3320); color: #06D6A0; border: 1px solid rgba(6,214,160,0.2); }
+  .badge-1 { background: linear-gradient(145deg, #FFE566, #FFAA00); color:#0A1628; font-weight:900; box-shadow: 0 0 14px rgba(255,200,0,0.7), 0 0 4px rgba(255,220,0,0.9); border:1px solid rgba(255,220,0,0.5); }
+  .badge-2 { background: linear-gradient(145deg, #E8E8F0, #A8B0C8); color:#0A1628; font-weight:900; box-shadow: 0 0 12px rgba(180,190,220,0.7), 0 0 4px rgba(200,210,240,0.8); border:1px solid rgba(200,210,240,0.4); }
+  .badge-3 { background: linear-gradient(145deg, #E8A060, #B86820); color:#0A0A0A; font-weight:900; box-shadow: 0 0 12px rgba(205,127,50,0.7), 0 0 4px rgba(230,150,70,0.8); border:1px solid rgba(205,140,60,0.5); }
   .badge-other { background: var(--bg-card-2); color: var(--faint); border: 1px solid var(--border); }
 
   /* CARDS */
@@ -474,7 +475,7 @@
               <select x-model="newUpcoming.referee">
                 <option value="">Sense àrbitres assignats</option>
                 <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                  <option :value="g.label" x-text="g.label + ': ' + g.members.map(m => m.split(' ')[0]).join(', ')"></option>
+                  <option :value="g.label" x-text="g.members.map(m => m.split(' ')[0]).join(', ')"></option>
                 </template>
               </select>
             </div>
@@ -643,11 +644,17 @@
             </div>
           </div>
         </template>
-        <!-- Zona de perill — només Rayan -->
+        <!-- Zona de perill — només Rayan/Esteve -->
         <template x-if="isOwner">
-          <div class="mt-6 pt-4" style="border-top:1px solid rgba(239,68,68,0.15)">
-            <button @click="resetAll()" class="btn-red">⚠ Esborrar totes les dades</button>
-            <p class="font-body text-xs mt-2" style="color:var(--faint)">Això eliminarà tots els equips, resultats i classificació.</p>
+          <div class="mt-6 pt-4 space-y-3" style="border-top:1px solid rgba(239,68,68,0.15)">
+            <div>
+              <button @click="clearActivityLog()" class="btn-red">🗑 Esborrar historial d'activitat</button>
+              <p class="font-body text-xs mt-1" style="color:var(--faint)">Elimina tot el registre d'accions. Les dades del torneig es mantenen.</p>
+            </div>
+            <div>
+              <button @click="resetAll()" class="btn-red">⚠ Esborrar totes les dades</button>
+              <p class="font-body text-xs mt-1" style="color:var(--faint)">Elimina equips, resultats i classificació.</p>
+            </div>
           </div>
         </template>
       </div>
@@ -823,7 +830,7 @@
                 <select x-model="modalResultData.referee">
                   <option value="">Sense àrbitres</option>
                   <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                    <option :value="g.label" x-text="g.label + ': ' + g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
+                    <option :value="g.label" x-text="g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
                   </template>
                 </select>
               </div>
@@ -868,7 +875,7 @@
                 <select x-model="modalResultData.referee">
                   <option value="">Sense àrbitres</option>
                   <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                    <option :value="g.label" x-text="g.label + ': ' + g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
+                    <option :value="g.label" x-text="g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
                   </template>
                 </select>
               </div>
@@ -878,6 +885,29 @@
               <button @click="deleteResultFromModal()" class="btn-red px-4">✕ Eliminar</button>
             </div>
             <p x-show="modalMsg" class="font-condensed text-sm mt-2" :style="modalErr?'color:var(--loss)':'color:var(--win)'" x-text="modalMsg"></p>
+          </div>
+        </template>
+      </div>
+    </template>
+
+    <!-- Confirmació d'àrbitres — visible per àrbitres del partit -->
+    <template x-if="modalMatch.type==='result' && modalMatch.referee && isRefereeOfMatch(modalMatch)">
+      <div class="px-6 py-4 border-b border-white/5" style="background:rgba(48,209,88,0.04)">
+        <p class="font-condensed text-xs uppercase tracking-widest mb-2" style="color:var(--win)">✓ Confirmació d'àrbitre</p>
+        <p class="font-condensed text-sm mb-3" style="color:var(--muted)">
+          Àrbitres: <span x-text="modalMatch.referee"></span>
+        </p>
+        <template x-if="!hasConfirmedReferee()">
+          <button @click="confirmAsReferee()" class="font-condensed text-sm px-4 py-2 rounded-lg" style="background:rgba(48,209,88,0.15);color:var(--win);border:1px solid rgba(48,209,88,0.3)">
+            ✓ Confirmo que he arbitrat aquest partit
+          </button>
+        </template>
+        <template x-if="hasConfirmedReferee()">
+          <div class="font-condensed text-sm" style="color:var(--win)">✓ Ja has confirmat la teva participació</div>
+        </template>
+        <template x-if="modalMatch.refereeConfirmed && Object.keys(modalMatch.refereeConfirmed||{}).length > 0">
+          <div class="mt-2 font-condensed text-xs" style="color:var(--faint)">
+            Confirmat per: <span x-text="Object.values(modalMatch.refereeConfirmed||{}).join(', ')"></span>
           </div>
         </template>
       </div>
@@ -987,6 +1017,8 @@ function app() {
     },
     OWNER_EMAIL: 'z118324@iesxarc.es',
     OWNER: 'rayan',
+    // Usuaris amb accés total (com Rayan)
+    SUPER_OWNERS: ['z118324@iesxarc.es', 'ecanovas@iesxarc.es'],
     // Grups d'àrbitres
     REFEREE_GROUPS: [
       { label: 'Grup 1', members: ['Raúl Castillo Benito', 'Joel Rohra Kelani', 'Thibault Ferrari Catalá'] },
@@ -1050,11 +1082,12 @@ function app() {
             if (member) {
               this.currentUser = email;
               this.isAdmin = true;
-              this.isOwner = (email === this.OWNER_EMAIL);
+              this.isOwner = this.SUPER_OWNERS.includes(email);
               this.showAdminLogin = false;
               this.loginError = '';
               if (this.isOwner && !this.publicTabs.find(t => t.id === 'owner')) {
-                this.publicTabs.push({ id: 'owner', label: '🔒 Rayan' });
+                const ownerLabel = email === this.OWNER_EMAIL ? '🔒 Rayan' : '🔒 Esteve';
+                this.publicTabs.push({ id: 'owner', label: ownerLabel });
               }
             } else {
               // Email no autoritzat — tanca sessió i mostra error
@@ -1612,6 +1645,33 @@ function app() {
       }
 
       return { hasEnoughData, t1, t2, h2h, prob1, prob2, hasProb };
+    },
+
+    isRefereeOfMatch(match) {
+      if (!match.referee || !this.currentUser) return false;
+      const myFirstName = this.MEMBERS[this.currentUser]?.name.split(' ')[0] || '';
+      return match.referee.includes(myFirstName);
+    },
+    hasConfirmedReferee() {
+      if (!this.modalMatch.refereeConfirmed) return false;
+      const myFirstName = this.MEMBERS[this.currentUser]?.name.split(' ')[0] || '';
+      return Object.values(this.modalMatch.refereeConfirmed).includes(myFirstName);
+    },
+    confirmAsReferee() {
+      const id = this.modalMatch.id;
+      if (!id) return;
+      const myFirstName = this.MEMBERS[this.currentUser]?.name.split(' ')[0] || '';
+      const key = `results/${id}/refereeConfirmed/${this.currentUser.replace(/[@.]/g, '_')}`;
+      window._set(window._ref(window._db, key), myFirstName);
+      this.logActivity('Àrbitre confirmat', `${myFirstName} confirma el partit ${this.modalMatch.team1} vs ${this.modalMatch.team2}`);
+      // Update local modal match
+      if (!this.modalMatch.refereeConfirmed) this.modalMatch.refereeConfirmed = {};
+      this.modalMatch.refereeConfirmed[this.currentUser.replace(/[@.]/g, '_')] = myFirstName;
+    },
+
+    clearActivityLog() {
+      if (!confirm('Segur que vols esborrar tot l\'historial d\'activitat? Aquesta acció no es pot desfer.')) return;
+      window._set(window._ref(window._db, 'activityLog'), null);
     },
 
     resetAll() {
