@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Ops+One&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   tailwind.config = {
     theme: {
@@ -332,9 +333,7 @@
             <span class="text-2xl" x-text="team.emoji||'🏀'"></span>
             <div>
               <span class="font-condensed font-600 text-white uppercase" style="font-size:15px;letter-spacing:0.05em" x-text="team.name"></span>
-              <template x-if="idx===0">
-                <span class="ml-2 font-condensed text-xs px-2 py-0.5 rounded-sm" style="background:rgba(249,115,22,0.12);color:var(--orange);border:1px solid rgba(249,115,22,0.2);letter-spacing:0.08em">LÍDER</span>
-              </template>
+
             </div>
           </div>
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="team.pj||0"></span>
@@ -519,9 +518,12 @@
                 <!-- Mode visualització -->
                 <template x-if="!editingPlayer || editingPlayer.teamId !== team.id || editingPlayer.playerIdx !== pi">
                   <div class="flex items-center justify-between py-1 rounded px-2 -mx-2 group" style="transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background=''">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                       <span class="font-condensed text-sm" style="color:var(--cream)" x-text="player.name"></span>
                       <span x-show="player.number" class="font-condensed text-xs px-2 py-0 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange);border:1px solid rgba(245,166,35,0.2)" x-text="player.number"></span>
+                      <template x-if="isAdmin && player.email">
+                        <span class="font-condensed text-xs" style="color:var(--faint)">✉ <span x-text="player.email"></span></span>
+                      </template>
                     </div>
                     <template x-if="isAdmin">
                       <div class="flex items-center gap-2">
@@ -535,6 +537,7 @@
                 <template x-if="editingPlayer && editingPlayer.teamId === team.id && editingPlayer.playerIdx === pi">
                   <div class="flex gap-2 items-center flex-wrap py-2 px-3 rounded-lg my-1" style="background:var(--bg-surface);border:1px dashed var(--orange)">
                     <input type="text" x-model="editPlayerData.name" @keydown.enter="saveEditPlayer()" @keydown.escape="editingPlayer=null" placeholder="Nom" class="text-sm" style="padding:4px 8px;min-width:80px;flex:1"/>
+                    <input type="email" x-model="editPlayerData.email" placeholder="Email (opcional)" class="text-sm" style="padding:4px 8px;min-width:140px;flex:1"/>
                     <select x-model="editPlayerData.number" class="text-sm" style="padding:4px 8px;min-width:100px">
                       <option value="">Classe</option>
                       <optgroup label="ESO">
@@ -573,6 +576,7 @@
             <div class="mt-4 pt-3 border-t border-white/5">
               <div class="flex gap-2 flex-wrap">
                 <input type="text" x-model="newPlayerNames[team.id]" placeholder="Nom jugador" class="text-sm" style="padding:6px 10px;min-width:120px;flex:1"/>
+                <input type="email" x-model="newPlayerEmails[team.id]" placeholder="Email (opcional)" class="text-sm" style="padding:6px 10px;min-width:140px;flex:1"/>
                 <select x-model="newPlayerNums[team.id]" class="text-sm" style="padding:6px 10px;min-width:110px">
                   <option value="">Classe</option>
                   <optgroup label="ESO">
@@ -735,6 +739,83 @@
       <template x-if="activityLog.length > 100">
         <p class="font-condensed text-xs mt-3 text-center" style="color:var(--faint)" x-text="'Mostrant els últims 100 de ' + activityLog.length + ' canvis'"></p>
       </template>
+    </div>
+  </div>
+
+  <!-- ======================== ÀRBITRES ======================== -->
+  <div x-show="activeTab==='arbitres' && isAdmin" class="fade-in">
+    <div class="flex items-center gap-4 mb-6">
+      <div>
+        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(48,209,88,0.7)">Els teus partits</p>
+        <h2 class="font-display text-5xl leading-none" style="color:var(--cream)">ÀRBITRES</h2>
+      </div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(48,209,88,0.4),transparent);margin-left:8px;margin-top:20px"></div>
+    </div>
+
+    <!-- Partits pendents de confirmar -->
+    <div class="card p-6 mb-4">
+      <h3 class="font-condensed font-700 uppercase tracking-widest mb-1" style="color:var(--cream);font-size:16px">⏳ Pendents de confirmar</h3>
+      <p class="font-condensed text-xs mb-4" style="color:var(--faint)">Partits on has arbitrat però encara no has confirmat la teva assistència</p>
+
+      <template x-if="myPendingRefereeMatches().length === 0">
+        <div class="py-8 text-center">
+          <div class="text-4xl mb-2">✅</div>
+          <p class="font-condensed" style="color:var(--win)">Tot confirmat! No tens partits pendents.</p>
+        </div>
+      </template>
+
+      <div class="space-y-3">
+        <template x-for="match in myPendingRefereeMatches()" :key="match.id">
+          <div class="px-5 py-4 rounded-xl flex items-center justify-between gap-4 flex-wrap" style="background:var(--bg-surface);border:1px solid rgba(239,71,111,0.25)">
+            <div>
+              <div class="font-condensed font-600 uppercase" style="color:var(--cream);font-size:15px;letter-spacing:0.05em">
+                <span x-text="match.team1"></span>
+                <span style="color:var(--faint);margin:0 8px">vs</span>
+                <span x-text="match.team2"></span>
+              </div>
+              <div class="flex items-center gap-3 mt-1 flex-wrap">
+                <span class="font-condensed text-sm" style="color:var(--muted)" x-text="match.date"></span>
+                <template x-if="match.score1 !== undefined">
+                  <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="(match.noShow1?'NP':match.score1) + ' - ' + (match.noShow2?'NP':match.score2)"></span>
+                </template>
+                <template x-if="match.score1 === undefined">
+                  <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange)">Pendent de jugar</span>
+                </template>
+                <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="refereeDisplay(match.referee)"></span></span>
+              </div>
+            </div>
+            <button @click="confirmRefereeFromTab(match)"
+              class="font-condensed text-sm px-5 py-2.5 rounded-lg flex-shrink-0"
+              style="background:rgba(48,209,88,0.15);color:var(--win);border:1px solid rgba(48,209,88,0.35);cursor:pointer"
+              onmouseover="this.style.background='rgba(48,209,88,0.25)'" onmouseout="this.style.background='rgba(48,209,88,0.15)'">
+              ✓ Confirmar assistència
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Partits ja confirmats -->
+    <div class="card p-6">
+      <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">✅ Ja confirmats</h3>
+      <template x-if="myConfirmedRefereeMatches().length === 0">
+        <p class="font-condensed" style="color:var(--faint)">Encara no has confirmat cap partit</p>
+      </template>
+      <div class="space-y-2">
+        <template x-for="match in myConfirmedRefereeMatches()" :key="match.id">
+          <div class="px-5 py-3 rounded-xl flex items-center justify-between gap-4" style="background:rgba(48,209,88,0.05);border:1px solid rgba(48,209,88,0.15)">
+            <div>
+              <div class="font-condensed font-600 uppercase text-sm" style="color:var(--cream);letter-spacing:0.04em">
+                <span x-text="match.team1"></span>
+                <span style="color:var(--faint);margin:0 6px">vs</span>
+                <span x-text="match.team2"></span>
+              </div>
+              <span class="font-condensed text-xs" style="color:var(--faint)" x-text="match.date"></span>
+            </div>
+            <span class="font-condensed text-xs" style="color:var(--win)">✓ Confirmat</span>
+          </div>
+        </template>
+      </div>
     </div>
   </div>
 
@@ -1040,6 +1121,7 @@ function app() {
     newUpcoming: { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'' },
     newPlayerNames: {},
     newPlayerNums: {},
+    newPlayerEmails: {},
     editingPlayer: null, // { teamId, playerIdx }
     editPlayerData: { name: '', number: '' },
     resultMsg: '',
@@ -1085,6 +1167,9 @@ function app() {
               this.isOwner = this.SUPER_OWNERS.includes(email);
               this.showAdminLogin = false;
               this.loginError = '';
+              if (!this.publicTabs.find(t => t.id === 'arbitres')) {
+                this.publicTabs.splice(2, 0, { id: 'arbitres', label: '🏁 Àrbitres' });
+              }
               if (this.isOwner && !this.publicTabs.find(t => t.id === 'owner')) {
                 const ownerLabel = email === this.OWNER_EMAIL ? '🔒 Rayan' : '🔒 Esteve';
                 this.publicTabs.push({ id: 'owner', label: ownerLabel });
@@ -1098,12 +1183,13 @@ function app() {
             this.currentUser = null;
             this.isAdmin = false;
             this.isOwner = false;
-            this.publicTabs = this.publicTabs.filter(t => t.id !== 'owner');
+            this.publicTabs = this.publicTabs.filter(t => t.id !== 'owner' && t.id !== 'arbitres');
           }
         });
       };
       if (window._db) { setup(); }
       else { window.addEventListener('firebaseReady', setup, { once: true }); }
+      this.initEmailJS();
     },
 
     async tryLogin() {
@@ -1130,7 +1216,7 @@ function app() {
       this.loginUser = '';
       this.loginPass = '';
       this.loginError = '';
-      this.publicTabs = this.publicTabs.filter(t => t.id !== 'owner');
+      this.publicTabs = this.publicTabs.filter(t => t.id !== 'owner' && t.id !== 'arbitres');
     },
     logActivity(action, detail) {
       if (!this.currentUser) return;
@@ -1223,12 +1309,14 @@ function app() {
       if (!name) return;
       const team = this.teams.find(t => t.id === teamId);
       if (!team) return;
-      const players = [...(team.players||[]), { name, number: (this.newPlayerNums[teamId]||'').trim() }];
+      const email = (this.newPlayerEmails[teamId]||'').trim();
+      const players = [...(team.players||[]), { name, number: (this.newPlayerNums[teamId]||'').trim(), ...(email ? {email} : {}) }];
       const tname = this.teams.find(t=>t.id===teamId)?.name||teamId;
       window._set(window._ref(window._db, `teams/${teamId}/players`), players);
       this.logActivity('Jugador afegit', `${name} → ${tname}`);
       this.newPlayerNames[teamId] = '';
       this.newPlayerNums[teamId] = '';
+      this.newPlayerEmails[teamId] = '';
     },
     removePlayer(teamId, playerIdx) {
       const team = this.teams.find(t => t.id === teamId);
@@ -1241,7 +1329,7 @@ function app() {
     },
     startEditPlayer(teamId, playerIdx, player) {
       this.editingPlayer = { teamId, playerIdx };
-      this.editPlayerData = { name: player.name, number: player.number || '' };
+      this.editPlayerData = { name: player.name, number: player.number || '', email: player.email || '' };
     },
     saveEditPlayer() {
       if (!this.editingPlayer) return;
@@ -1251,7 +1339,8 @@ function app() {
       const team = this.teams.find(t => t.id === teamId);
       if (!team) return;
       const players = [...(team.players||[])];
-      players[playerIdx] = { name, number: this.editPlayerData.number };
+      const email = (this.editPlayerData.email||'').trim();
+      players[playerIdx] = { name, number: this.editPlayerData.number, ...(email ? {email} : {}) };
       window._set(window._ref(window._db, `teams/${teamId}/players`), players);
       this.logActivity('Jugador editat', `${players[playerIdx].name} → ${this.teams.find(t=>t.id===teamId)?.name||teamId}`);
       this.editingPlayer = null;
@@ -1299,6 +1388,7 @@ function app() {
         if (count >= 3) {
           this.resultMsg = `⚠ ${team1} ha acumulat 3 no presentacions i queda ELIMINAT!`;
           this.logActivity('Equip eliminat automàticament', `${team1} — 3 no presentacions`);
+          this.sendEliminationEmail(team1);
         } else {
           this.resultMsg = `✓ Resultat registrat · ${team1}: ${count}/3 no presentacions`;
         }
@@ -1307,6 +1397,7 @@ function app() {
         if (count >= 3) {
           this.resultMsg = `⚠ ${team2} ha acumulat 3 no presentacions i queda ELIMINAT!`;
           this.logActivity('Equip eliminat automàticament', `${team2} — 3 no presentacions`);
+          this.sendEliminationEmail(team2);
         } else {
           this.resultMsg = `✓ Resultat registrat · ${team2}: ${count}/3 no presentacions`;
         }
@@ -1413,11 +1504,11 @@ function app() {
       // Check 3 NP
       if (noShow1 && !noShow2) {
         const count = this.noShowCount(team1) + 1;
-        if (count >= 3) { this.logActivity('Equip eliminat automàticament', `${team1} — 3 NP`); }
+        if (count >= 3) { this.logActivity('Equip eliminat automàticament', `${team1} — 3 NP`); this.sendEliminationEmail(team1); }
       }
       if (noShow2 && !noShow1) {
         const count = this.noShowCount(team2) + 1;
-        if (count >= 3) { this.logActivity('Equip eliminat automàticament', `${team2} — 3 NP`); }
+        if (count >= 3) { this.logActivity('Equip eliminat automàticament', `${team2} — 3 NP`); this.sendEliminationEmail(team2); }
       }
 
       this.modalMsg = '✓ Resultat registrat!';
@@ -1647,7 +1738,150 @@ function app() {
       return { hasEnoughData, t1, t2, h2h, prob1, prob2, hasProb };
     },
 
-    // Tradueix "Grup 1" → noms reals (compatibilitat amb dades antigues)
+    // Retorna tots els partits (jugats + programats) on l'usuari és àrbitre i NO ha confirmat
+    myPendingRefereeMatches() {
+      if (!this.currentUser) return [];
+      const myKey = this.currentUser.replace(/[@.]/g, '_');
+      const allMatches = [
+        ...this.results.map(m => ({...m, _type:'result'})),
+        ...this.upcoming.map(m => ({...m, _type:'upcoming'})),
+      ];
+      return allMatches.filter(m => {
+        if (!m.referee) return false;
+        if (!this.isRefereeOfMatch(m)) return false;
+        const confirmed = m.refereeConfirmed || {};
+        return !confirmed[myKey];
+      }).sort((a,b) => (a.date > b.date ? 1 : -1));
+    },
+
+    myConfirmedRefereeMatches() {
+      if (!this.currentUser) return [];
+      const myKey = this.currentUser.replace(/[@.]/g, '_');
+      const allMatches = [
+        ...this.results.map(m => ({...m, _type:'result'})),
+        ...this.upcoming.map(m => ({...m, _type:'upcoming'})),
+      ];
+      return allMatches.filter(m => {
+        if (!m.referee) return false;
+        if (!this.isRefereeOfMatch(m)) return false;
+        const confirmed = m.refereeConfirmed || {};
+        return !!confirmed[myKey];
+      }).sort((a,b) => (a.date > b.date ? 1 : -1));
+    },
+
+    confirmRefereeFromTab(match) {
+      const myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
+      const myKey = this.currentUser.replace(/[@.]/g, '_');
+      const collection = match._type === 'result' ? 'results' : 'upcoming';
+      const path = `${collection}/${match.id}/refereeConfirmed/${myKey}`;
+      window._set(window._ref(window._db, path), myFirstName);
+      this.logActivity('Àrbitre confirmat', `${myFirstName} · ${match.team1} vs ${match.team2} (${match.date})`);
+    },
+
+    // EmailJS — configura aquí els teus IDs (veure instruccions)
+    EMAILJS_PUBLIC_KEY: 'POSA_EL_TEU_PUBLIC_KEY',
+    EMAILJS_SERVICE_ID: 'POSA_EL_TEU_SERVICE_ID',
+    EMAILJS_TEMPLATE_ID: 'POSA_EL_TEU_TEMPLATE_ID',
+    WEB_URL: 'https://rayaneqem.github.io/torneig-basquet-ies-xarc/',
+
+    emailjsReady: false,
+
+    initEmailJS() {
+      if (this.EMAILJS_PUBLIC_KEY === 'POSA_EL_TEU_PUBLIC_KEY') return;
+      emailjs.init({ publicKey: this.EMAILJS_PUBLIC_KEY });
+      this.emailjsReady = true;
+      this.scheduleReminderCheck();
+    },
+
+    // Comprova si toca enviar recordatoris (executa un cop al carregar i cada hora)
+    scheduleReminderCheck() {
+      this.checkReminders();
+      setInterval(() => this.checkReminders(), 60 * 60 * 1000);
+    },
+
+    checkReminders() {
+      if (!this.emailjsReady) return;
+      const now = new Date();
+      const hour = now.getHours();
+      // Només a les 14h
+      if (hour !== 14) return;
+      // Evita enviar dues vegades el mateix dia
+      const todayKey = now.toISOString().slice(0, 10);
+      const lastSent = localStorage.getItem('reminderSentDate');
+      if (lastSent === todayKey) return;
+      localStorage.setItem('reminderSentDate', todayKey);
+      this.sendTomorrowReminders();
+    },
+
+    sendTomorrowReminders() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+      const matches = this.upcoming.filter(m => m.date === tomorrowStr);
+      matches.forEach(match => this.sendMatchEmail(match));
+    },
+
+    getPlayerEmails(teamName) {
+      const team = this.teams.find(t => t.name === teamName);
+      return (team?.players || []).map(p => p.email).filter(Boolean);
+    },
+
+    getRefereeEmails() {
+      // Els àrbitres organitzadors els trobem per nom → email a MEMBERS
+      const emailByFirstName = {};
+      Object.entries(this.MEMBERS).forEach(([email, m]) => {
+        emailByFirstName[m.name.split(' ')[0]] = email;
+      });
+      return emailByFirstName;
+    },
+
+    sendMatchEmail(match) {
+      const { team1, team2, date, time, location, referee } = match;
+      const refereeNames = this.refereeDisplay(referee);
+      const locationStr = location || 'Pista de bàsquet';
+      const timeStr = time || '—';
+
+      const playerEmails = [
+        ...this.getPlayerEmails(team1),
+        ...this.getPlayerEmails(team2),
+      ];
+
+      // Àrbitres
+      const emailByName = this.getRefereeEmails();
+      const refereeEmails = refereeNames
+        ? refereeNames.split(', ').map(n => emailByName[n]).filter(Boolean)
+        : [];
+
+      const allEmails = [...new Set([...playerEmails, ...refereeEmails])];
+
+      allEmails.forEach(email => {
+        emailjs.send(this.EMAILJS_SERVICE_ID, this.EMAILJS_TEMPLATE_ID, {
+          to_email: email,
+          team1, team2, date,
+          time: timeStr,
+          location: locationStr,
+          referees: refereeNames || '—',
+          web_url: this.WEB_URL,
+        }).then(() => {
+          console.log('Email enviat a', email);
+        }).catch(e => {
+          console.error('Error email', email, e);
+        });
+      });
+    },
+
+    // Avís eliminació — es crida quan s'afegeix un resultat amb NP
+    sendEliminationEmail(teamName) {
+      if (!this.emailjsReady) return;
+      // Envia als organitzadors (Rayan + Esteve)
+      this.SUPER_OWNERS.forEach(email => {
+        emailjs.send(this.EMAILJS_SERVICE_ID, 'template_eliminat', {
+          to_email: email,
+          team_name: teamName,
+          web_url: this.WEB_URL,
+        }).catch(e => console.error(e));
+      });
+    },
     refereeDisplay(val) {
       if (!val) return '';
       const map = {};
@@ -1685,7 +1919,10 @@ function app() {
     },
 
     resetAll() {
-      if (!confirm('Segur que vols esborrar TOTS els dades? Aquesta acció no es pot desfer.')) return;
+      const pwd = prompt('Introdueix la contrasenya per esborrar totes les dades:');
+      if (pwd === null) return;
+      if (pwd !== 'iesxarc2526') { alert('Contrasenya incorrecta.'); return; }
+      if (!confirm('Segur que vols esborrar TOTS els dades? Aquesta acció NO es pot desfer.')) return;
       this.logActivity('⚠️ RESET TOTAL', 'Totes les dades han estat esborrades');
       window._set(window._ref(window._db, '/'), null);
     },
