@@ -78,7 +78,7 @@ function getTeamPlayers(teams, teamName) {
 async function sendEmail(to, subject, html) {
   try {
     await transporter.sendMail({
-      from: `"Torneig Basquet IES Xarc" <${GMAIL_USER}>`,
+      from: `"Torneig Bàsquet IES Xarc" <${GMAIL_USER}>`,
       replyTo: 'noreply@torneig.invalid',
       to,
       subject,
@@ -91,56 +91,128 @@ async function sendEmail(to, subject, html) {
 }
 
 function buildReminderHtml(team1, team2, date, time, location, refereeStr, rolText, refBadge) {
-  return `
-  <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#0d1117;color:#e6edf3;border-radius:12px;overflow:hidden">
-    <div style="background:linear-gradient(135deg,#08142A,#0D1E42);padding:28px 32px;border-bottom:2px solid #F97316">
-      <div style="font-size:11px;color:rgba(249,115,22,0.8);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">IES Xarc - Torneig Bàsquet 2025-26</div>
-      <div style="font-size:24px;font-weight:900;color:#F97316">RECORDATORI DE PARTIT</div>
+  return `<!DOCTYPE html>
+<html lang="ca">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
+<body style="margin:0;padding:20px;background:#0A1628;font-family:'Barlow',Arial,sans-serif">
+  <div style="max-width:540px;margin:0 auto;background:#0F1F3D;border-radius:14px;overflow:hidden;border:1px solid #1F3A6B;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+
+    <!-- HEADER -->
+    <div style="background:linear-gradient(135deg,#0A1628 0%,#0F1F3D 60%,#162848 100%);padding:28px 32px;border-bottom:2px solid #F5A623">
+      <div style="font-size:10px;color:rgba(245,166,35,0.7);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;font-weight:600">IES Xarc · Torneig Bàsquet 2025–26</div>
+      <div style="font-size:26px;font-weight:900;color:#F5A623;letter-spacing:1px;text-transform:uppercase">🏀 Recordatori de Partit</div>
+      <div style="width:36px;height:2px;background:#F5A623;border-radius:2px;opacity:0.7;margin-top:10px"></div>
     </div>
-    <div style="padding:28px 32px">
-      <p style="color:#8b949e;margin-bottom:20px">Hola! Et recordem que demà tens un <strong style="color:#e6edf3">partit per ${rolText}</strong>:</p>
-      <div style="background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
-        <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:14px">${team1} <span style="color:#F97316">VS</span> ${team2}</div>
-        <table style="width:100%;font-size:14px;color:#8b949e;text-align:left">
-          <tr><td style="padding:5px 8px">Data</td><td style="color:#e6edf3;font-weight:600">${date}</td></tr>
-          <tr><td style="padding:5px 8px">Hora</td><td style="color:#F97316;font-weight:700">${time}</td></tr>
-          <tr><td style="padding:5px 8px">Lloc</td><td style="color:#e6edf3">${location}</td></tr>
-          ${refereeStr ? `<tr><td style="padding:5px 8px">Arbitres</td><td style="color:#e6edf3">${refereeStr}</td></tr>` : ''}
+
+    <!-- BODY -->
+    <div style="padding:28px 32px;background:#0A1628">
+
+      <p style="color:#7A9CC8;margin:0 0 22px 0;font-size:15px;line-height:1.6">
+        Hola! Et recordem que demà tens un <strong style="color:#E8F0FF">partit per ${rolText}</strong>:
+      </p>
+
+      <!-- MATCH CARD -->
+      <div style="background:#0F1F3D;border:1px solid #1F3A6B;border-radius:12px;padding:24px;margin-bottom:20px;text-align:center">
+
+        <!-- Equips -->
+        <div style="font-size:20px;font-weight:900;color:#E8F0FF;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase">
+          ${team1}
+        </div>
+        <div style="font-size:13px;font-weight:700;color:#F5A623;letter-spacing:3px;margin-bottom:6px">VS</div>
+        <div style="font-size:20px;font-weight:900;color:#E8F0FF;margin-bottom:20px;letter-spacing:1px;text-transform:uppercase">
+          ${team2}
+        </div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:linear-gradient(90deg,transparent,#1F3A6B,transparent);margin-bottom:20px"></div>
+
+        <!-- Detalls -->
+        <table style="width:100%;font-size:14px;text-align:left;border-collapse:collapse">
+          <tr>
+            <td style="padding:8px 12px;color:#7A9CC8;font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:1px;width:100px">📅 Data</td>
+            <td style="padding:8px 12px;color:#E8F0FF;font-weight:700">${date}</td>
+          </tr>
+          <tr style="background:rgba(245,166,35,0.04);border-radius:6px">
+            <td style="padding:8px 12px;color:#7A9CC8;font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:1px">⏰ Hora</td>
+            <td style="padding:8px 12px;color:#F5A623;font-weight:900;font-size:17px">${time}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px;color:#7A9CC8;font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:1px">📍 Lloc</td>
+            <td style="padding:8px 12px;color:#E8F0FF;font-weight:600">${location}</td>
+          </tr>
+          ${refereeStr ? `
+          <tr style="background:rgba(245,166,35,0.04)">
+            <td style="padding:8px 12px;color:#7A9CC8;font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:1px">🦺 Àrbitres</td>
+            <td style="padding:8px 12px;color:#E8F0FF">${refereeStr}</td>
+          </tr>` : ''}
         </table>
       </div>
+
+      <!-- BADGE ÀRBITRE -->
       ${refBadge}
-      <div style="text-align:center;margin:24px 0">
-        <a href="${WEB_URL}" style="background:#F97316;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block">Veure classificació i partits</a>
+
+      <!-- BOTÓ CTA -->
+      <div style="text-align:center;margin:26px 0 22px">
+        <a href="${WEB_URL}" style="background:#F5A623;color:#0A1628;text-decoration:none;padding:13px 32px;border-radius:8px;font-weight:900;font-size:14px;display:inline-block;text-transform:uppercase;letter-spacing:1px;box-shadow:0 2px 8px rgba(245,166,35,0.3)">
+          Veure Classificació i Partits →
+        </a>
       </div>
-      <div style="border-top:1px solid #21262d;padding-top:16px;font-size:11px;color:#484f58;text-align:center">
+
+      <!-- FOOTER -->
+      <div style="border-top:1px solid #1F3A6B;padding-top:16px;font-size:11px;color:#2A4E8A;text-align:center;line-height:2">
         Aquest correu és automàtic. Si us plau, no responguis.<br>
-        Per a qualsevol consulta: <a href="mailto:${SUPORT_EMAIL}" style="color:#F97316">${SUPORT_EMAIL}</a>
+        Consultes: <a href="mailto:${SUPORT_EMAIL}" style="color:#F5A623;text-decoration:none">${SUPORT_EMAIL}</a>
       </div>
+
     </div>
-  </div>`;
+  </div>
+</body>
+</html>`;
 }
 
 function buildEliminationHtml(teamName, noShows) {
-  return `
-  <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#0d1117;color:#e6edf3;border-radius:12px;overflow:hidden">
-    <div style="background:linear-gradient(135deg,#1a0a0a,#2a0d0d);padding:28px 32px;border-bottom:2px solid #EF476F">
-      <div style="font-size:11px;color:rgba(239,71,111,0.8);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">IES Xarc - Torneig Bàsquet 2025-26</div>
-      <div style="font-size:24px;font-weight:900;color:#EF476F">EQUIP ELIMINAT</div>
+  return `<!DOCTYPE html>
+<html lang="ca">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
+<body style="margin:0;padding:20px;background:#0A1628;font-family:'Barlow',Arial,sans-serif">
+  <div style="max-width:540px;margin:0 auto;background:#0F1F3D;border-radius:14px;overflow:hidden;border:1px solid #1F3A6B;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+
+    <!-- HEADER -->
+    <div style="background:linear-gradient(135deg,#1a0510 0%,#0F1F3D 100%);padding:28px 32px;border-bottom:2px solid #EF476F">
+      <div style="font-size:10px;color:rgba(239,71,111,0.7);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;font-weight:600">IES Xarc · Torneig Bàsquet 2025–26</div>
+      <div style="font-size:26px;font-weight:900;color:#EF476F;letter-spacing:1px;text-transform:uppercase">⛔ Equip Eliminat</div>
+      <div style="width:36px;height:2px;background:#EF476F;border-radius:2px;opacity:0.7;margin-top:10px"></div>
     </div>
-    <div style="padding:28px 32px">
-      <div style="background:#1a0a0a;border:1px solid rgba(239,71,111,0.3);border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
-        <div style="font-size:22px;font-weight:900;color:#EF476F;margin-bottom:8px">${teamName}</div>
-        <div style="color:#8b949e;font-size:14px">Ha acumulat <strong style="color:#EF476F">${noShows} no presentacions</strong> i queda eliminat del torneig.</div>
+
+    <!-- BODY -->
+    <div style="padding:28px 32px;background:#0A1628">
+
+      <!-- TEAM CARD -->
+      <div style="background:#0F1F3D;border:1px solid rgba(239,71,111,0.3);border-radius:12px;padding:24px;margin-bottom:20px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:#EF476F;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase">${teamName}</div>
+        <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(239,71,111,0.3),transparent);margin-bottom:14px"></div>
+        <div style="color:#7A9CC8;font-size:14px;line-height:1.6">
+          Ha acumulat <strong style="color:#EF476F">${noShows} no presentacions</strong><br>i queda eliminat del torneig.
+        </div>
       </div>
-      <div style="text-align:center;margin:24px 0">
-        <a href="${WEB_URL}" style="background:#F97316;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block">Veure classificació actualitzada</a>
+
+      <!-- BOTÓ CTA -->
+      <div style="text-align:center;margin:26px 0 22px">
+        <a href="${WEB_URL}" style="background:#F5A623;color:#0A1628;text-decoration:none;padding:13px 32px;border-radius:8px;font-weight:900;font-size:14px;display:inline-block;text-transform:uppercase;letter-spacing:1px;box-shadow:0 2px 8px rgba(245,166,35,0.3)">
+          Veure Classificació Actualitzada →
+        </a>
       </div>
-      <div style="border-top:1px solid #21262d;padding-top:16px;font-size:11px;color:#484f58;text-align:center">
+
+      <!-- FOOTER -->
+      <div style="border-top:1px solid #1F3A6B;padding-top:16px;font-size:11px;color:#2A4E8A;text-align:center;line-height:2">
         Aquest correu és automàtic. Si us plau, no responguis.<br>
-        Per a qualsevol consulta: <a href="mailto:${SUPORT_EMAIL}" style="color:#F97316">${SUPORT_EMAIL}</a>
+        Consultes: <a href="mailto:${SUPORT_EMAIL}" style="color:#F5A623;text-decoration:none">${SUPORT_EMAIL}</a>
       </div>
+
     </div>
-  </div>`;
+  </div>
+</body>
+</html>`;
 }
 
 async function main() {
@@ -165,13 +237,16 @@ async function main() {
     const refereeEmails = getRefereeEmails(referee, emailMap);
     const allEmails     = unique([...playerEmails, ...refereeEmails]);
     const refereeStr    = resolveRefereeNames(referee);
-    const subject       = `Recordatori: ${team1} vs ${team2} - Dema ${date}`;
+    const subject       = `🏀 Recordatori: ${team1} vs ${team2} — Demà ${date}`;
 
     for (const email of allEmails) {
       const isRef    = refereeEmails.includes(email);
       const rolText  = isRef ? 'arbitrar' : 'jugar';
       const refBadge = isRef
-        ? `<div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.25);border-radius:8px;padding:14px;margin-bottom:20px;font-size:13px;color:#3DD68C">Ets arbitre d'aquest partit. Recorda confirmar la teva assistencia a la pestanya Arbitres de la web.</div>`
+        ? `<div style="background:rgba(6,214,160,0.07);border:1px solid rgba(6,214,160,0.25);border-radius:8px;padding:14px;margin-bottom:20px;font-size:13px;color:#06D6A0;line-height:1.6">
+            🦺 <strong>Ets àrbitre d'aquest partit.</strong><br>
+            Recorda confirmar la teva assistència a la pestanya Àrbitres de la web.
+           </div>`
         : '';
       const html = buildReminderHtml(team1, team2, date, time, location, refereeStr, rolText, refBadge);
       await sendEmail(email, subject, html);
@@ -186,7 +261,7 @@ async function main() {
   });
   for (const [team, count] of Object.entries(noShowCount)) {
     if (count >= 3) {
-      const subject = `Equip eliminat del torneig: ${team}`;
+      const subject = `⛔ Equip eliminat del torneig: ${team}`;
       const html    = buildEliminationHtml(team, count);
       for (const email of ORGANITZADORS) {
         await sendEmail(email, subject, html);
