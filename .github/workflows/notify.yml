@@ -2,8 +2,8 @@ name: Enviar recordatoris partits
 
 on:
   schedule:
-    - cron: '0 13 * * *'   # 13h UTC = 14h hora espanyola (hivern)
-  workflow_dispatch:         # permet executar-lo manualment per provar
+    - cron: '0 13 * * *'
+  workflow_dispatch:
 
 jobs:
   notify:
@@ -13,7 +13,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Instal·lar dependències
+        run: npm install nodemailer
       - name: Executar script de notificacions
         run: node notify.js
         env:
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
