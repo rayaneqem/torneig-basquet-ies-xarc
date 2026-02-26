@@ -94,11 +94,11 @@ function buildReminderHtml(team1, team2, date, time, location, refereeStr, rolTe
   return `
   <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#0d1117;color:#e6edf3;border-radius:12px;overflow:hidden">
     <div style="background:linear-gradient(135deg,#08142A,#0D1E42);padding:28px 32px;border-bottom:2px solid #F97316">
-      <div style="font-size:11px;color:rgba(249,115,22,0.8);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">IES Xarc - Torneig Basquet 2025-26</div>
+      <div style="font-size:11px;color:rgba(249,115,22,0.8);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">IES Xarc - Torneig Bàsquet 2025-26</div>
       <div style="font-size:24px;font-weight:900;color:#F97316">RECORDATORI DE PARTIT</div>
     </div>
     <div style="padding:28px 32px">
-      <p style="color:#8b949e;margin-bottom:20px">Hola! Et recordem que dema tens un <strong style="color:#e6edf3">partit per ${rolText}</strong>:</p>
+      <p style="color:#8b949e;margin-bottom:20px">Hola! Et recordem que demà tens un <strong style="color:#e6edf3">partit per ${rolText}</strong>:</p>
       <div style="background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
         <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:14px">${team1} <span style="color:#F97316">VS</span> ${team2}</div>
         <table style="width:100%;font-size:14px;color:#8b949e;text-align:left">
@@ -110,10 +110,10 @@ function buildReminderHtml(team1, team2, date, time, location, refereeStr, rolTe
       </div>
       ${refBadge}
       <div style="text-align:center;margin:24px 0">
-        <a href="${WEB_URL}" style="background:#F97316;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block">Veure classificacio i partits</a>
+        <a href="${WEB_URL}" style="background:#F97316;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block">Veure classificació i partits</a>
       </div>
       <div style="border-top:1px solid #21262d;padding-top:16px;font-size:11px;color:#484f58;text-align:center">
-        Aquest correu es automatic. Si us plau, no responguis.<br>
+        Aquest correu es automàtic. Si us plau, no responguis.<br>
         Per a qualsevol consulta: <a href="mailto:${SUPORT_EMAIL}" style="color:#F97316">${SUPORT_EMAIL}</a>
       </div>
     </div>
