@@ -462,10 +462,11 @@
             </div>
             <div>
               <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Jornada</label>
-              <select x-model.number="newUpcoming.jornada">
-                <option value="">Sense jornada</option>
-                <template x-for="n in 20" :key="n"><option :value="n" x-text="'Jornada ' + n"></option></template>
+              <select x-model.number="newUpcoming.jornada" :style="!newUpcoming.jornada?'border-color:rgba(239,68,68,0.5);':''">
+                <option value="">— Selecciona jornada —</option>
+                <template x-for="n in 7" :key="n"><option :value="n" x-text="'Jornada ' + n"></option></template>
               </select>
+              <p x-show="!newUpcoming.jornada" class="text-xs mt-1" style="color:#EF476F">La jornada és obligatòria</p>
             </div>
             <div>
               <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Lloc</label>
@@ -1621,11 +1622,11 @@ function app() {
 
     addUpcoming() {
       const { team1, team2, date, time, location, referee } = this.newUpcoming;
-      if (!team1 || !team2 || !date || team1 === team2) return;
-      const upcomingJornada = this.newUpcoming.jornada || null;
-      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location,
-        ...(upcomingJornada ? {jornada: upcomingJornada} : {}),
+      if (!team1 || !team2 || !date || team1 === team2 || !this.newUpcoming.jornada) return;
+      const upcomingJornada = this.newUpcoming.jornada;
+      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location, jornada: upcomingJornada,
         ...(referee ? {referee} : {}),
+      });
       });
       this.logActivity('Partit programat', `${team1} vs ${team2} (${date} ${time})`);
       this.newUpcoming = { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'', referee:'' };
