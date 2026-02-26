@@ -1,8 +1,11 @@
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FIREBASE_URL   = 'https://torneig-iesxarc-default-rtdb.europe-west1.firebasedatabase.app';
-const WEB_URL        = 'https://rayaneqem.github.io/torneig-basquet-ies-xarc/';
-const SUPORT_EMAIL   = 'z118324@iesxarc.es';
-const FROM_EMAIL     = 'Torneig Basquet IES Xarc <onboarding@resend.dev>';
+import nodemailer from 'nodemailer';
+
+const GMAIL_USER = 'rayaneqem@gmail.com';
+const GMAIL_PASS = process.env.GMAIL_PASSWORD;
+
+const FIREBASE_URL = 'https://torneig-iesxarc-default-rtdb.europe-west1.firebasedatabase.app';
+const WEB_URL      = 'https://rayaneqem.github.io/torneig-basquet-ies-xarc/';
+const SUPORT_EMAIL = 'z118324@iesxarc.es';
 
 const ORGANITZADORS = ['z118324@iesxarc.es', 'ecanovas@iesxarc.es'];
 
@@ -24,6 +27,14 @@ const REFEREE_GROUPS = {
   'Grup 2': ['Sergio', 'Lluc', 'Carlos'],
   'Grup 3': ['Pere', 'Rayan', 'Didac'],
 };
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: GMAIL_USER,
+    pass: GMAIL_PASS,
+  },
+});
 
 function getTomorrowDate() {
   const d = new Date();
@@ -65,19 +76,17 @@ function getTeamPlayers(teams, teamName) {
 }
 
 async function sendEmail(to, subject, html) {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ from: FROM_EMAIL, to: ['rayaneqem@gmail.com'], subject, html }),
-  });
-  const data = await res.json();
-  if (res.ok) {
+  try {
+    await transporter.sendMail({
+      from: `"Torneig Basquet IES Xarc" <${GMAIL_USER}>`,
+      replyTo: 'noreply@torneig.invalid',
+      to,
+      subject,
+      html,
+    });
     console.log(`OK -> ${to}`);
-  } else {
-    console.error(`ERR -> ${to}:`, data);
+  } catch (e) {
+    console.error(`ERR -> ${to}:`, e.message);
   }
 }
 
@@ -150,9 +159,9 @@ async function main() {
 
   for (const match of tomorrowMatches) {
     const { team1, team2, date, time = '--', location = 'Pista de basquet', referee = '' } = match;
-    const players1     = getTeamPlayers(teams, team1);
-    const players2     = getTeamPlayers(teams, team2);
-    const playerEmails = unique([...players1, ...players2].map(p => p.email || emailMap[p.name?.split(' ')[0]] || emailMap[p.name]));
+    const players1      = getTeamPlayers(teams, team1);
+    const players2      = getTeamPlayers(teams, team2);
+    const playerEmails  = unique([...players1, ...players2].map(p => p.email || emailMap[p.name?.split(' ')[0]] || emailMap[p.name]));
     const refereeEmails = getRefereeEmails(referee, emailMap);
     const allEmails     = unique([...playerEmails, ...refereeEmails]);
     const refereeStr    = resolveRefereeNames(referee);
