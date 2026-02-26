@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const GMAIL_USER = 'rayaneqem@gmail.com';
+const GMAIL_USER = 'torneigbasquetiesxarc@gmail.com';
 const GMAIL_PASS = process.env.GMAIL_PASSWORD;
 
 const FIREBASE_URL = 'https://torneig-iesxarc-default-rtdb.europe-west1.firebasedatabase.app';
