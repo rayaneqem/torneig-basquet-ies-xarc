@@ -531,17 +531,21 @@
                     <option value="">Selecciona equip</option>
                     <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
                   </select>
+                  <label class="flex items-center gap-2 mt-1 cursor-pointer">
+                    <input type="checkbox" x-model="newResult.noShow1" @change="if(newResult.noShow1){newResult.score1=0}"/>
+                    <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
+                  </label>
                 </div>
                 <div>
                   <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
-                  <input type="number" x-model.number="newResult.score1" min="0" placeholder="0"/>
+                  <input type="number" x-model.number="newResult.score1" min="0" placeholder="0" :disabled="newResult.noShow1" :style="newResult.noShow1 ? 'opacity:0.4' : ''"/>
                 </div>
                 <div class="flex items-end justify-center pb-2">
                   <span class="font-display text-2xl" style="color:var(--faint)">VS</span>
                 </div>
                 <div>
                   <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Punts</label>
-                  <input type="number" x-model.number="newResult.score2" min="0" placeholder="0"/>
+                  <input type="number" x-model.number="newResult.score2" min="0" placeholder="0" :disabled="newResult.noShow2" :style="newResult.noShow2 ? 'opacity:0.4' : ''"/>
                 </div>
                 <div>
                   <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Equip Visitant</label>
@@ -549,9 +553,33 @@
                     <option value="">Selecciona equip</option>
                     <template x-for="t in teams" :key="t.id"><option :value="t.name" x-text="t.name"></option></template>
                   </select>
+                  <label class="flex items-center gap-2 mt-1 cursor-pointer">
+                    <input type="checkbox" x-model="newResult.noShow2" @change="if(newResult.noShow2){newResult.score2=0}"/>
+                    <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
+                  </label>
                 </div>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <!-- No presentat warning -->
+              <template x-if="newResult.noShow1 || newResult.noShow2">
+                <div class="px-4 py-2 rounded-lg font-condensed text-sm" style="background:rgba(239,71,111,0.1);border:1px solid rgba(239,71,111,0.3);color:var(--loss)">
+                  <template x-if="newResult.noShow1 && newResult.noShow2">
+                    ⚠ Els dos equips no presentats → 0 punts per a tots dos
+                  </template>
+                  <template x-if="newResult.noShow1 && !newResult.noShow2">
+                    ⚠ <span x-text="newResult.team1 || 'Equip Local'"></span> no presentat → victòria per a <span x-text="newResult.team2 || 'Equip Visitant'"></span>
+                    <template x-if="newResult.team1">
+                      <span x-text="' · Faltes: ' + noShowCount(newResult.team1) + '/3'"></span>
+                    </template>
+                  </template>
+                  <template x-if="!newResult.noShow1 && newResult.noShow2">
+                    ⚠ <span x-text="newResult.team2 || 'Equip Visitant'"></span> no presentat → victòria per a <span x-text="newResult.team1 || 'Equip Local'"></span>
+                    <template x-if="newResult.team2">
+                      <span x-text="' · Faltes: ' + noShowCount(newResult.team2) + '/3'"></span>
+                    </template>
+                  </template>
+                </div>
+              </template>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
                   <input type="date" x-model="newResult.date"/>
@@ -561,6 +589,15 @@
                   <select x-model.number="newResult.jornada">
                     <option value="">Automàtica (per data)</option>
                     <template x-for="n in 20" :key="n"><option :value="n" x-text="'Jornada ' + n"></option></template>
+                  </select>
+                </div>
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Àrbitres</label>
+                  <select x-model="newResult.referee">
+                    <option value="">Sense àrbitres</option>
+                    <template x-for="g in REFEREE_GROUPS" :key="g.label">
+                      <option :value="g.label" x-text="g.label + ': ' + g.members.map(m => m.split(' ')[0]).join(', ')"></option>
+                    </template>
                   </select>
                 </div>
               </div>
@@ -810,7 +847,7 @@
             <div class="flex items-center gap-3 mb-1">
               <span class="font-condensed text-xs w-5 text-center" style="color:var(--faint)" x-text="idx+1"></span>
               <span class="font-condensed text-sm flex-1" style="color:var(--cream)"
-                x-text="email === OWNER_EMAIL ? '👑 ' + MEMBERS[email].name.split(' ')[0] : MEMBERS[email].name.split(' ')[0]"></span>
+                x-text="email === OWNER_EMAIL ? MEMBERS[email].name.split(' ')[0] : MEMBERS[email].name.split(' ')[0]"></span>
               <span class="font-condensed text-xs px-1.5 py-0.5 rounded" style="background:rgba(48,209,88,0.12);color:var(--win)"
                 x-text="activityLog.filter(a => a.user === MEMBERS[email].name && isCreate(a.action)).length + ' creats'"></span>
               <span class="font-condensed text-xs px-1.5 py-0.5 rounded" style="background:rgba(245,166,35,0.12);color:var(--orange)"
@@ -1116,9 +1153,16 @@ function app() {
       'z133122@iesxarc.es': { name: 'Sergio Ferrer Chaler' },
       'z118343@iesxarc.es': { name: 'Joel Rohra Kelani' },
       'z133143@iesxarc.es': { name: 'Carlos Planells Planells' },
+      'ecanovas@iesxarc.es': { name: 'E. Canovas' },
     },
     OWNER_EMAIL: 'z118324@iesxarc.es',
     OWNER: 'rayan',
+    // Grups d'àrbitres
+    REFEREE_GROUPS: [
+      { label: 'Grup 1', members: ['Raúl Castillo Benito', 'Joel Rohra Kelani', 'Thibault Ferrari Catalá'] },
+      { label: 'Grup 2', members: ['Sergio Ferrer Chaler', 'Lluc Cardona Marí', 'Carlos Planells Planells'] },
+      { label: 'Grup 3', members: ['Pere Nolasc Luis Roselló', 'Rayan El Qoraychy El Meskini', 'Didac Fernández Ruiz'] },
+    ],
     loginUser: '',
     loginPass: '',
     loginError: '',
@@ -1130,7 +1174,7 @@ function app() {
     standings: [],
 
     newTeam: { name:'', emoji:'' },
-    newResult: { team1:'', team2:'', score1:0, score2:0, date: new Date().toISOString().slice(0,10), jornada:'' },
+    newResult: { team1:'', team2:'', score1:0, score2:0, date: new Date().toISOString().slice(0,10), jornada:'', noShow1: false, noShow2: false, referee: '' },
     newUpcoming: { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'' },
     newPlayerNames: {},
     newPlayerNums: {},
@@ -1180,7 +1224,7 @@ function app() {
               this.showAdminLogin = false;
               this.loginError = '';
               if (this.isOwner && !this.publicTabs.find(t => t.id === 'owner')) {
-                this.publicTabs.push({ id: 'owner', label: '👑 Rayan' });
+                this.publicTabs.push({ id: 'owner', label: '🔒 Rayan' });
               }
             } else {
               // Email no autoritzat — tanca sessió i mostra error
@@ -1352,30 +1396,95 @@ function app() {
 
     addResult() {
       this.resultMsg = ''; this.resultErr = '';
-      const { team1, team2, score1, score2, date } = this.newResult;
+      const { team1, team2, date, noShow1, noShow2, referee } = this.newResult;
       if (!team1 || !team2) { this.resultErr = 'Selecciona els dos equips'; return; }
       if (team1 === team2) { this.resultErr = "L'equip no pot jugar contra ell mateix"; return; }
-      
+
+      let score1, score2, noShowLabel = '';
+      if (noShow1 && noShow2) {
+        score1 = 0; score2 = 0;
+        noShowLabel = 'NP-NP';
+      } else if (noShow1) {
+        score1 = 0; score2 = 3; // victòria tècnica
+        noShowLabel = 'NP';
+      } else if (noShow2) {
+        score1 = 3; score2 = 0;
+        noShowLabel = 'NP';
+      } else {
+        score1 = Number(this.newResult.score1);
+        score2 = Number(this.newResult.score2);
+      }
+
       const jornada = this.newResult.jornada || null;
-      window._push(window._ref(window._db, 'results'), { team1, team2, score1: Number(score1), score2: Number(score2), date, ...(jornada ? {jornada} : {}) });
-      this.logActivity('Resultat afegit', `${team1} ${score1}-${score2} ${team2} (${date})`);
-      this.resultMsg = '✓ Resultat registrat i classificació actualitzada!';
-      this.newResult = { team1:'', team2:'', score1:0, score2:0, date: new Date().toISOString().slice(0,10), jornada:'' };
-      setTimeout(() => this.resultMsg = '', 4000);
+      const entry = { team1, team2, score1, score2, date,
+        ...(jornada ? {jornada} : {}),
+        ...(noShow1 ? {noShow1: true} : {}),
+        ...(noShow2 ? {noShow2: true} : {}),
+        ...(referee ? {referee} : {}),
+      };
+      window._push(window._ref(window._db, 'results'), entry);
+
+      let logDetail = `${team1} ${score1}-${score2} ${team2}`;
+      if (noShow1) logDetail += ` (${team1} NO PRESENTAT)`;
+      if (noShow2) logDetail += ` (${team2} NO PRESENTAT)`;
+      if (referee) logDetail += ` · Àrb: ${referee}`;
+      this.logActivity('Resultat afegit', logDetail);
+
+      // Comprovar 3 no presentacions → eliminació automàtica
+      if (noShow1 && !noShow2) {
+        const count = this.noShowCount(team1) + 1;
+        if (count >= 3) {
+          this.resultMsg = `⚠ ${team1} ha acumulat 3 no presentacions i queda ELIMINAT!`;
+          this.logActivity('Equip eliminat automàticament', `${team1} — 3 no presentacions`);
+        } else {
+          this.resultMsg = `✓ Resultat registrat · ${team1}: ${count}/3 no presentacions`;
+        }
+      } else if (noShow2 && !noShow1) {
+        const count = this.noShowCount(team2) + 1;
+        if (count >= 3) {
+          this.resultMsg = `⚠ ${team2} ha acumulat 3 no presentacions i queda ELIMINAT!`;
+          this.logActivity('Equip eliminat automàticament', `${team2} — 3 no presentacions`);
+        } else {
+          this.resultMsg = `✓ Resultat registrat · ${team2}: ${count}/3 no presentacions`;
+        }
+      } else {
+        this.resultMsg = '✓ Resultat registrat i classificació actualitzada!';
+      }
+
+      this.newResult = { team1:'', team2:'', score1:0, score2:0, date: new Date().toISOString().slice(0,10), jornada:'', noShow1: false, noShow2: false, referee: '' };
+      setTimeout(() => this.resultMsg = '', 6000);
+    },
+
+    noShowCount(teamName) {
+      return this.results.filter(r =>
+        (r.team1 === teamName && r.noShow1) ||
+        (r.team2 === teamName && r.noShow2)
+      ).length;
     },
 
     recalcStandings() {
       const stats = {};
-      this.teams.forEach(t => { stats[t.name] = { ...t, pj:0, pg:0, pp:0, pf:0, pc:0, pts:0 }; });
+      this.teams.forEach(t => { stats[t.name] = { ...t, pj:0, pg:0, pp:0, pf:0, pc:0, pts:0, noShows:0 }; });
       this.results.forEach(r => {
         if (!stats[r.team1] || !stats[r.team2]) return;
         const s1 = Number(r.score1), s2 = Number(r.score2);
-        stats[r.team1].pj++; stats[r.team2].pj++;
-        stats[r.team1].pf += s1; stats[r.team1].pc += s2;
-        stats[r.team2].pf += s2; stats[r.team2].pc += s1;
-        if (s1 > s2) { stats[r.team1].pg++; stats[r.team1].pts+=3; stats[r.team2].pp++; stats[r.team2].pts+=0; }
-        else if (s2 > s1) { stats[r.team2].pg++; stats[r.team2].pts+=3; stats[r.team1].pp++; stats[r.team1].pts+=0; }
-        else { stats[r.team1].pts+=1; stats[r.team2].pts+=1; }
+        const ns1 = r.noShow1, ns2 = r.noShow2;
+
+        if (ns1) stats[r.team1].noShows++;
+        if (ns2) stats[r.team2].noShows++;
+
+        if (ns1 && ns2) {
+          // Tots dos no presentats — compten com a derrota sense punts
+          stats[r.team1].pj++; stats[r.team2].pj++;
+          stats[r.team1].pp++; stats[r.team2].pp++;
+        } else {
+          stats[r.team1].pj++; stats[r.team2].pj++;
+          stats[r.team1].pf += s1; stats[r.team1].pc += s2;
+          stats[r.team2].pf += s2; stats[r.team2].pc += s1;
+          if (s1 > s2) { stats[r.team1].pg++; stats[r.team1].pts+=3; stats[r.team2].pp++; }
+          else if (s2 > s1) { stats[r.team2].pg++; stats[r.team2].pts+=3; stats[r.team1].pp++; }
+          else { stats[r.team1].pts+=1; stats[r.team2].pts+=1; }
+        }
       });
       this.standings = Object.values(stats).sort((a,b) => b.pts !== a.pts ? b.pts-a.pts : (b.pf-b.pc)-(a.pf-a.pc));
     },
