@@ -812,7 +812,15 @@
               </div>
               <span class="font-condensed text-xs" style="color:var(--faint)" x-text="match.date"></span>
             </div>
-            <span class="font-condensed text-xs" style="color:var(--win)">✓ Confirmat</span>
+            <div class="flex items-center gap-2">
+              <span class="font-condensed text-xs" style="color:var(--win)">✓ Confirmat</span>
+              <button @click="unconfirmRefereeFromTab(match)"
+                class="font-condensed text-xs px-3 py-1.5 rounded-lg"
+                style="background:rgba(239,71,111,0.1);color:var(--loss);border:1px solid rgba(239,71,111,0.25);cursor:pointer"
+                onmouseover="this.style.background='rgba(239,71,111,0.2)'" onmouseout="this.style.background='rgba(239,71,111,0.1)'">
+                ✕ Desconfirmar
+              </button>
+            </div>
           </div>
         </template>
       </div>
@@ -984,7 +992,13 @@
           </button>
         </template>
         <template x-if="hasConfirmedReferee()">
-          <div class="font-condensed text-sm" style="color:var(--win)">✓ Ja has confirmat la teva participació</div>
+          <div class="flex items-center gap-3">
+            <div class="font-condensed text-sm" style="color:var(--win)">✓ Ja has confirmat la teva participació</div>
+            <button @click="unconfirmAsReferee()" class="font-condensed text-xs px-3 py-1.5 rounded-lg"
+              style="background:rgba(239,71,111,0.1);color:var(--loss);border:1px solid rgba(239,71,111,0.25);cursor:pointer">
+              ✕ Desconfirmar
+            </button>
+          </div>
         </template>
         <template x-if="modalMatch.refereeConfirmed && Object.keys(modalMatch.refereeConfirmed||{}).length > 0">
           <div class="mt-2 font-condensed text-xs" style="color:var(--faint)">
@@ -1770,12 +1784,30 @@ function app() {
     },
 
     confirmRefereeFromTab(match) {
-      const myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
-      const myKey = this.currentUser.replace(/[@.]/g, '_');
-      const collection = match._type === 'result' ? 'results' : 'upcoming';
-      const path = `${collection}/${match.id}/refereeConfirmed/${myKey}`;
-      window._set(window._ref(window._db, path), myFirstName);
+      var myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
+      var myKey = this.currentUser.replace(/[@.]/g, '_');
+      var collection = match._type === 'result' ? 'results' : 'upcoming';
+      window._set(window._ref(window._db, `${collection}/${match.id}/refereeConfirmed/${myKey}`), myFirstName);
       this.logActivity('Àrbitre confirmat', `${myFirstName} · ${match.team1} vs ${match.team2} (${match.date})`);
+    },
+
+    unconfirmRefereeFromTab(match) {
+      var myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
+      var myKey = this.currentUser.replace(/[@.]/g, '_');
+      var collection = match._type === 'result' ? 'results' : 'upcoming';
+      window._remove(window._ref(window._db, `${collection}/${match.id}/refereeConfirmed/${myKey}`));
+      this.logActivity('Àrbitre desconfirmat', `${myFirstName} · ${match.team1} vs ${match.team2} (${match.date})`);
+    },
+
+    unconfirmAsReferee() {
+      var id = this.modalMatch.id;
+      if (!id) return;
+      var myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
+      var myKey = this.currentUser.replace(/[@.]/g, '_');
+      var collection = this.modalMatch.type === 'result' ? 'results' : 'upcoming';
+      window._remove(window._ref(window._db, `${collection}/${id}/refereeConfirmed/${myKey}`));
+      this.logActivity('Àrbitre desconfirmat', `${myFirstName} · ${this.modalMatch.team1} vs ${this.modalMatch.team2}`);
+      if (this.modalMatch.refereeConfirmed) delete this.modalMatch.refereeConfirmed[myKey];
     },
 
     // EmailJS — configura aquí els teus IDs (veure instruccions)
