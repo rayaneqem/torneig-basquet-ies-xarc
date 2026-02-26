@@ -1627,7 +1627,6 @@ function app() {
       window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location, jornada: upcomingJornada,
         ...(referee ? {referee} : {}),
       });
-      });
       this.logActivity('Partit programat', `${team1} vs ${team2} (${date} ${time})`);
       this.newUpcoming = { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'', referee:'' };
     },
