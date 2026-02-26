@@ -124,7 +124,7 @@ function buildEliminationHtml(teamName, noShows) {
   return `
   <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#0d1117;color:#e6edf3;border-radius:12px;overflow:hidden">
     <div style="background:linear-gradient(135deg,#1a0a0a,#2a0d0d);padding:28px 32px;border-bottom:2px solid #EF476F">
-      <div style="font-size:11px;color:rgba(239,71,111,0.8);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">IES Xarc - Torneig Basquet 2025-26</div>
+      <div style="font-size:11px;color:rgba(239,71,111,0.8);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">IES Xarc - Torneig Bàsquet 2025-26</div>
       <div style="font-size:24px;font-weight:900;color:#EF476F">EQUIP ELIMINAT</div>
     </div>
     <div style="padding:28px 32px">
@@ -136,7 +136,7 @@ function buildEliminationHtml(teamName, noShows) {
         <a href="${WEB_URL}" style="background:#F97316;color:#fff;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block">Veure classificació actualitzada</a>
       </div>
       <div style="border-top:1px solid #21262d;padding-top:16px;font-size:11px;color:#484f58;text-align:center">
-        Aquest correu es automatic. Si us plau, no responguis.<br>
+        Aquest correu es automàtic. Si us plau, no responguis.<br>
         Per a qualsevol consulta: <a href="mailto:${SUPORT_EMAIL}" style="color:#F97316">${SUPORT_EMAIL}</a>
       </div>
     </div>
