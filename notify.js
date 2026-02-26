@@ -71,7 +71,7 @@ async function sendEmail(to, subject, html) {
       'Authorization': `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ from: FROM_EMAIL, to: [to], subject, html }),
+    body: JSON.stringify({ from: FROM_EMAIL, to: [rayaneqem@gmail.com], subject, html }),
   });
   const data = await res.json();
   if (res.ok) {
