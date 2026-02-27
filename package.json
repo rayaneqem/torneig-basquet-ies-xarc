@@ -1,0 +1,10 @@
+{
+  "name": "torneig-notify",
+  "type": "module",
+  "scripts": {
+    "start": "node notify.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.0"
+  }
+}
