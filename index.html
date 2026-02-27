@@ -473,57 +473,96 @@
               <input type="text" x-model="newUpcoming.location" placeholder="Pavelló, pista..."/>
             </div>
             <div class="md:col-span-2">
-              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Àrbitres</label>
-              <select x-model="newUpcoming.referee">
-                <option value="">Sense àrbitres assignats</option>
-                <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                  <option :value="g.members.map(m=>m.split(' ')[0]).join(', ')" x-text="g.members.map(m => m.split(' ')[0]).join(', ')"></option>
+              <label class="font-condensed text-xs uppercase mb-2 block" style="color:var(--muted)">Àrbitres <span class="normal-case" style="color:var(--faint)">(màx. 3)</span></label>
+              <div class="grid grid-cols-3 gap-1">
+                <template x-for="member in allRefereeMembers()" :key="member">
+                  <label class="flex items-center gap-1 cursor-pointer p-1.5 rounded text-xs"
+                    :style="(newUpcoming.refereeArr.includes(member) ? 'background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.4);' : 'background:var(--bg-card-2);border:1px solid var(--border);') + 'border-radius:6px'"
+                    @click.prevent="newUpcoming.refereeArr.includes(member) ? newUpcoming.refereeArr.splice(newUpcoming.refereeArr.indexOf(member),1) : (newUpcoming.refereeArr.length < 3 ? newUpcoming.refereeArr.push(member) : null)">
+                    <span style="font-size:11px" x-text="member.split(' ')[0]"></span>
+                  </label>
                 </template>
-              </select>
+              </div>
+              <p class="text-xs mt-1" style="color:var(--faint)" x-text="(newUpcoming.refereeArr.length ? newUpcoming.refereeArr.map(m=>m.split(' ')[0]).join(', ') : 'Cap àrbitre seleccionat')"></p>
             </div>
           </div>
           <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
+          <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
 
-          <template x-if="currentUser === OWNER_EMAIL">
-            <div class="mt-6" style="border-top:1px solid var(--border);padding-top:20px">
-              <div class="flex items-center gap-3 mb-3">
-                <span class="font-display text-xl" style="color:var(--orange)">GENERAR CALENDARI</span>
-                <div class="divider-orange"></div>
-              </div>
-              <p class="font-body text-sm mb-4" style="color:var(--muted)">Genera automàticament tots els enfrontaments possibles entre els equips, dividits en 7 jornades.</p>
-              <template x-if="teams.length < 2">
-                <p class="font-body text-sm" style="color:var(--loss)">⚠ Cal tenir almenys 2 equips registrats.</p>
-              </template>
-              <template x-if="teams.length >= 2">
-                <div>
-                  <template x-if="teams.length > 8">
-                    <div class="mb-4">
-                      <p class="font-condensed text-xs uppercase mb-2" style="color:var(--muted);letter-spacing:1px">Selecciona els 8 equips (<span x-text="teams.length"></span> registrats):</p>
-                      <div class="grid grid-cols-2 gap-2">
-                        <template x-for="team in teams" :key="team.id">
-                          <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="background:var(--bg-card-2);border:1px solid var(--border)">
-                            <input type="checkbox" :value="team.name" x-model="calendariTeams"/>
-                            <span class="font-body text-sm" x-text="(team.emoji||'🏀')+' '+team.name"></span>
-                          </label>
-                        </template>
-                      </div>
-                      <p class="text-xs mt-2" :style="calendariTeams.length > 8 ? 'color:var(--loss)' : 'color:var(--muted)'" x-text="'Seleccionats: ' + calendariTeams.length + '/8'"></p>
-                    </div>
-                  </template>
-                  <button @click="generarCalendari()" class="btn-orange" :disabled="teams.length > 8 && calendariTeams.length !== 8" :style="(teams.length > 8 && calendariTeams.length !== 8) ? 'opacity:0.4;cursor:not-allowed' : ''">
-                    🗓 Generar Calendari Complet
-                  </button>
-                  <template x-if="calendariMsg">
-                    <p class="font-body text-sm mt-3" :style="calendariErr ? 'color:var(--loss)' : 'color:var(--win)'" x-text="calendariMsg"></p>
-                  </template>
-                </div>
-              </template>
+          <!-- GENERAR CALENDARI -->
+          <div class="mt-6" style="border-top:1px solid var(--border);padding-top:20px">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="font-display text-xl" style="color:var(--orange)">GENERAR CALENDARI</span>
+              <div class="divider-orange"></div>
             </div>
-          </template>
-        </div>
+            <p class="font-body text-sm mb-4" style="color:var(--muted)">Genera automàticament tots els enfrontaments possibles entre els equips, dividits en 7 jornades.</p>
+            <template x-if="teams.length < 2">
+              <p class="font-body text-sm" style="color:var(--loss)">⚠ Cal tenir almenys 2 equips registrats.</p>
+            </template>
+            <template x-if="teams.length >= 2">
+              <div>
+                <template x-if="teams.length > 8">
+                  <div class="mb-4">
+                    <p class="font-condensed text-xs uppercase mb-2" style="color:var(--muted);letter-spacing:1px">Selecciona els 8 equips (<span x-text="teams.length"></span> registrats):</p>
+                    <div class="grid grid-cols-2 gap-2">
+                      <template x-for="team in teams" :key="team.id">
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="background:var(--bg-card-2);border:1px solid var(--border)">
+                          <input type="checkbox" :value="team.name" x-model="calendariTeams"/>
+                          <span class="font-body text-sm" x-text="(team.emoji||'🏀')+' '+team.name"></span>
+                        </label>
+                      </template>
+                    </div>
+                    <p class="text-xs mt-2" :style="calendariTeams.length > 8 ? 'color:var(--loss)' : 'color:var(--muted)'" x-text="'Seleccionats: ' + calendariTeams.length + '/8'"></p>
+                  </div>
+                </template>
+                <button @click="generarCalendari()" class="btn-orange" :disabled="teams.length > 8 && calendariTeams.length !== 8" :style="(teams.length > 8 && calendariTeams.length !== 8) ? 'opacity:0.4;cursor:not-allowed' : ''">
+                  🗓 Generar Calendari Complet
+                </button>
+                <template x-if="calendariMsg">
+                  <p class="font-body text-sm mt-3" :style="calendariErr ? 'color:var(--loss)' : 'color:var(--win)'" x-text="calendariMsg"></p>
+                </template>
+              </div>
+            </template>
+          </div>
 
-      </div>
-    </template>
+          <!-- GENERAR CALENDARI -->
+          <div class="mt-6" style="border-top:1px solid var(--border);padding-top:20px">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="font-display text-xl" style="color:var(--orange)">GENERAR CALENDARI</span>
+              <div class="divider-orange"></div>
+            </div>
+            <p class="font-body text-sm mb-4" style="color:var(--muted)">
+              Genera automàticament tots els enfrontaments possibles entre els equips registrats, dividits en 7 jornades.
+            </p>
+            <template x-if="teams.length < 2">
+              <p class="font-body text-sm" style="color:var(--loss)">⚠ Cal tenir almenys 2 equips registrats per generar el calendari.</p>
+            </template>
+            <template x-if="teams.length >= 2">
+              <div>
+                <!-- Selector equips si n'hi ha més de 8 -->
+                <template x-if="teams.length > 8">
+                  <div class="mb-4">
+                    <p class="font-condensed text-xs uppercase mb-2" style="color:var(--muted);letter-spacing:1px">Selecciona els 8 equips participants (tens <span x-text="teams.length"></span> equips):</p>
+                    <div class="grid grid-cols-2 gap-2">
+                      <template x-for="team in teams" :key="team.id">
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="background:var(--bg-card-2);border:1px solid var(--border)">
+                          <input type="checkbox" :value="team.name" x-model="calendariTeams" class="accent-orange-400"/>
+                          <span class="font-body text-sm" x-text="(team.emoji||'🏀')+' '+team.name"></span>
+                        </label>
+                      </template>
+                    </div>
+                    <p class="text-xs mt-2" :style="calendariTeams.length > 8 ? 'color:var(--loss)' : 'color:var(--muted)'" x-text="'Seleccionats: ' + calendariTeams.length + '/8'"></p>
+                  </div>
+                </template>
+                <button @click="generarCalendari()" class="btn-orange" :disabled="teams.length > 8 && calendariTeams.length !== 8" :style="(teams.length > 8 && calendariTeams.length !== 8) ? 'opacity:0.4;cursor:not-allowed' : ''">
+                  🗓 Generar Calendari Complet
+                </button>
+                <template x-if="calendariMsg">
+                  <p class="font-body text-sm mt-3" :style="calendariErr ? 'color:var(--loss)' : 'color:var(--win)'" x-text="calendariMsg"></p>
+                </template>
+              </div>
+            </template>
+          </div>
         </div>
 
       </div>
@@ -959,13 +998,15 @@
                 <input type="date" x-model="modalResultData.date"/>
               </div>
               <div>
-                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Àrbitres</label>
-                <select x-model="modalResultData.referee">
-                  <option value="">Sense àrbitres</option>
-                  <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                    <option :value="g.members.map(m=>m.split(' ')[0]).join(', ')" x-text="g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
+                <label class="font-condensed text-xs uppercase mb-2 block" style="color:var(--muted)">Àrbitres <span class="normal-case" style="color:var(--faint)">(màx. 3)</span></label>
+                <div class="grid grid-cols-3 gap-1">
+                  <template x-for="member in allRefereeMembers()" :key="member">
+                    <label class="flex items-center gap-1 cursor-pointer p-1.5 rounded text-xs" :style="(modalResultData.refereeArr.includes(member) ? 'background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.4);' : 'background:var(--bg-card-2);border:1px solid var(--border);') + 'border-radius:6px'" @click.prevent="modalResultData.refereeArr.includes(member) ? modalResultData.refereeArr.splice(modalResultData.refereeArr.indexOf(member),1) : (modalResultData.refereeArr.length < 3 ? modalResultData.refereeArr.push(member) : null)">
+                      <span style="font-size:11px" x-text="member.split(' ')[0]"></span>
+                    </label>
                   </template>
-                </select>
+                </div>
+                <p class="text-xs mt-1" style="color:var(--faint)" x-text="(modalResultData.refereeArr.length ? modalResultData.refereeArr.map(m=>m.split(' ')[0]).join(', ') : 'Cap àrbitre seleccionat')"></p>
               </div>
             </div>
             <div class="flex gap-2 flex-wrap">
@@ -1004,13 +1045,15 @@
                 <input type="date" x-model="modalResultData.date"/>
               </div>
               <div>
-                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Àrbitres</label>
-                <select x-model="modalResultData.referee">
-                  <option value="">Sense àrbitres</option>
-                  <template x-for="g in REFEREE_GROUPS" :key="g.label">
-                    <option :value="g.members.map(m=>m.split(' ')[0]).join(', ')" x-text="g.members.map(m=>m.split(' ')[0]).join(', ')"></option>
+                <label class="font-condensed text-xs uppercase mb-2 block" style="color:var(--muted)">Àrbitres <span class="normal-case" style="color:var(--faint)">(màx. 3)</span></label>
+                <div class="grid grid-cols-3 gap-1">
+                  <template x-for="member in allRefereeMembers()" :key="member">
+                    <label class="flex items-center gap-1 cursor-pointer p-1.5 rounded text-xs" :style="(modalResultData.refereeArr.includes(member) ? 'background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.4);' : 'background:var(--bg-card-2);border:1px solid var(--border);') + 'border-radius:6px'" @click.prevent="modalResultData.refereeArr.includes(member) ? modalResultData.refereeArr.splice(modalResultData.refereeArr.indexOf(member),1) : (modalResultData.refereeArr.length < 3 ? modalResultData.refereeArr.push(member) : null)">
+                      <span style="font-size:11px" x-text="member.split(' ')[0]"></span>
+                    </label>
                   </template>
-                </select>
+                </div>
+                <p class="text-xs mt-1" style="color:var(--faint)" x-text="(modalResultData.refereeArr.length ? modalResultData.refereeArr.map(m=>m.split(' ')[0]).join(', ') : 'Cap àrbitre seleccionat')"></p>
               </div>
             </div>
             <div class="flex gap-2 flex-wrap">
@@ -1176,7 +1219,7 @@ function app() {
 
     newTeam: { name:'', emoji:'' },
     newResult: { team1:'', team2:'', score1:0, score2:0, date: new Date().toISOString().slice(0,10), jornada:'', noShow1: false, noShow2: false, referee: '' },
-    newUpcoming: { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'' },
+    newUpcoming: { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'', refereeArr: [] },
     calendariTeams: [],
     calendariMsg: '',
     calendariErr: false,
@@ -1526,14 +1569,14 @@ function app() {
           date: match.date,
           noShow1: match.noShow1 || false,
           noShow2: match.noShow2 || false,
-          referee: match.referee || '',
+          refereeArr: match.referee ? match.referee.split(', ').flatMap(name => this.allRefereeMembers().filter(m => m.split(' ')[0] === name)) : [],
         };
       } else {
         this.modalResultData = {
           score1: 0, score2: 0,
           date: match.date || new Date().toISOString().slice(0,10),
           noShow1: false, noShow2: false,
-          referee: match.referee || '',
+          refereeArr: match.referee ? match.referee.split(', ').flatMap(name => this.allRefereeMembers().filter(m => m.split(' ')[0] === name)) : [],
         };
       }
       this.matchModal = true;
@@ -1541,7 +1584,7 @@ function app() {
 
     // Posar resultat a un partit programat
     submitModalResult() {
-      const { score1, score2, date, noShow1, noShow2, referee } = this.modalResultData;
+      const { score1, score2, date, noShow1, noShow2, refereeArr } = this.modalResultData;
       const { team1, team2, id: upcomingId, jornada } = this.modalMatch;
       if (!team1 || !team2) { this.modalMsg = 'Error: equips no definits'; this.modalErr = true; return; }
 
@@ -1555,7 +1598,7 @@ function app() {
         ...(jornada ? {jornada} : {}),
         ...(noShow1 ? {noShow1: true} : {}),
         ...(noShow2 ? {noShow2: true} : {}),
-        ...(referee ? {referee} : {}),
+        ...(refereeArr && refereeArr.length ? {referee: refereeArr.map(m => m.split(' ')[0]).join(', ')} : {}),
       };
       window._push(window._ref(window._db, 'results'), entry);
 
@@ -1584,7 +1627,7 @@ function app() {
 
     // Guardar edició d'un resultat existent
     saveModalResult() {
-      const { score1, score2, date, noShow1, noShow2, referee } = this.modalResultData;
+      const { score1, score2, date, noShow1, noShow2, refereeArr } = this.modalResultData;
       const { id, team1, team2 } = this.modalMatch;
       if (!id) return;
 
@@ -1597,7 +1640,7 @@ function app() {
       window._set(window._ref(window._db, `results/${id}`), { team1, team2, score1: s1, score2: s2, date,
         ...(noShow1 ? {noShow1: true} : {}),
         ...(noShow2 ? {noShow2: true} : {}),
-        ...(referee ? {referee} : {}),
+        ...(refereeArr && refereeArr.length ? {referee: refereeArr.map(m => m.split(' ')[0]).join(', ')} : {}),
       });
       this.logActivity('Resultat editat', `${team1} ${s1}-${s2} ${team2}`);
       this.modalMsg = '✓ Guardat!';
@@ -1720,14 +1763,14 @@ function app() {
     },
 
     addUpcoming() {
-      const { team1, team2, date, time, location, referee } = this.newUpcoming;
-      if (!team1 || !team2 || !date || team1 === team2 || !this.newUpcoming.jornada) return;
-      const upcomingJornada = this.newUpcoming.jornada;
-      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location, jornada: upcomingJornada,
-        ...(referee ? {referee} : {}),
+      const { team1, team2, date, time, location, refereeArr, jornada } = this.newUpcoming;
+      if (!team1 || !team2 || !date || team1 === team2 || !jornada) return;
+      const refereeStr = refereeArr && refereeArr.length ? refereeArr.map(m => m.split(' ')[0]).join(', ') : '';
+      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location, jornada,
+        ...(refereeStr ? {referee: refereeStr} : {}),
       });
       this.logActivity('Partit programat', `${team1} vs ${team2} (${date} ${time})`);
-      this.newUpcoming = { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'', referee:'' };
+      this.newUpcoming = { team1:'', team2:'', date:'', time:'12:00', location:'Pista de bàsquet', jornada:'', refereeArr: [] };
     },
     removeUpcoming(id) {
       const u = this.upcoming.find(u => u.id === id);
@@ -2020,6 +2063,10 @@ function app() {
         }).catch(e => console.error(e));
       });
     },
+    allRefereeMembers() {
+      return this.REFEREE_GROUPS.flatMap(g => g.members);
+    },
+
     refereeDisplay(val) {
       if (!val) return '';
       const map = {};
