@@ -86,7 +86,6 @@ async function sendEmail(to, subject, html) {
   try {
     await transporter.sendMail({
       from: `"Torneig Bàsquet IES Xarc" <${GMAIL_USER}>`,
-      replyTo: 'noreply@torneig.invalid',
       to,
       subject,
       html,
@@ -243,21 +242,24 @@ async function main() {
     const players2      = getTeamPlayers(teams, team2);
     const playerEmails  = unique([...players1, ...players2].map(p => p.email || emailMap[p.name?.split(' ')[0]] || emailMap[p.name]));
     const refereeEmails = getRefereeEmails(referee, emailMap);
-    const allEmails     = unique([...playerEmails, ...refereeEmails]);
     const refereeStr    = resolveRefereeNames(referee);
     const subject       = `🏀 Recordatori: ${team1} vs ${team2} — Demà ${formatDate(date)}`;
 
-    for (const email of allEmails) {
-      const isRef    = refereeEmails.includes(email);
-      const rolText  = isRef ? 'arbitrar' : 'jugar';
-      const refBadge = isRef
-        ? `<div style="background:rgba(6,214,160,0.07);border:1px solid rgba(6,214,160,0.25);border-radius:8px;padding:14px;margin-bottom:20px;font-size:13px;color:#06D6A0;line-height:1.6">
+    const refBadge = `<div style="background:rgba(6,214,160,0.07);border:1px solid rgba(6,214,160,0.25);border-radius:8px;padding:14px;margin-bottom:20px;font-size:13px;color:#06D6A0;line-height:1.6">
             🦺 <strong>Ets àrbitre d'aquest partit.</strong><br>
             Recorda confirmar la teva assistència a la pestanya Àrbitres de la web.
-           </div>`
-        : '';
-      const html = buildReminderHtml(team1, team2, date, time, location, refereeStr, rolText, refBadge);
+           </div>`;
+
+    // Envia correu com a jugador a tots els jugadors
+    for (const email of playerEmails) {
+      const html = buildReminderHtml(team1, team2, date, time, location, refereeStr, 'jugar', '');
       await sendEmail(email, subject, html);
+    }
+
+    // Envia correu com a àrbitre a tots els àrbitres (fins i tot si ja han rebut un com a jugador)
+    for (const email of refereeEmails) {
+      const html = buildReminderHtml(team1, team2, date, time, location, refereeStr, 'arbitrar', refBadge);
+      await sendEmail(email, `🦺 ${subject}`, html);
     }
   }
 
