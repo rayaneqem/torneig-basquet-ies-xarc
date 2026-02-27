@@ -412,7 +412,7 @@
                   <span x-text="match.team2"></span>
                 </div>
                 <div class="flex items-center gap-3 flex-wrap mt-1.5">
-                  <span class="font-condensed text-sm" :style="match.date==='per-decidir'?'color:var(--orange)':'color:var(--muted)'" x-text="match.date==='per-decidir'?'📅 Per decidir':match.date"></span>
+                  <span class="font-condensed text-sm" :style="(!match.date || match.date==='per-decidir')?'color:var(--faint)':'color:var(--muted)'" x-text="(!match.date || match.date==='per-decidir')?'📅 No confirmat':match.date"></span>
                   <template x-if="match.time">
                     <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="match.time"></span>
                   </template>
@@ -487,8 +487,8 @@
             </div>
           </div>
           <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
+          <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
 
-          <template x-if="currentUser === OWNER_EMAIL">
           <!-- GENERAR CALENDARI -->
           <div class="mt-6" style="border-top:1px solid var(--border);padding-top:20px">
             <div class="flex items-center gap-3 mb-3">
@@ -524,7 +524,45 @@
               </div>
             </template>
           </div>
-          </template>
+
+          <!-- GENERAR CALENDARI -->
+          <div class="mt-6" style="border-top:1px solid var(--border);padding-top:20px">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="font-display text-xl" style="color:var(--orange)">GENERAR CALENDARI</span>
+              <div class="divider-orange"></div>
+            </div>
+            <p class="font-body text-sm mb-4" style="color:var(--muted)">
+              Genera automàticament tots els enfrontaments possibles entre els equips registrats, dividits en 7 jornades.
+            </p>
+            <template x-if="teams.length < 2">
+              <p class="font-body text-sm" style="color:var(--loss)">⚠ Cal tenir almenys 2 equips registrats per generar el calendari.</p>
+            </template>
+            <template x-if="teams.length >= 2">
+              <div>
+                <!-- Selector equips si n'hi ha més de 8 -->
+                <template x-if="teams.length > 8">
+                  <div class="mb-4">
+                    <p class="font-condensed text-xs uppercase mb-2" style="color:var(--muted);letter-spacing:1px">Selecciona els 8 equips participants (tens <span x-text="teams.length"></span> equips):</p>
+                    <div class="grid grid-cols-2 gap-2">
+                      <template x-for="team in teams" :key="team.id">
+                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="background:var(--bg-card-2);border:1px solid var(--border)">
+                          <input type="checkbox" :value="team.name" x-model="calendariTeams" class="accent-orange-400"/>
+                          <span class="font-body text-sm" x-text="(team.emoji||'🏀')+' '+team.name"></span>
+                        </label>
+                      </template>
+                    </div>
+                    <p class="text-xs mt-2" :style="calendariTeams.length > 8 ? 'color:var(--loss)' : 'color:var(--muted)'" x-text="'Seleccionats: ' + calendariTeams.length + '/8'"></p>
+                  </div>
+                </template>
+                <button @click="generarCalendari()" class="btn-orange" :disabled="teams.length > 8 && calendariTeams.length !== 8" :style="(teams.length > 8 && calendariTeams.length !== 8) ? 'opacity:0.4;cursor:not-allowed' : ''">
+                  🗓 Generar Calendari Complet
+                </button>
+                <template x-if="calendariMsg">
+                  <p class="font-body text-sm mt-3" :style="calendariErr ? 'color:var(--loss)' : 'color:var(--win)'" x-text="calendariMsg"></p>
+                </template>
+              </div>
+            </template>
+          </div>
         </div>
 
       </div>
@@ -800,7 +838,7 @@
     <!-- Partits pendents de confirmar -->
     <div class="card p-6 mb-4">
       <h3 class="font-condensed font-700 uppercase tracking-widest mb-1" style="color:var(--cream);font-size:16px">⏳ Pendents de confirmar</h3>
-      <p class="font-condensed text-xs mb-4" style="color:var(--faint)">Partits on has arbitrat però encara no has confirmat la teva assistència</p>
+      <p class="font-condensed text-xs mb-4" style="color:var(--faint)">Partits ja jugats on has arbitrat però encara no has confirmat la teva assistència</p>
 
       <template x-if="myPendingRefereeMatches().length === 0">
         <div class="py-8 text-center">
@@ -932,50 +970,106 @@
     <template x-if="isAdmin">
       <div class="px-6 py-5 border-b border-white/5" style="background:rgba(245,166,35,0.03)">
 
-        <!-- Upcoming: formulari per posar resultat -->
+        <!-- Upcoming: dos modes — editar detalls o registrar resultat -->
         <template x-if="modalMatch.type==='upcoming'">
           <div>
-            <p class="font-condensed text-xs uppercase tracking-widest mb-3" style="color:var(--orange)">Registrar resultat</p>
-            <div class="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)" x-text="modalMatch.team1 || 'Equip 1'"></label>
-                <input type="number" x-model.number="modalResultData.score1" min="0" placeholder="0" :disabled="modalResultData.noShow1" :style="modalResultData.noShow1?'opacity:0.4':''"/>
-                <label class="flex items-center gap-2 mt-1 cursor-pointer">
-                  <input type="checkbox" x-model="modalResultData.noShow1" @change="if(modalResultData.noShow1)modalResultData.score1=0"/>
-                  <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
-                </label>
-              </div>
-              <div>
-                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)" x-text="modalMatch.team2 || 'Equip 2'"></label>
-                <input type="number" x-model.number="modalResultData.score2" min="0" placeholder="0" :disabled="modalResultData.noShow2" :style="modalResultData.noShow2?'opacity:0.4':''"/>
-                <label class="flex items-center gap-2 mt-1 cursor-pointer">
-                  <input type="checkbox" x-model="modalResultData.noShow2" @change="if(modalResultData.noShow2)modalResultData.score2=0"/>
-                  <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
-                </label>
-              </div>
+            <!-- Toggle de mode -->
+            <div class="flex gap-2 mb-4">
+              <button @click="modalUpcomingMode='details'"
+                class="font-condensed text-xs uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all"
+                :style="modalUpcomingMode==='details' ? 'background:rgba(245,166,35,0.15);color:var(--orange);border:1px solid rgba(245,166,35,0.4)' : 'background:var(--bg-card-2);color:var(--muted);border:1px solid var(--border)'">
+                ✏ Editar detalls
+              </button>
+              <button @click="modalUpcomingMode='result'"
+                class="font-condensed text-xs uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all"
+                :style="modalUpcomingMode==='result' ? 'background:rgba(245,166,35,0.15);color:var(--orange);border:1px solid rgba(245,166,35,0.4)' : 'background:var(--bg-card-2);color:var(--muted);border:1px solid var(--border)'">
+                🏀 Registrar resultat
+              </button>
             </div>
-            <div class="grid grid-cols-2 gap-3 mb-3">
+
+            <!-- Mode: Editar data i àrbitres sense resultat -->
+            <template x-if="modalUpcomingMode==='details'">
               <div>
-                <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
-                <input type="date" x-model="modalResultData.date"/>
-              </div>
-              <div>
-                <label class="font-condensed text-xs uppercase mb-2 block" style="color:var(--muted)">Àrbitres <span class="normal-case" style="color:var(--faint)">(màx. 3)</span></label>
-                <div class="grid grid-cols-3 gap-1">
-                  <template x-for="member in allRefereeMembers()" :key="member">
-                    <label class="flex items-center gap-1 cursor-pointer p-1.5 rounded text-xs" :style="(modalResultData.refereeArr.includes(member) ? 'background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.4);' : 'background:var(--bg-card-2);border:1px solid var(--border);') + 'border-radius:6px'" @click.prevent="modalResultData.refereeArr.includes(member) ? modalResultData.refereeArr.splice(modalResultData.refereeArr.indexOf(member),1) : (modalResultData.refereeArr.length < 3 ? modalResultData.refereeArr.push(member) : null)">
-                      <span style="font-size:11px" x-text="member.split(' ')[0]"></span>
-                    </label>
-                  </template>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+                    <input type="date" x-model="modalDetailsData.date"/>
+                  </div>
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Hora</label>
+                    <input type="time" x-model="modalDetailsData.time"/>
+                  </div>
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Lloc</label>
+                    <input type="text" x-model="modalDetailsData.location" placeholder="Pavelló, pista..."/>
+                  </div>
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-2 block" style="color:var(--muted)">Àrbitres <span class="normal-case" style="color:var(--faint)">(màx. 3)</span></label>
+                    <div class="grid grid-cols-3 gap-1">
+                      <template x-for="member in allRefereeMembers()" :key="member">
+                        <label class="flex items-center gap-1 cursor-pointer p-1.5 rounded text-xs"
+                          :style="(modalDetailsData.refereeArr.includes(member) ? 'background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.4);' : 'background:var(--bg-card-2);border:1px solid var(--border);') + 'border-radius:6px'"
+                          @click.prevent="modalDetailsData.refereeArr.includes(member) ? modalDetailsData.refereeArr.splice(modalDetailsData.refereeArr.indexOf(member),1) : (modalDetailsData.refereeArr.length < 3 ? modalDetailsData.refereeArr.push(member) : null)">
+                          <span style="font-size:11px" x-text="member.split(' ')[0]"></span>
+                        </label>
+                      </template>
+                    </div>
+                    <p class="text-xs mt-1" style="color:var(--faint)" x-text="(modalDetailsData.refereeArr.length ? modalDetailsData.refereeArr.map(m=>m.split(' ')[0]).join(', ') : 'Cap àrbitre seleccionat')"></p>
+                  </div>
                 </div>
-                <p class="text-xs mt-1" style="color:var(--faint)" x-text="(modalResultData.refereeArr.length ? modalResultData.refereeArr.map(m=>m.split(' ')[0]).join(', ') : 'Cap àrbitre seleccionat')"></p>
+                <div class="flex gap-2 flex-wrap">
+                  <button @click="saveUpcomingDetails()" class="btn-orange flex-1">✓ Guardar Canvis</button>
+                  <button @click="deleteUpcomingFromModal()" class="btn-red px-4">✕ Eliminar Partit</button>
+                </div>
+                <p x-show="modalMsg" class="font-condensed text-sm mt-2" :style="modalErr?'color:var(--loss)':'color:var(--win)'" x-text="modalMsg"></p>
               </div>
-            </div>
-            <div class="flex gap-2 flex-wrap">
-              <button @click="submitModalResult()" class="btn-orange flex-1">✓ Confirmar Resultat</button>
-              <button @click="deleteUpcomingFromModal()" class="btn-red px-4">✕ Eliminar Partit</button>
-            </div>
-            <p x-show="modalMsg" class="font-condensed text-sm mt-2" :style="modalErr?'color:var(--loss)':'color:var(--win)'" x-text="modalMsg"></p>
+            </template>
+
+            <!-- Mode: Registrar resultat -->
+            <template x-if="modalUpcomingMode==='result'">
+              <div>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)" x-text="modalMatch.team1 || 'Equip 1'"></label>
+                    <input type="number" x-model.number="modalResultData.score1" min="0" placeholder="0" :disabled="modalResultData.noShow1" :style="modalResultData.noShow1?'opacity:0.4':''"/>
+                    <label class="flex items-center gap-2 mt-1 cursor-pointer">
+                      <input type="checkbox" x-model="modalResultData.noShow1" @change="if(modalResultData.noShow1)modalResultData.score1=0"/>
+                      <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
+                    </label>
+                  </div>
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)" x-text="modalMatch.team2 || 'Equip 2'"></label>
+                    <input type="number" x-model.number="modalResultData.score2" min="0" placeholder="0" :disabled="modalResultData.noShow2" :style="modalResultData.noShow2?'opacity:0.4':''"/>
+                    <label class="flex items-center gap-2 mt-1 cursor-pointer">
+                      <input type="checkbox" x-model="modalResultData.noShow2" @change="if(modalResultData.noShow2)modalResultData.score2=0"/>
+                      <span class="font-condensed text-xs" style="color:var(--loss)">No presentat</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+                    <input type="date" x-model="modalResultData.date"/>
+                  </div>
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-2 block" style="color:var(--muted)">Àrbitres <span class="normal-case" style="color:var(--faint)">(màx. 3)</span></label>
+                    <div class="grid grid-cols-3 gap-1">
+                      <template x-for="member in allRefereeMembers()" :key="member">
+                        <label class="flex items-center gap-1 cursor-pointer p-1.5 rounded text-xs" :style="(modalResultData.refereeArr.includes(member) ? 'background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.4);' : 'background:var(--bg-card-2);border:1px solid var(--border);') + 'border-radius:6px'" @click.prevent="modalResultData.refereeArr.includes(member) ? modalResultData.refereeArr.splice(modalResultData.refereeArr.indexOf(member),1) : (modalResultData.refereeArr.length < 3 ? modalResultData.refereeArr.push(member) : null)">
+                          <span style="font-size:11px" x-text="member.split(' ')[0]"></span>
+                        </label>
+                      </template>
+                    </div>
+                    <p class="text-xs mt-1" style="color:var(--faint)" x-text="(modalResultData.refereeArr.length ? modalResultData.refereeArr.map(m=>m.split(' ')[0]).join(', ') : 'Cap àrbitre seleccionat')"></p>
+                  </div>
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                  <button @click="submitModalResult()" class="btn-orange flex-1">✓ Confirmar Resultat</button>
+                  <button @click="deleteUpcomingFromModal()" class="btn-red px-4">✕ Eliminar Partit</button>
+                </div>
+                <p x-show="modalMsg" class="font-condensed text-sm mt-2" :style="modalErr?'color:var(--loss)':'color:var(--win)'" x-text="modalMsg"></p>
+              </div>
+            </template>
           </div>
         </template>
 
@@ -1028,8 +1122,8 @@
       </div>
     </template>
 
-    <!-- Confirmació d'àrbitres — visible per àrbitres del partit -->
-    <template x-if="modalMatch.referee && isRefereeOfMatch(modalMatch)">
+    <!-- Confirmació d'àrbitres — visible per àrbitres del partit, NOMÉS si ja ha estat jugat -->
+    <template x-if="modalMatch.referee && isRefereeOfMatch(modalMatch) && modalMatch.type === 'result'">
       <div class="px-6 py-4 border-b border-white/5" style="background:rgba(48,209,88,0.04)">
         <p class="font-condensed text-xs uppercase tracking-widest mb-2" style="color:var(--win)">✓ Confirmació d'àrbitre</p>
         <p class="font-condensed text-sm mb-3" style="color:var(--muted)">
@@ -1517,6 +1611,8 @@ function app() {
     matchModal: false,
     modalMatch: {},
     modalResultData: {},
+    modalDetailsData: {},
+    modalUpcomingMode: 'details',
     modalMsg: '',
     modalErr: false,
 
@@ -1534,14 +1630,44 @@ function app() {
           refereeArr: match.referee ? match.referee.split(', ').flatMap(name => this.allRefereeMembers().filter(m => m.split(' ')[0] === name)) : [],
         };
       } else {
+        this.modalUpcomingMode = 'details';
+        this.modalDetailsData = {
+          date: (match.date && match.date !== 'per-decidir') ? match.date : '',
+          time: match.time || '12:00',
+          location: match.location || 'Pista de bàsquet',
+          refereeArr: match.referee ? match.referee.split(', ').flatMap(name => this.allRefereeMembers().filter(m => m.split(' ')[0] === name)) : [],
+        };
         this.modalResultData = {
           score1: 0, score2: 0,
-          date: match.date || new Date().toISOString().slice(0,10),
+          date: (match.date && match.date !== 'per-decidir') ? match.date : new Date().toISOString().slice(0,10),
           noShow1: false, noShow2: false,
           refereeArr: match.referee ? match.referee.split(', ').flatMap(name => this.allRefereeMembers().filter(m => m.split(' ')[0] === name)) : [],
         };
       }
       this.matchModal = true;
+    },
+
+    // Guardar data/hora/lloc/àrbitres d'un upcoming sense posar resultat
+    saveUpcomingDetails() {
+      const { date, time, location, refereeArr } = this.modalDetailsData;
+      const { id, team1, team2, jornada } = this.modalMatch;
+      if (!id) return;
+      const refereeStr = refereeArr && refereeArr.length ? refereeArr.map(m => m.split(' ')[0]).join(', ') : '';
+      const update = {
+        team1, team2,
+        date: date || '',
+        time: time || '',
+        location: location || '',
+        jornada: jornada || null,
+        ...(refereeStr ? {referee: refereeStr} : {}),
+      };
+      window._set(window._ref(window._db, `upcoming/${id}`), update);
+      this.logActivity('Pròxim partit editat', `${team1} vs ${team2}${date ? ' (' + date + ')' : ''}`);
+      this.modalMsg = '✓ Canvis guardats!';
+      this.modalErr = false;
+      // Update local modalMatch so display refreshes
+      this.modalMatch = { ...this.modalMatch, date: date || '', time, location, referee: refereeStr || undefined };
+      setTimeout(() => { this.matchModal = false; this.modalMsg = ''; }, 1500);
     },
 
     // Posar resultat a un partit programat
@@ -1726,9 +1852,10 @@ function app() {
 
     addUpcoming() {
       const { team1, team2, date, time, location, refereeArr, jornada } = this.newUpcoming;
-      if (!team1 || !team2 || !date || team1 === team2 || !jornada) return;
+      if (!team1 || !team2 || team1 === team2 || !jornada) return;
       const refereeStr = refereeArr && refereeArr.length ? refereeArr.map(m => m.split(' ')[0]).join(', ') : '';
-      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date, time, location, jornada,
+      const dateVal = date || '';
+      window._push(window._ref(window._db, 'upcoming'), { team1, team2, date: dateVal, time, location, jornada,
         ...(refereeStr ? {referee: refereeStr} : {}),
       });
       this.logActivity('Partit programat', `${team1} vs ${team2} (${date} ${time})`);
@@ -1807,7 +1934,10 @@ function app() {
         const jNum = u.jornada || null;
         if (jNum) {
           const key = 'J' + jNum;
-          getOrCreate(key, jNum, u.date).upcoming.push(u);
+          // For dateLabel, use date if set, else empty string (no date)
+          const dateLabel = (u.date && u.date !== 'per-decidir') ? u.date : '';
+          const existing = jornadaMap[key];
+          getOrCreate(key, jNum, existing ? existing.dateLabel : dateLabel).upcoming.push(u);
         } else {
           // Group by date, reuse existing date jornada if exists
           const key = 'D' + u.date;
@@ -1863,15 +1993,12 @@ function app() {
       return { hasEnoughData, t1, t2, h2h, prob1, prob2, hasProb };
     },
 
-    // Retorna tots els partits (jugats + programats) on l'usuari és àrbitre i NO ha confirmat
+    // Retorna tots els partits JUGATS on l'usuari és àrbitre i NO ha confirmat
     myPendingRefereeMatches() {
       if (!this.currentUser) return [];
       const myKey = this.currentUser.replace(/[@.]/g, '_');
-      const allMatches = [
-        ...this.results.map(m => ({...m, _type:'result'})),
-        ...this.upcoming.map(m => ({...m, _type:'upcoming'})),
-      ];
-      return allMatches.filter(m => {
+      // Només resultats (partits jugats), no upcoming
+      return this.results.filter(m => {
         if (!m.referee) return false;
         if (!this.isRefereeOfMatch(m)) return false;
         const confirmed = m.refereeConfirmed || {};
@@ -1882,11 +2009,8 @@ function app() {
     myConfirmedRefereeMatches() {
       if (!this.currentUser) return [];
       const myKey = this.currentUser.replace(/[@.]/g, '_');
-      const allMatches = [
-        ...this.results.map(m => ({...m, _type:'result'})),
-        ...this.upcoming.map(m => ({...m, _type:'upcoming'})),
-      ];
-      return allMatches.filter(m => {
+      // Només resultats (partits jugats)
+      return this.results.filter(m => {
         if (!m.referee) return false;
         if (!this.isRefereeOfMatch(m)) return false;
         const confirmed = m.refereeConfirmed || {};
@@ -1897,16 +2021,16 @@ function app() {
     confirmRefereeFromTab(match) {
       var myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
       var myKey = this.currentUser.replace(/[@.]/g, '_');
-      var collection = match._type === 'result' ? 'results' : 'upcoming';
-      window._set(window._ref(window._db, `${collection}/${match.id}/refereeConfirmed/${myKey}`), myFirstName);
+      // Always 'results' since we only show played matches now
+      window._set(window._ref(window._db, `results/${match.id}/refereeConfirmed/${myKey}`), myFirstName);
       this.logActivity('Àrbitre confirmat', `${myFirstName} · ${match.team1} vs ${match.team2} (${match.date})`);
     },
 
     unconfirmRefereeFromTab(match) {
       var myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
       var myKey = this.currentUser.replace(/[@.]/g, '_');
-      var collection = match._type === 'result' ? 'results' : 'upcoming';
-      window._remove(window._ref(window._db, `${collection}/${match.id}/refereeConfirmed/${myKey}`));
+      // Always 'results' since we only show played matches now
+      window._remove(window._ref(window._db, `results/${match.id}/refereeConfirmed/${myKey}`));
       this.logActivity('Àrbitre desconfirmat', `${myFirstName} · ${match.team1} vs ${match.team2} (${match.date})`);
     },
 
