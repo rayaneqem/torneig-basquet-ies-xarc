@@ -487,8 +487,8 @@
             </div>
           </div>
           <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
-          <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
 
+          <template x-if="currentUser === OWNER_EMAIL">
           <!-- GENERAR CALENDARI -->
           <div class="mt-6" style="border-top:1px solid var(--border);padding-top:20px">
             <div class="flex items-center gap-3 mb-3">
@@ -524,45 +524,7 @@
               </div>
             </template>
           </div>
-
-          <!-- GENERAR CALENDARI -->
-          <div class="mt-6" style="border-top:1px solid var(--border);padding-top:20px">
-            <div class="flex items-center gap-3 mb-3">
-              <span class="font-display text-xl" style="color:var(--orange)">GENERAR CALENDARI</span>
-              <div class="divider-orange"></div>
-            </div>
-            <p class="font-body text-sm mb-4" style="color:var(--muted)">
-              Genera automàticament tots els enfrontaments possibles entre els equips registrats, dividits en 7 jornades.
-            </p>
-            <template x-if="teams.length < 2">
-              <p class="font-body text-sm" style="color:var(--loss)">⚠ Cal tenir almenys 2 equips registrats per generar el calendari.</p>
-            </template>
-            <template x-if="teams.length >= 2">
-              <div>
-                <!-- Selector equips si n'hi ha més de 8 -->
-                <template x-if="teams.length > 8">
-                  <div class="mb-4">
-                    <p class="font-condensed text-xs uppercase mb-2" style="color:var(--muted);letter-spacing:1px">Selecciona els 8 equips participants (tens <span x-text="teams.length"></span> equips):</p>
-                    <div class="grid grid-cols-2 gap-2">
-                      <template x-for="team in teams" :key="team.id">
-                        <label class="flex items-center gap-2 cursor-pointer p-2 rounded" style="background:var(--bg-card-2);border:1px solid var(--border)">
-                          <input type="checkbox" :value="team.name" x-model="calendariTeams" class="accent-orange-400"/>
-                          <span class="font-body text-sm" x-text="(team.emoji||'🏀')+' '+team.name"></span>
-                        </label>
-                      </template>
-                    </div>
-                    <p class="text-xs mt-2" :style="calendariTeams.length > 8 ? 'color:var(--loss)' : 'color:var(--muted)'" x-text="'Seleccionats: ' + calendariTeams.length + '/8'"></p>
-                  </div>
-                </template>
-                <button @click="generarCalendari()" class="btn-orange" :disabled="teams.length > 8 && calendariTeams.length !== 8" :style="(teams.length > 8 && calendariTeams.length !== 8) ? 'opacity:0.4;cursor:not-allowed' : ''">
-                  🗓 Generar Calendari Complet
-                </button>
-                <template x-if="calendariMsg">
-                  <p class="font-body text-sm mt-3" :style="calendariErr ? 'color:var(--loss)' : 'color:var(--win)'" x-text="calendariMsg"></p>
-                </template>
-              </div>
-            </template>
-          </div>
+          </template>
         </div>
 
       </div>
