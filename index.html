@@ -349,7 +349,295 @@
       </template>
     </div>
     <p class="font-condensed text-xs mt-3" style="color:var(--faint);letter-spacing:0.06em">PJ · PG · PP · +/- · PTS</p>
-  </div>
+
+    <!-- ===== FASE ELIMINATÒRIA ===== -->
+    <div class="mt-12">
+      <!-- Header -->
+      <div class="flex items-center gap-4 mb-2">
+        <div>
+          <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(245,166,35,0.6)">Post temporada</p>
+          <h2 class="font-display text-5xl leading-none" style="color:var(--cream);letter-spacing:0.02em">PLAYOFFS</h2>
+        </div>
+        <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(245,166,35,0.3),transparent);margin-left:8px;margin-top:20px"></div>
+        <!-- Botó activar (admin) -->
+        <template x-if="isAdmin && !(playoffs && playoffs.active)">
+          <button @click="activatePlayoffs()"
+            class="btn-orange text-sm px-4 py-2">
+            🏆 Activar Playoffs
+          </button>
+        </template>
+        <template x-if="isOwner && playoffs && playoffs.active">
+          <button @click="resetPlayoffs()" class="btn-red text-xs px-3 py-1.5">↺ Reiniciar</button>
+        </template>
+      </div>
+      <p class="font-condensed text-xs mb-8" style="color:var(--faint)" x-text="(playoffs && playoffs.active) ? 'Fase eliminatòria activa — els equips ja han estat assignats.' : 'Fase eliminatòria pendent. L\'admin l\'activarà al final de la fase regular.'"></p>
+
+      <!-- BRACKET -->
+      <div class="overflow-x-auto pb-4">
+        <div style="min-width:680px">
+
+          <!-- CSS línies connectors -->
+          <style>
+            .bracket-col { display:flex; flex-direction:column; justify-content:space-around; }
+            .bracket-match { position:relative; }
+            /* Línia horitzontal dreta */
+            .bracket-match::after {
+              content:''; position:absolute;
+              right:-24px; top:50%; width:24px; height:1px;
+              background: rgba(245,166,35,0.25);
+            }
+            /* Línia vertical que uneix dos partits cap al de la dreta */
+            .bracket-connector {
+              position:absolute; right:-24px;
+              border-right: 1px solid rgba(245,166,35,0.25);
+              pointer-events:none;
+            }
+            .bracket-team {
+              display:flex; align-items:center; justify-content:space-between;
+              padding: 7px 10px; border-radius:6px;
+              border: 1px solid var(--border);
+              background: var(--bg-surface);
+              transition: all .2s;
+              min-width: 160px;
+            }
+            .bracket-team.winner {
+              background: rgba(245,166,35,0.1);
+              border-color: rgba(245,166,35,0.45);
+            }
+            .bracket-team.loser { opacity: 0.45; }
+            .bracket-team.empty {
+              border-style: dashed;
+              border-color: var(--border);
+              background: transparent;
+            }
+          </style>
+
+          <div style="display:grid; grid-template-columns: 1fr 40px 1fr 40px 1fr 40px 1fr; align-items:center; gap:0;">
+
+            <!-- COL 1: SEMIFINALS (esquerra) -->
+            <div style="display:flex;flex-direction:column;gap:0;">
+
+              <!-- SF1: 1r vs 4t -->
+              <div style="padding: 12px 0; position:relative;">
+                <div class="font-condensed text-xs uppercase mb-2" style="color:var(--faint);letter-spacing:0.12em;padding-left:2px">
+                  <span x-text="(playoffs && playoffs.active) ? 'SF1' : 'SF1'"></span>
+                  <span style="color:rgba(245,166,35,0.4);margin-left:6px">1r vs 4t</span>
+                </div>
+                <!-- Equip A -->
+                <div class="bracket-team mb-1"
+                  :class="(playoffs.sf1 && playoffs.sf1.winner) ? (playoffs.sf1.winner===playoffs.sf1.team1 ? 'winner' : 'loser') : ''">
+                  <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span style="font-size:16px" x-text="(playoffs && playoffs.active && playoffs.sf1 && playoffs.sf1.team1) ? getTeamEmoji(playoffs.sf1.team1) : '❓'"></span>
+                    <span class="font-condensed text-sm uppercase truncate"
+                      :style="(playoffs.sf1 && playoffs.sf1.winner===playoffs.sf1.team1) ? 'color:var(--orange)' : 'color:var(--cream)'"
+                      x-text="(playoffs && playoffs.active && playoffs.sf1 && playoffs.sf1.team1) ? playoffs.sf1.team1 : '1r classificat'"></span>
+                  </div>
+                  <span class="font-score text-lg ml-2 flex-shrink-0"
+                    :style="(playoffs.sf1 && playoffs.sf1.winner===playoffs.sf1.team1) ? 'color:var(--orange)' : 'color:var(--muted)'"
+                    x-text="(playoffs.sf1 && playoffs.sf1.score1 !== undefined && playoffs.sf1.winner) ? playoffs.sf1.score1 : ''"></span>
+                </div>
+                <!-- Equip B -->
+                <div class="bracket-team"
+                  :class="(playoffs.sf1 && playoffs.sf1.winner) ? (playoffs.sf1.winner===playoffs.sf1.team2 ? 'winner' : 'loser') : ''">
+                  <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span style="font-size:16px" x-text="(playoffs && playoffs.active && playoffs.sf1 && playoffs.sf1.team2) ? getTeamEmoji(playoffs.sf1.team2) : '❓'"></span>
+                    <span class="font-condensed text-sm uppercase truncate"
+                      :style="(playoffs.sf1 && playoffs.sf1.winner===playoffs.sf1.team2) ? 'color:var(--orange)' : 'color:var(--cream)'"
+                      x-text="(playoffs && playoffs.active && playoffs.sf1 && playoffs.sf1.team2) ? playoffs.sf1.team2 : '4t classificat'"></span>
+                  </div>
+                  <span class="font-score text-lg ml-2 flex-shrink-0"
+                    :style="(playoffs.sf1 && playoffs.sf1.winner===playoffs.sf1.team2) ? 'color:var(--orange)' : 'color:var(--muted)'"
+                    x-text="(playoffs.sf1 && playoffs.sf1.score2 !== undefined && playoffs.sf1.winner) ? playoffs.sf1.score2 : ''"></span>
+                </div>
+                <!-- Input admin -->
+                <template x-if="isAdmin && playoffs.sf1 && playoffs.sf1.team1 && playoffs.sf1.team2 && !playoffs.sf1.winner">
+                  <div class="flex gap-1 mt-2 items-center">
+                    <input type="number" x-model.number="playoffInput.sf1.score1" min="0" placeholder="0" style="width:48px;padding:4px 6px;font-size:12px;text-align:center"/>
+                    <span style="color:var(--faint);font-size:11px">-</span>
+                    <input type="number" x-model.number="playoffInput.sf1.score2" min="0" placeholder="0" style="width:48px;padding:4px 6px;font-size:12px;text-align:center"/>
+                    <button @click="savePlayoffResult('sf1')" class="btn-orange px-2 py-1" style="font-size:11px">✓</button>
+                  </div>
+                </template>
+                <template x-if="playoffs.sf1 && playoffs.sf1.winner && isAdmin">
+                  <button @click="resetPlayoffMatch('sf1')" class="font-condensed text-xs mt-1 px-2 py-0.5 rounded" style="color:var(--faint);border:1px solid var(--border);cursor:pointer;font-size:10px">↺ refer</button>
+                </template>
+              </div>
+
+              <!-- Espai entre SF1 i SF2 -->
+              <div style="height:32px"></div>
+
+              <!-- SF2: 2n vs 3r -->
+              <div style="padding: 12px 0; position:relative;">
+                <div class="font-condensed text-xs uppercase mb-2" style="color:var(--faint);letter-spacing:0.12em;padding-left:2px">
+                  SF2 <span style="color:rgba(245,166,35,0.4);margin-left:6px">2n vs 3r</span>
+                </div>
+                <!-- Equip A -->
+                <div class="bracket-team mb-1"
+                  :class="(playoffs.sf2 && playoffs.sf2.winner) ? (playoffs.sf2.winner===playoffs.sf2.team1 ? 'winner' : 'loser') : ''">
+                  <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span style="font-size:16px" x-text="(playoffs && playoffs.active && playoffs.sf2 && playoffs.sf2.team1) ? getTeamEmoji(playoffs.sf2.team1) : '❓'"></span>
+                    <span class="font-condensed text-sm uppercase truncate"
+                      :style="(playoffs.sf2 && playoffs.sf2.winner===playoffs.sf2.team1) ? 'color:var(--orange)' : 'color:var(--cream)'"
+                      x-text="(playoffs && playoffs.active && playoffs.sf2 && playoffs.sf2.team1) ? playoffs.sf2.team1 : '2n classificat'"></span>
+                  </div>
+                  <span class="font-score text-lg ml-2 flex-shrink-0"
+                    :style="(playoffs.sf2 && playoffs.sf2.winner===playoffs.sf2.team1) ? 'color:var(--orange)' : 'color:var(--muted)'"
+                    x-text="(playoffs.sf2 && playoffs.sf2.score1 !== undefined && playoffs.sf2.winner) ? playoffs.sf2.score1 : ''"></span>
+                </div>
+                <!-- Equip B -->
+                <div class="bracket-team"
+                  :class="(playoffs.sf2 && playoffs.sf2.winner) ? (playoffs.sf2.winner===playoffs.sf2.team2 ? 'winner' : 'loser') : ''">
+                  <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span style="font-size:16px" x-text="(playoffs && playoffs.active && playoffs.sf2 && playoffs.sf2.team2) ? getTeamEmoji(playoffs.sf2.team2) : '❓'"></span>
+                    <span class="font-condensed text-sm uppercase truncate"
+                      :style="(playoffs.sf2 && playoffs.sf2.winner===playoffs.sf2.team2) ? 'color:var(--orange)' : 'color:var(--cream)'"
+                      x-text="(playoffs && playoffs.active && playoffs.sf2 && playoffs.sf2.team2) ? playoffs.sf2.team2 : '3r classificat'"></span>
+                  </div>
+                  <span class="font-score text-lg ml-2 flex-shrink-0"
+                    :style="(playoffs.sf2 && playoffs.sf2.winner===playoffs.sf2.team2) ? 'color:var(--orange)' : 'color:var(--muted)'"
+                    x-text="(playoffs.sf2 && playoffs.sf2.score2 !== undefined && playoffs.sf2.winner) ? playoffs.sf2.score2 : ''"></span>
+                </div>
+                <!-- Input admin -->
+                <template x-if="isAdmin && playoffs.sf2 && playoffs.sf2.team1 && playoffs.sf2.team2 && !playoffs.sf2.winner">
+                  <div class="flex gap-1 mt-2 items-center">
+                    <input type="number" x-model.number="playoffInput.sf2.score1" min="0" placeholder="0" style="width:48px;padding:4px 6px;font-size:12px;text-align:center"/>
+                    <span style="color:var(--faint);font-size:11px">-</span>
+                    <input type="number" x-model.number="playoffInput.sf2.score2" min="0" placeholder="0" style="width:48px;padding:4px 6px;font-size:12px;text-align:center"/>
+                    <button @click="savePlayoffResult('sf2')" class="btn-orange px-2 py-1" style="font-size:11px">✓</button>
+                  </div>
+                </template>
+                <template x-if="playoffs.sf2 && playoffs.sf2.winner && isAdmin">
+                  <button @click="resetPlayoffMatch('sf2')" class="font-condensed text-xs mt-1 px-2 py-0.5 rounded" style="color:var(--faint);border:1px solid var(--border);cursor:pointer;font-size:10px">↺ refer</button>
+                </template>
+              </div>
+            </div>
+
+            <!-- COL 2: connector SF → FINAL (SVG) -->
+            <div style="height:100%;display:flex;align-items:center;justify-content:center;">
+              <svg width="40" height="260" style="overflow:visible">
+                <!-- Línia de SF1 cap al centre -->
+                <line x1="0" y1="52" x2="20" y2="52" stroke="rgba(245,166,35,0.3)" stroke-width="1.5"/>
+                <!-- Línia de SF2 cap al centre -->
+                <line x1="0" y1="208" x2="20" y2="208" stroke="rgba(245,166,35,0.3)" stroke-width="1.5"/>
+                <!-- Línia vertical unint les dues -->
+                <line x1="20" y1="52" x2="20" y2="208" stroke="rgba(245,166,35,0.3)" stroke-width="1.5"/>
+                <!-- Línia al centre cap a la dreta -->
+                <line x1="20" y1="130" x2="40" y2="130" stroke="rgba(245,166,35,0.3)" stroke-width="1.5"/>
+              </svg>
+            </div>
+
+            <!-- COL 3: FINAL -->
+            <div style="display:flex;flex-direction:column;justify-content:center;padding:12px 0;">
+              <div class="font-condensed text-xs uppercase mb-2" style="color:var(--orange);letter-spacing:0.15em;text-align:center">🏆 FINAL</div>
+              <!-- Equip A (guanyador SF1) -->
+              <div class="bracket-team mb-1"
+                :class="(playoffs.final && playoffs.final.winner) ? (playoffs.final.winner===playoffs.final.team1 ? 'winner' : 'loser') : ''">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                  <span style="font-size:16px" x-text="(playoffs.final && playoffs.final.team1) ? getTeamEmoji(playoffs.final.team1) : '❓'"></span>
+                  <span class="font-condensed text-sm uppercase truncate"
+                    :style="(playoffs.final && playoffs.final.winner===playoffs.final.team1) ? 'color:var(--orange)' : 'color:var(--cream)'"
+                    x-text="(playoffs.final && playoffs.final.team1) || 'Guanyador SF1'"></span>
+                </div>
+                <span class="font-score text-lg ml-2 flex-shrink-0"
+                  :style="(playoffs.final && playoffs.final.winner===playoffs.final.team1) ? 'color:var(--orange)' : 'color:var(--muted)'"
+                  x-text="(playoffs.final && playoffs.final.score1 !== undefined && playoffs.final.winner) ? playoffs.final.score1 : ''"></span>
+              </div>
+              <!-- Equip B (guanyador SF2) -->
+              <div class="bracket-team"
+                :class="(playoffs.final && playoffs.final.winner) ? (playoffs.final.winner===playoffs.final.team2 ? 'winner' : 'loser') : ''">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                  <span style="font-size:16px" x-text="(playoffs.final && playoffs.final.team2) ? getTeamEmoji(playoffs.final.team2) : '❓'"></span>
+                  <span class="font-condensed text-sm uppercase truncate"
+                    :style="(playoffs.final && playoffs.final.winner===playoffs.final.team2) ? 'color:var(--orange)' : 'color:var(--cream)'"
+                    x-text="(playoffs.final && playoffs.final.team2) || 'Guanyador SF2'"></span>
+                </div>
+                <span class="font-score text-lg ml-2 flex-shrink-0"
+                  :style="(playoffs.final && playoffs.final.winner===playoffs.final.team2) ? 'color:var(--orange)' : 'color:var(--muted)'"
+                  x-text="(playoffs.final && playoffs.final.score2 !== undefined && playoffs.final.winner) ? playoffs.final.score2 : ''"></span>
+              </div>
+              <!-- Input admin Final -->
+              <template x-if="isAdmin && playoffs.final && playoffs.final.team1 && playoffs.final.team2 && !playoffs.final.winner">
+                <div class="flex gap-1 mt-2 items-center">
+                  <input type="number" x-model.number="playoffInput.final.score1" min="0" placeholder="0" style="width:48px;padding:4px 6px;font-size:12px;text-align:center"/>
+                  <span style="color:var(--faint);font-size:11px">-</span>
+                  <input type="number" x-model.number="playoffInput.final.score2" min="0" placeholder="0" style="width:48px;padding:4px 6px;font-size:12px;text-align:center"/>
+                  <button @click="savePlayoffResult('final')" class="btn-orange px-2 py-1" style="font-size:11px">✓</button>
+                </div>
+              </template>
+              <template x-if="playoffs.final && playoffs.final.winner && isAdmin">
+                <button @click="resetPlayoffMatch('final')" class="font-condensed text-xs mt-1 px-2 py-0.5 rounded" style="color:var(--faint);border:1px solid var(--border);cursor:pointer;font-size:10px">↺ refer</button>
+              </template>
+            </div>
+
+            <!-- COL 4: connector FINAL → CAMPIÓ (SVG) -->
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <svg width="40" height="60">
+                <line x1="0" y1="30" x2="40" y2="30" stroke="rgba(245,166,35,0.4)" stroke-width="1.5"/>
+              </svg>
+            </div>
+
+            <!-- COL 5: CAMPIÓ -->
+            <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px 0;">
+              <div class="font-condensed text-xs uppercase mb-3" style="color:var(--amber);letter-spacing:0.15em">🥇 Campió</div>
+              <div class="px-4 py-3 rounded-xl text-center" style="background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(245,166,35,0.08));border:1px solid rgba(255,200,0,0.35);min-width:150px">
+                <div style="font-size:28px" x-text="(playoffs.final && playoffs.final.winner) ? getTeamEmoji(playoffs.final.winner) : '🏆'"></div>
+                <div class="font-display text-lg mt-1" style="color:var(--amber)" x-text="(playoffs.final && playoffs.final.winner) || '—'"></div>
+              </div>
+            </div>
+
+            <!-- COL 6: connector cap a 3r/4t (invertit) -->
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <svg width="40" height="60">
+                <line x1="0" y1="30" x2="40" y2="30" stroke="rgba(122,156,200,0.3)" stroke-width="1"/>
+              </svg>
+            </div>
+
+            <!-- COL 7: 3r/4t lloc (vertical a la dreta) -->
+            <div style="display:flex;flex-direction:column;justify-content:center;padding:12px 0;">
+              <div class="font-condensed text-xs uppercase mb-2" style="color:var(--muted);letter-spacing:0.12em;text-align:center">3r / 4t lloc</div>
+              <div class="bracket-team mb-1"
+                :class="(playoffs.third && playoffs.third.winner) ? (playoffs.third.winner===playoffs.third.team1 ? 'winner' : 'loser') : ''">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                  <span style="font-size:16px" x-text="(playoffs.third && playoffs.third.team1) ? getTeamEmoji(playoffs.third.team1) : '❓'"></span>
+                  <span class="font-condensed text-sm uppercase truncate" style="color:var(--cream)"
+                    x-text="(playoffs.third && playoffs.third.team1) || 'Perdedor SF1'"></span>
+                </div>
+                <span class="font-score text-lg ml-2 flex-shrink-0" style="color:var(--muted)"
+                  x-text="(playoffs.third && playoffs.third.score1 !== undefined && playoffs.third.winner) ? playoffs.third.score1 : ''"></span>
+              </div>
+              <div class="bracket-team"
+                :class="(playoffs.third && playoffs.third.winner) ? (playoffs.third.winner===playoffs.third.team2 ? 'winner' : 'loser') : ''">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                  <span style="font-size:16px" x-text="(playoffs.third && playoffs.third.team2) ? getTeamEmoji(playoffs.third.team2) : '❓'"></span>
+                  <span class="font-condensed text-sm uppercase truncate" style="color:var(--cream)"
+                    x-text="(playoffs.third && playoffs.third.team2) || 'Perdedor SF2'"></span>
+                </div>
+                <span class="font-score text-lg ml-2 flex-shrink-0" style="color:var(--muted)"
+                  x-text="(playoffs.third && playoffs.third.score2 !== undefined && playoffs.third.winner) ? playoffs.third.score2 : ''"></span>
+              </div>
+              <!-- Input admin 3r/4t -->
+              <template x-if="isAdmin && playoffs.third && playoffs.third.team1 && playoffs.third.team2 && !playoffs.third.winner">
+                <div class="flex gap-1 mt-2 items-center">
+                  <input type="number" x-model.number="playoffInput.third.score1" min="0" placeholder="0" style="width:48px;padding:4px 6px;font-size:12px;text-align:center"/>
+                  <span style="color:var(--faint);font-size:11px">-</span>
+                  <input type="number" x-model.number="playoffInput.third.score2" min="0" placeholder="0" style="width:48px;padding:4px 6px;font-size:12px;text-align:center"/>
+                  <button @click="savePlayoffResult('third')" class="btn-orange px-2 py-1" style="font-size:11px">✓</button>
+                </div>
+              </template>
+              <template x-if="playoffs.third && playoffs.third.winner && isAdmin">
+                <button @click="resetPlayoffMatch('third')" class="font-condensed text-xs mt-1 px-2 py-0.5 rounded" style="color:var(--faint);border:1px solid var(--border);cursor:pointer;font-size:10px">↺ refer</button>
+              </template>
+              <template x-if="playoffs.third && playoffs.third.winner">
+                <div class="mt-2 text-center font-condensed text-xs" style="color:var(--muted)">
+                  🥉 <span x-text="playoffs.third.winner"></span>
+                </div>
+              </template>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
 
   <!-- ======================== PARTITS (RESULTATS + PRÒXIMS) ======================== -->
   <div x-show="activeTab==='partits'" class="fade-in">
@@ -1278,6 +1566,9 @@ function app() {
           const val = snap.val();
           this.activityLog = val ? Object.entries(val).map(([id, a]) => ({ ...a, id })).sort((a,b) => b.ts - a.ts) : [];
         });
+        onValue(ref(db, 'playoffs'), (snap) => {
+          this.playoffs = snap.val() || {};
+        });
 
         // Escoltar canvis d'autenticació Firebase
         window._onAuthStateChanged((firebaseUser) => {
@@ -1570,6 +1861,9 @@ function app() {
         return b.pts !== a.pts ? b.pts-a.pts : (b.pf-b.pc)-(a.pf-a.pc);
       });
     },
+
+    playoffs: {},
+    playoffInput: { sf1:{score1:0,score2:0}, sf2:{score1:0,score2:0}, final:{score1:0,score2:0}, third:{score1:0,score2:0} },
 
     matchModal: false,
     modalMatch: {},
@@ -2184,6 +2478,80 @@ function app() {
       ), 1);
       const count = this.activityLog.filter(x => x.user === this.MEMBERS[email].name).length;
       return Math.round(count / max * 100);
+    },
+
+    // ===== PLAYOFFS =====
+
+    activatePlayoffs() {
+      if (!confirm('Activar la fase eliminatòria? Això assignarà els equips als emparellaments segons la classificació actual.')) return;
+      const top4 = this.standings.filter(t => (t.noShows || 0) < 3).slice(0, 4);
+      if (top4.length < 4) { alert('Cal tenir almenys 4 equips classificats.'); return; }
+      const sf1 = { team1: top4[0].name, team2: top4[3].name };
+      const sf2 = { team1: top4[1].name, team2: top4[2].name };
+      window._set(window._ref(window._db, 'playoffs'), {
+        active: true,
+        sf1, sf2,
+        final: { team1: '', team2: '' },
+        third: { team1: '', team2: '' },
+      });
+      this.logActivity('Playoffs activats', `SF1: ${sf1.team1} vs ${sf1.team2} · SF2: ${sf2.team1} vs ${sf2.team2}`);
+    },
+
+    savePlayoffResult(match) {
+      const { score1, score2 } = this.playoffInput[match];
+      const data = this.playoffs[match];
+      if (!data || !data.team1 || !data.team2) return;
+      const winner = score1 > score2 ? data.team1 : score1 < score2 ? data.team2 : null;
+      if (!winner) { alert('El resultat no pot ser empat.'); return; }
+      const loser = winner === data.team1 ? data.team2 : data.team1;
+
+      window._set(window._ref(window._db, 'playoffs/' + match), {
+        ...data, score1, score2, winner
+      });
+
+      this.logActivity('Playoff resultat', `${match.toUpperCase()}: ${data.team1} ${score1}-${score2} ${data.team2}`);
+
+      // Propagar automàticament guanyadors/perdedors a les finals
+      if (match === 'sf1' || match === 'sf2') {
+        // Esperar un tick perquè playoffs s'actualitzi via Firebase
+        setTimeout(() => this.propagatePlayoffs(), 500);
+      }
+    },
+
+    propagatePlayoffs() {
+      const sf1 = this.playoffs.sf1;
+      const sf2 = this.playoffs.sf2;
+      if (sf1 && sf1.winner && sf2 && sf2.winner) {
+        const finalData = this.playoffs.final;
+        if (!finalData || !finalData.team1) {
+          window._set(window._ref(window._db, 'playoffs/final'), { team1: sf1.winner, team2: sf2.winner });
+        }
+        const thirdData = this.playoffs.third;
+        const loser1 = sf1.team1 === sf1.winner ? sf1.team2 : sf1.team1;
+        const loser2 = sf2.team1 === sf2.winner ? sf2.team2 : sf2.team1;
+        if (!thirdData || !thirdData.team1) {
+          window._set(window._ref(window._db, 'playoffs/third'), { team1: loser1, team2: loser2 });
+        }
+      }
+    },
+
+    resetPlayoffMatch(match) {
+      if (!confirm('Reiniciar aquest resultat?')) return;
+      const data = this.playoffs[match];
+      if (!data) return;
+      window._set(window._ref(window._db, 'playoffs/' + match), { team1: data.team1, team2: data.team2 });
+      // Si es reinicia una semifinal, neteja també la final i el 3r/4t
+      if (match === 'sf1' || match === 'sf2') {
+        window._set(window._ref(window._db, 'playoffs/final'), { team1: '', team2: '' });
+        window._set(window._ref(window._db, 'playoffs/third'), { team1: '', team2: '' });
+      }
+      this.logActivity('Playoff reiniciat', match.toUpperCase());
+    },
+
+    resetPlayoffs() {
+      if (!confirm('Reiniciar TOTS els playoffs? Es perdran tots els resultats i els emparellaments.')) return;
+      window._set(window._ref(window._db, 'playoffs'), { active: false });
+      this.logActivity('Playoffs reiniciats', 'Tots els resultats eliminats');
     },
   }
 }
