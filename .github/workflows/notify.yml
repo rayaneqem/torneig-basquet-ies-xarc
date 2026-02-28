@@ -1,10 +1,6 @@
 name: Enviar recordatoris partits
-
 on:
-  schedule:
-    - cron: '0 12 * * *'
   workflow_dispatch:
-
 jobs:
   notify:
     runs-on: ubuntu-latest
