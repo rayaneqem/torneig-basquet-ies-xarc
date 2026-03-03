@@ -311,11 +311,12 @@
       <!-- Table header -->
       <div class="grid grid-cols-12 px-5 py-3" style="background:linear-gradient(90deg,rgba(249,115,22,0.06),transparent);border-bottom:1px solid var(--border)">
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">#</span>
-        <span class="col-span-5 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
+        <span class="col-span-4 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PJ</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PG</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PP</span>
         <span class="col-span-2 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">+/-</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--loss);opacity:0.8">NP</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--orange);opacity:0.8">PTS</span>
       </div>
       <template x-if="standings.length===0">
@@ -329,7 +330,7 @@
               <span x-text="idx+1"></span>
             </div>
           </div>
-          <div class="col-span-5 flex items-center gap-3">
+          <div class="col-span-4 flex items-center gap-3">
             <span class="text-2xl" x-text="team.emoji||'🏀'"></span>
             <div class="flex flex-col gap-1">
               <span class="font-condensed font-600 uppercase" :style="(team.noShows||0)>=3?'color:#EF476F;font-size:15px;letter-spacing:0.05em':'color:white;font-size:15px;letter-spacing:0.05em'" x-text="team.name"></span>
@@ -343,12 +344,15 @@
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--loss)" x-text="team.pp||0"></span>
           <span class="col-span-2 font-body text-sm text-center" style="color:var(--muted)" x-text="(team.pf||0)-(team.pc||0)>0?'+'+(team.pf-team.pc):(team.pf||0)-(team.pc||0)"></span>
           <div class="col-span-1 text-center">
+            <span class="font-body text-sm font-600" :style="(team.noShows||0)>=3?'color:#EF476F':(team.noShows||0)>=2?'color:#F5A623':'color:var(--muted)'" x-text="team.noShows||0"></span>
+          </div>
+          <div class="col-span-1 text-center">
             <span class="font-score text-2xl" style="color:var(--orange)" x-text="team.pts||0"></span>
           </div>
         </div>
       </template>
     </div>
-    <p class="font-condensed text-xs mt-3" style="color:var(--faint);letter-spacing:0.06em">PJ · PG · PP · +/- · PTS</p>
+    <p class="font-condensed text-xs mt-3" style="color:var(--faint);letter-spacing:0.06em">PJ · PG · PP · +/- · NP · PTS</p>
 
     <!-- ===== FASE ELIMINATÒRIA ===== -->
     <div class="mt-12">
@@ -777,7 +781,8 @@
           </div>
           <button @click="addUpcoming()" class="btn-orange">Afegir Partit</button>
 
-          <!-- GENERAR CALENDARI -->
+          <!-- GENERAR CALENDARI — només Rayan -->
+          <template x-if="currentUser === OWNER_EMAIL">
           <div class="mt-6" style="border-top:1px solid var(--border);padding-top:20px">
             <div class="flex items-center gap-3 mb-3">
               <span class="font-display text-xl" style="color:var(--orange)">GENERAR CALENDARI</span>
@@ -815,6 +820,7 @@
               </div>
             </template>
           </div>
+          </template>
         </div>
 
       </div>
