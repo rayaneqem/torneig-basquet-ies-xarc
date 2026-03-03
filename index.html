@@ -296,8 +296,46 @@
 
 <main class="max-w-5xl mx-auto px-4 py-8" style="min-height:60vh">
 
+  <!-- ════ SKELETON LOADING ════ -->
+  <div x-show="loading" class="fade-in">
+    <style>
+      @keyframes shimmer { 0%{background-position:-800px 0} 100%{background-position:800px 0} }
+      .skeleton {
+        background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-2) 50%, var(--bg-card) 75%);
+        background-size: 800px 100%;
+        animation: shimmer 1.4s infinite;
+        border-radius: 6px;
+      }
+    </style>
+    <!-- Header skeleton -->
+    <div class="mb-6">
+      <div class="skeleton h-3 w-32 mb-2"></div>
+      <div class="skeleton h-10 w-56"></div>
+    </div>
+    <!-- Table skeleton -->
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+      <div class="px-5 py-3" style="border-bottom:1px solid var(--border)">
+        <div class="skeleton h-3 w-full"></div>
+      </div>
+      <template x-for="i in 8" :key="i">
+        <div class="grid grid-cols-12 px-5 py-4 items-center" style="border-bottom:1px solid var(--border)">
+          <div class="col-span-1"><div class="skeleton w-8 h-8 rounded"></div></div>
+          <div class="col-span-5 flex items-center gap-3">
+            <div class="skeleton w-8 h-8 rounded-full"></div>
+            <div class="skeleton h-4 w-28"></div>
+          </div>
+          <div class="col-span-1"><div class="skeleton h-4 w-6 mx-auto"></div></div>
+          <div class="col-span-1"><div class="skeleton h-4 w-6 mx-auto"></div></div>
+          <div class="col-span-1"><div class="skeleton h-4 w-6 mx-auto"></div></div>
+          <div class="col-span-2"><div class="skeleton h-4 w-8 mx-auto"></div></div>
+          <div class="col-span-1"><div class="skeleton h-6 w-8 mx-auto"></div></div>
+        </div>
+      </template>
+    </div>
+  </div>
+
   <!-- ======================== CLASSIFICACIÓ ======================== -->
-  <div x-show="activeTab==='standings'" class="fade-in">
+  <div x-show="activeTab==='standings' && !loading" class="fade-in">
     <!-- Section header -->
     <div class="flex items-center gap-4 mb-6">
       <div>
@@ -645,7 +683,7 @@
   </div>
 
   <!-- ======================== PARTITS (RESULTATS + PRÒXIMS) ======================== -->
-  <div x-show="activeTab==='partits'" class="fade-in">
+  <div x-show="activeTab==='partits' && !loading" class="fade-in">
     <div class="flex items-center gap-4 mb-6">
       <div>
         <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(249,115,22,0.6)">Temporada 2025–26</p>
@@ -828,7 +866,7 @@
   </div>
 
   <!-- ======================== EQUIPS ======================== -->
-  <div x-show="activeTab==='teams'" class="fade-in">
+  <div x-show="activeTab==='teams' && !loading" class="fade-in">
     <div class="flex items-center gap-4 mb-6">
       <div>
         <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(249,115,22,0.6)">Temporada 2025–26</p>
