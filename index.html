@@ -2060,7 +2060,7 @@ function app() {
     },
 
     generarCalendari() {
-      // Agafa els equips: si n'hi ha >8 usa els seleccionats, si no tots
+      // Agafa els equips
       const equipNames = this.teams.length > 8
         ? this.calendariTeams
         : this.teams.map(t => t.name);
@@ -2074,38 +2074,59 @@ function app() {
         this.calendariErr = true; return;
       }
 
-      // Genera tots els enfrontaments (round-robin)
-      const partits = [];
-      for (let i = 0; i < equipNames.length; i++) {
-        for (let j = i + 1; j < equipNames.length; j++) {
-          partits.push([equipNames[i], equipNames[j]]);
+      // ── Algorisme Round-Robin (circle method) ──────────────
+      // Garanteix que cada equip juga exactament 1 cop per jornada
+      // i que no es repeteix cap enfrontament.
+      const n = equipNames.length;
+      const teams = [...equipNames];
+      // Si nombre senar, afegim un "bye" (descans)
+      if (n % 2 !== 0) teams.push(null);
+      const total = teams.length;
+      const numRounds = total - 1;       // jornades necessàries
+      const matchesPerRound = total / 2;
+
+      // Jornades com a array de arrays de parelles
+      const jornades = [];
+      const fixed = teams[0];
+      const rotating = teams.slice(1);
+
+      for (let r = 0; r < numRounds; r++) {
+        const roundTeams = [fixed, ...rotating];
+        const pairs = [];
+        for (let i = 0; i < matchesPerRound; i++) {
+          const t1 = roundTeams[i];
+          const t2 = roundTeams[total - 1 - i];
+          if (t1 !== null && t2 !== null) {
+            pairs.push([t1, t2]);
+          }
         }
+        jornades.push(pairs);
+        // Rota: mou el primer de rotating al final
+        rotating.push(rotating.shift());
       }
 
-      // Barreja els partits aleatòriament per repartir-los bé
-      for (let i = partits.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [partits[i], partits[j]] = [partits[j], partits[i]];
-      }
-
-      // Reparteix en 7 jornades
+      // Si tenim més jornades que 7, tallem; si en tenim menys, repetim
+      // (per a 8 equips surten exactament 7 jornades)
       const numJornades = 7;
-      const perJornada = Math.ceil(partits.length / numJornades);
-      let jornadaIdx = 0;
-      let count = 0;
+      const jornadesFinals = [];
+      for (let j = 0; j < numJornades; j++) {
+        jornadesFinals.push(jornades[j % jornades.length]);
+      }
 
-      partits.forEach((p, idx) => {
-        if (idx > 0 && idx % perJornada === 0) jornadaIdx++;
-        const jornada = jornadaIdx + 1;
-        window._push(window._ref(window._db, 'upcoming'), {
-          team1: p[0],
-          team2: p[1],
-          date: 'per-decidir',
-          time: '12:00',
-          location: 'Pista de bàsquet',
-          jornada: jornada,
+      // Puja a Firebase
+      let count = 0;
+      jornadesFinals.forEach((pairs, jornadaIdx) => {
+        pairs.forEach(([t1, t2]) => {
+          window._push(window._ref(window._db, 'upcoming'), {
+            team1: t1,
+            team2: t2,
+            date: 'per-decidir',
+            time: '12:00',
+            location: 'Pista de bàsquet',
+            jornada: jornadaIdx + 1,
+          });
+          count++;
         });
-        count++;
       });
 
       this.logActivity('Calendari generat', `${count} partits en ${numJornades} jornades`);
@@ -2211,10 +2232,8 @@ function app() {
       });
 
       return Object.values(jornadaMap).sort((a,b) => {
-        // Sort by dateLabel descending (most recent first)
-        if (b.dateLabel > a.dateLabel) return 1;
-        if (b.dateLabel < a.dateLabel) return -1;
-        return b.num - a.num;
+        // Jornada 1 primer, 7 al final
+        return a.num - b.num;
       });
     },
 
