@@ -283,7 +283,7 @@
 <nav class="sticky top-0 z-40 scrollbar-hide overflow-x-auto" style="background:rgba(8,18,38,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);">
   <div class="max-w-5xl mx-auto px-4 flex gap-0">
     <template x-for="tab in publicTabs" :key="tab.id">
-      <button @click="activeTab=tab.id"
+      <button @click="activeTab=tab.id; window.location.hash=tab.id"
         :class="activeTab===tab.id ? 'tab-active' : 'tab-inactive'"
         class="font-condensed uppercase tracking-widest text-sm px-6 py-4 whitespace-nowrap transition-all"
         style="font-weight:600;font-size:13px;letter-spacing:0.12em">
@@ -1489,7 +1489,7 @@
 <script>
 function app() {
   return {
-    activeTab: 'standings',
+    activeTab: window.location.hash.replace('#','') || 'standings',
     isAdmin: false,
     isOwner: false,
     showAdminLogin: false,
