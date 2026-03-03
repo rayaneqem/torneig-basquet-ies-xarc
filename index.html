@@ -2230,11 +2230,7 @@ function app() {
 
       const getOrCreate = (key, num, dateLabel) => {
         if (!jornadaMap[key]) jornadaMap[key] = { num, dateLabel, key, results: [], upcoming: [] };
-        return Object.values(jornadaMap).sort((a,b) => a.num - b.num).map(j => ({
-  ...j,
-  results:  j.results.sort((a,b)  => b.date > a.date ? 1 : -1),
-  upcoming: j.upcoming.sort((a,b) => b.date > a.date ? 1 : -1),
-}));
+        return jornadaMap[key];
       };
 
       // Add results
