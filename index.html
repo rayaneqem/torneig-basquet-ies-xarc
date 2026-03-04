@@ -77,7 +77,7 @@
   .standing-first  { background: linear-gradient(90deg, rgba(255,215,0,0.13) 0%, rgba(245,166,35,0.04) 40%, transparent 100%) !important; }
   .standing-second { background: linear-gradient(90deg, rgba(192,192,220,0.10) 0%, transparent 60%) !important; }
   .standing-third  { background: linear-gradient(90deg, rgba(205,127,50,0.10) 0%, transparent 60%) !important; }
-  .standing-third  { background: linear-gradient(90deg, rgba(196,130,26,0.1) 0%, transparent 60%) !important; }
+  .standing-fourth { background: linear-gradient(90deg, rgba(6,214,160,0.07) 0%, transparent 60%) !important; }
 
   /* BADGE positions */
   .badge-pos {
@@ -88,6 +88,7 @@
   .badge-1 { background: linear-gradient(145deg, #FFE566, #FFAA00); color:#0A1628; font-weight:900; box-shadow: 0 0 14px rgba(255,200,0,0.7), 0 0 4px rgba(255,220,0,0.9); border:1px solid rgba(255,220,0,0.5); }
   .badge-2 { background: linear-gradient(145deg, #E8E8F0, #A8B0C8); color:#0A1628; font-weight:900; box-shadow: 0 0 12px rgba(180,190,220,0.7), 0 0 4px rgba(200,210,240,0.8); border:1px solid rgba(200,210,240,0.4); }
   .badge-3 { background: linear-gradient(145deg, #E8A060, #B86820); color:#0A0A0A; font-weight:900; box-shadow: 0 0 12px rgba(205,127,50,0.7), 0 0 4px rgba(230,150,70,0.8); border:1px solid rgba(205,140,60,0.5); }
+  .badge-4 { background: linear-gradient(145deg, #06D6A0, #049e75); color:#0A1628; font-weight:900; box-shadow: 0 0 12px rgba(6,214,160,0.5), 0 0 4px rgba(6,214,160,0.7); border:1px solid rgba(6,214,160,0.4); }
   .badge-other { background: var(--bg-card-2); color: var(--faint); border: 1px solid var(--border); }
 
   /* CARDS */
@@ -353,11 +354,11 @@
       <!-- Table header -->
       <div class="grid grid-cols-12 px-5 py-3" style="background:linear-gradient(90deg,rgba(249,115,22,0.06),transparent);border-bottom:1px solid var(--border)">
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">#</span>
-        <span class="col-span-3 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
+        <span class="col-span-4 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PJ</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PG</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PP</span>
-        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--muted);opacity:0.8">PE</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PE</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--loss);opacity:0.8">NP</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">+/-</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--orange);opacity:0.8">PTS</span>
@@ -367,16 +368,16 @@
       </template>
       <template x-for="(team, idx) in standings" :key="team.id">
         <div class="grid grid-cols-12 px-5 py-4 items-center standing-row"
-          :class="idx===0?'standing-first':idx===1?'standing-second':idx===2?'standing-third':''">
+          :class="idx===0?'standing-first':idx===1?'standing-second':idx===2?'standing-third':idx===3?'standing-fourth':''">
           <div class="col-span-1">
-            <div class="badge-pos" :class="idx===0?'badge-1':idx===1?'badge-2':idx===2?'badge-3':'badge-other'">
+            <div class="badge-pos" :class="idx===0?'badge-1':idx===1?'badge-2':idx===2?'badge-3':idx===3?'badge-4':'badge-other'">
               <span x-text="idx+1"></span>
             </div>
           </div>
-          <div class="col-span-3 flex items-center gap-2">
-            <span class="text-xl" x-text="team.emoji||'🏀'"></span>
+          <div class="col-span-4 flex items-center gap-2 min-w-0">
+            <span class="text-xl flex-shrink-0" x-text="team.emoji||'🏀'"></span>
             <div class="flex flex-col gap-1 min-w-0">
-              <span class="font-condensed font-600 uppercase truncate" :style="(team.noShows||0)>=3?'color:#EF476F;font-size:13px;letter-spacing:0.05em':'color:white;font-size:13px;letter-spacing:0.05em'" x-text="team.name"></span>
+              <span class="font-condensed font-600 uppercase truncate" :style="(team.noShows||0)>=3?'color:#EF476F;font-size:14px;letter-spacing:0.05em':'color:white;font-size:14px;letter-spacing:0.05em'" x-text="team.name"></span>
               <template x-if="(team.noShows||0)>=3">
                 <span class="font-condensed uppercase font-700" style="color:#EF476F;font-size:9px;letter-spacing:0.1em">⛔ ELIMINAT</span>
               </template>
