@@ -1482,7 +1482,7 @@
 </div>
 
   <!-- ======================== NORMATIVA ======================== -->
-  <div x-show="activeTab==='normativa'" class="fade-in">
+  <div x-show="activeTab==='normativa'">
     <div class="flex items-center gap-4 mb-8">
       <div>
         <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(245,166,35,0.6)">Temporada 2025–26</p>
@@ -1502,7 +1502,7 @@
     </div>
 
     <!-- ══ MODE LECTURA ══ -->
-    <div x-show="!normativaEdit" class="space-y-4">
+    <template x-if="!normativaEdit"><div class="space-y-4">
 
       <!-- PUNTUACIÓ (estàtic, no editable) -->
       <div class="card p-6">
@@ -1560,10 +1560,10 @@
         </div>
       </template>
 
-    </div>
+    </div></template>
 
     <!-- ══ MODE EDICIÓ ══ -->
-    <div x-show="normativaEdit" class="space-y-4">
+    <template x-if="normativaEdit"><div class="space-y-4">
       <template x-for="section in [
         {key:'generals', icon:'📌', title:'NORMES GENERALS'},
         {key:'reglament', icon:'📖', title:'REGLAMENT'},
@@ -1608,7 +1608,7 @@
         <button @click="normativaEdit=false" class="text-sm px-4 py-2 rounded" style="background:var(--bg-card-2);color:var(--muted);border:1px solid var(--border)">Cancel·lar</button>
         <button @click="saveNormativa()" class="btn-orange">💾 Guardar canvis</button>
       </div>
-    </div>
+    </div></template>
 
   </div>
 
@@ -1719,9 +1719,9 @@ function app() {
     resultErr: '',
 
     publicTabs: [
-      { id:'standings', label:'Classificació' },
-      { id:'partits', label:'Partits' },
-      { id:'teams', label:'Equips' },
+      { id:'standings', label:'🏆 Classificació' },
+      { id:'partits', label:'🏀 Partits' },
+      { id:'teams', label:'👥 Equips' },
       { id:'normativa', label:'📋 Normativa' },
     ],
 
