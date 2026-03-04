@@ -177,8 +177,7 @@
   .btn-red:hover { background:#991b1b; }
 
   /* ANIMATIONS */
-  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  .fade-in { animation: fadeIn .3s ease forwards; }
+
 
   .scoreboard { font-family:'Bebas Neue'; letter-spacing:.05em; }
   .divider-orange { width:36px; height:2px; background: var(--orange); border-radius:2px; opacity:0.7; }
@@ -297,7 +296,7 @@
 <main class="max-w-5xl mx-auto px-4 py-8" style="min-height:60vh">
 
   <!-- ════ SKELETON LOADING ════ -->
-  <div x-show="loading" class="fade-in">
+  <div x-show="loading">
     <style>
       @keyframes shimmer { 0%{background-position:-800px 0} 100%{background-position:800px 0} }
       .skeleton {
@@ -335,7 +334,7 @@
   </div>
 
   <!-- ======================== CLASSIFICACIÓ ======================== -->
-  <div x-show="activeTab==='standings' && !loading" class="fade-in">
+  <div x-show="activeTab==='standings' && !loading">
     <!-- Section header -->
     <div class="flex items-center gap-4 mb-6">
       <div>
@@ -683,7 +682,7 @@
   </div>
 
   <!-- ======================== PARTITS (RESULTATS + PRÒXIMS) ======================== -->
-  <div x-show="activeTab==='partits' && !loading" class="fade-in">
+  <div x-show="activeTab==='partits' && !loading">
     <div class="flex items-center gap-4 mb-6">
       <div>
         <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(249,115,22,0.6)">Temporada 2025–26</p>
@@ -866,7 +865,7 @@
   </div>
 
   <!-- ======================== EQUIPS ======================== -->
-  <div x-show="activeTab==='teams' && !loading" class="fade-in">
+  <div x-show="activeTab==='teams' && !loading">
     <div class="flex items-center gap-4 mb-6">
       <div>
         <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(249,115,22,0.6)">Temporada 2025–26</p>
@@ -1050,7 +1049,7 @@
 
 
   <!-- ======================== PESTANYA PROPIETARI (RAYAN) ======================== -->
-  <div x-show="activeTab==='owner' && isOwner" class="fade-in">
+  <div x-show="activeTab==='owner' && isOwner">
     <div class="flex items-center gap-4 mb-6">
       <div>
         <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(245,166,35,0.7)">Accés exclusiu</p>
@@ -1125,7 +1124,7 @@
   </div>
 
   <!-- ======================== ÀRBITRES ======================== -->
-  <div x-show="activeTab==='arbitres' && isAdmin" class="fade-in">
+  <div x-show="activeTab==='arbitres' && isAdmin">
     <div class="flex items-center gap-4 mb-6">
       <div>
         <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(48,209,88,0.7)">Els teus partits</p>
@@ -1482,7 +1481,7 @@
 </div>
 
   <!-- ======================== NORMATIVA ======================== -->
-  <div x-show="activeTab==='normativa'">
+  <div x-show="activeTab==='normativa' && !loading">
     <div class="flex items-center gap-4 mb-8">
       <div>
         <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(245,166,35,0.6)">Temporada 2025–26</p>
