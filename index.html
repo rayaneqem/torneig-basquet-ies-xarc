@@ -1489,81 +1489,28 @@
         <h2 class="font-display text-5xl leading-none" style="color:var(--cream);letter-spacing:0.02em">NORMATIVA</h2>
       </div>
       <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(245,166,35,0.3),transparent);margin-left:8px;margin-top:20px"></div>
+      <!-- Botó editar — només admins -->
+      <template x-if="isOwner && !normativaEdit">
+        <button @click="startEditNormativa()" class="btn-orange text-xs px-3 py-1.5">✏️ Editar</button>
+      </template>
+      <template x-if="isOwner && normativaEdit">
+        <div class="flex gap-2">
+          <button @click="saveNormativa()" class="btn-orange text-xs px-3 py-1.5">💾 Guardar</button>
+          <button @click="normativaEdit=false" class="text-xs px-3 py-1.5 rounded" style="background:var(--bg-card-2);color:var(--muted);border:1px solid var(--border)">Cancel·lar</button>
+        </div>
+      </template>
     </div>
 
-    <div class="space-y-4">
+    <!-- ══ MODE LECTURA ══ -->
+    <div x-show="!normativaEdit" class="space-y-4">
 
-      <!-- NORMES GENERALS -->
-      <div class="card p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <span style="font-size:22px">📌</span>
-          <h3 class="font-display text-2xl" style="color:var(--orange)">NORMES GENERALS</h3>
-        </div>
-        <div class="space-y-3">
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">Camp enrere:</strong> Una vegada la pilota passa la meitat del camp, no pot tornar cap enrere fins que canviï la possessió.</p>
-          </div>
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">No presentació:</strong> Si un equip no es presenta abans de les <strong style="color:var(--orange)">12:05</strong>, es donarà el partit com a perdut i es donarà el punt a l'altre equip.</p>
-          </div>
-          <div class="flex gap-3 py-2">
-            <span style="color:var(--loss);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--loss)">Eliminació:</strong> Si un equip no es presenta a jugar per <strong style="color:var(--loss)">tres partits</strong>, quedarà eliminat del torneig.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- REGLAMENT -->
-      <div class="card p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <span style="font-size:22px">📖</span>
-          <h3 class="font-display text-2xl" style="color:var(--orange)">REGLAMENT</h3>
-        </div>
-        <div class="space-y-3">
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Quan un equip encesta, l'altre equip treu la pilota des de la seva <strong style="color:var(--cream)">línia de fons</strong>.</p>
-          </div>
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">Dobles o passos:</strong> Es donarà la pilota a l'equip contrari; l'àrbitre xiula i l'equip contrari treu des de la lateral més propera.</p>
-          </div>
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">Falta:</strong> La pilota torna a l'equip al qual li han fet falta. Es treu des de la <strong style="color:var(--cream)">línia de banda més propera</strong>.</p>
-          </div>
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">Fora:</strong> Si un jugador trepitja la línia o la pilota bota fora, passa immediatament a l'equip contrari. Es treu del mateix lloc.</p>
-          </div>
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">Canvis:</strong> Es realitzen durant el partit sense parar el joc. <strong style="color:var(--orange)">Màxim 2 canvis per equip.</strong></p>
-          </div>
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">Fi del partit:</strong> Els partits acaben quan sona el timbre del pati.</p>
-          </div>
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--loss);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--loss)">6 faltes:</strong> El jugador serà obligat a sortir del partit.</p>
-          </div>
-          <div class="flex gap-3 py-2">
-            <span style="color:var(--loss);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--loss)">Faltes de respecte o actes violents:</strong> Expulsió del partit. En cas de violència intencionada, expulsió del campionat.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- PUNTUACIÓ -->
+      <!-- PUNTUACIÓ (estàtic, no editable) -->
       <div class="card p-6">
         <div class="flex items-center gap-3 mb-4">
           <span style="font-size:22px">🏀</span>
           <h3 class="font-display text-2xl" style="color:var(--orange)">PUNTUACIÓ</h3>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <div class="text-center py-4 rounded-xl" style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25)">
             <div class="font-display text-4xl" style="color:var(--orange)">2</div>
             <div class="font-condensed text-xs uppercase mt-1" style="color:var(--muted)">Punts — cistella normal</div>
@@ -1571,10 +1518,6 @@
           <div class="text-center py-4 rounded-xl" style="background:rgba(6,214,160,0.08);border:1px solid rgba(6,214,160,0.25)">
             <div class="font-display text-4xl" style="color:var(--win)">3</div>
             <div class="font-condensed text-xs uppercase mt-1" style="color:var(--muted)">Punts — des de triples</div>
-          </div>
-          <div class="text-center py-4 rounded-xl" style="background:rgba(122,156,200,0.08);border:1px solid rgba(122,156,200,0.2)">
-            <div class="font-display text-4xl" style="color:var(--muted)">1</div>
-            <div class="font-condensed text-xs uppercase mt-1" style="color:var(--muted)">Punt — empat</div>
           </div>
         </div>
         <div class="space-y-2">
@@ -1593,80 +1536,80 @@
         </div>
       </div>
 
-      <!-- FORMAT + JUGADORS -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
+      <!-- Seccions dinàmiques -->
+      <template x-for="section in [
+        {key:'generals', icon:'📌', title:'NORMES GENERALS'},
+        {key:'reglament', icon:'📖', title:'REGLAMENT'},
+        {key:'jugadors', icon:'👥', title:'JUGADORS'},
+        {key:'format', icon:'🏆', title:'FORMAT'},
+        {key:'arbitres', icon:'🦺', title:'ÀRBITRES'}
+      ]" :key="section.key">
         <div class="card p-6">
           <div class="flex items-center gap-3 mb-4">
-            <span style="font-size:22px">👥</span>
-            <h3 class="font-display text-2xl" style="color:var(--orange)">JUGADORS</h3>
+            <span style="font-size:22px" x-text="section.icon"></span>
+            <h3 class="font-display text-2xl" style="color:var(--orange)" x-text="section.title"></h3>
           </div>
-          <div class="space-y-3">
-            <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-              <span style="color:var(--orange);flex-shrink:0">▸</span>
-              <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Partits de <strong style="color:var(--orange)">5 vs 5</strong>.</p>
-            </div>
-            <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-              <span style="color:var(--orange);flex-shrink:0">▸</span>
-              <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Mínim <strong style="color:var(--orange)">5 jugadors</strong> per jugar, amb <strong style="color:var(--orange)">2 o 3 suplents</strong> recomanats.</p>
-            </div>
-            <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-              <span style="color:var(--orange);flex-shrink:0">▸</span>
-              <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Poden participar <strong style="color:var(--cream)">alumnes i professors</strong>.</p>
-            </div>
-            <div class="flex gap-3 py-2">
-              <span style="color:var(--orange);flex-shrink:0">▸</span>
-              <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Terreny de joc: <strong style="color:var(--cream)">tot el camp de bàsquet</strong>.</p>
-            </div>
+          <div class="space-y-2">
+            <template x-for="(item, i) in getNormativa(section.key)" :key="i">
+              <div class="flex gap-3 py-2" :style="i < getNormativa(section.key).length-1 ? 'border-bottom:1px solid var(--border)' : ''">
+                <span :style="item.warning ? 'color:var(--loss)' : 'color:var(--orange)'" style="flex-shrink:0;margin-top:2px">▸</span>
+                <p class="font-body text-sm" style="color:var(--cream);line-height:1.7" x-text="item.text"></p>
+              </div>
+            </template>
           </div>
         </div>
-
-        <div class="card p-6">
-          <div class="flex items-center gap-3 mb-4">
-            <span style="font-size:22px">🏆</span>
-            <h3 class="font-display text-2xl" style="color:var(--orange)">FORMAT</h3>
-          </div>
-          <div class="space-y-3">
-            <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-              <span style="color:var(--orange);flex-shrink:0">▸</span>
-              <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">Fase regular:</strong> Tots contra tots.</p>
-            </div>
-            <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-              <span style="color:var(--orange);flex-shrink:0">▸</span>
-              <p class="font-body text-sm" style="color:var(--cream);line-height:1.7"><strong style="color:var(--cream)">Playoffs:</strong> Els <strong style="color:var(--orange)">4 millors equips</strong> passen a semifinals i final.</p>
-            </div>
-            <div class="flex gap-3 py-2">
-              <span style="color:var(--orange);flex-shrink:0">▸</span>
-              <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Els perdedors de semifinal juguen el <strong style="color:var(--cream)">3r i 4t lloc</strong>.</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ÀRBITRES -->
-      <div class="card p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <span style="font-size:22px">🦺</span>
-          <h3 class="font-display text-2xl" style="color:var(--orange)">ÀRBITRES</h3>
-        </div>
-        <div class="space-y-3">
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Els àrbitres supervisaran els partits, xiularan infraccions i gestionaran el temps.</p>
-          </div>
-          <div class="flex gap-3 py-2" style="border-bottom:1px solid var(--border)">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Les decisions es prendran <strong style="color:var(--cream)">conjuntament</strong>. <strong style="color:var(--loss)">No s'escoltarà el públic.</strong></p>
-          </div>
-          <div class="flex gap-3 py-2">
-            <span style="color:var(--orange);flex-shrink:0;margin-top:2px">▸</span>
-            <p class="font-body text-sm" style="color:var(--cream);line-height:1.7">Les queixes es podran debatre al <strong style="color:var(--cream)">final del partit</strong> si es considera molt rellevant.</p>
-          </div>
-        </div>
-      </div>
+      </template>
 
     </div>
+
+    <!-- ══ MODE EDICIÓ ══ -->
+    <div x-show="normativaEdit" class="space-y-4">
+      <template x-for="section in [
+        {key:'generals', icon:'📌', title:'NORMES GENERALS'},
+        {key:'reglament', icon:'📖', title:'REGLAMENT'},
+        {key:'jugadors', icon:'👥', title:'JUGADORS'},
+        {key:'format', icon:'🏆', title:'FORMAT'},
+        {key:'arbitres', icon:'🦺', title:'ÀRBITRES'}
+      ]" :key="section.key">
+        <div class="card p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <span style="font-size:22px" x-text="section.icon"></span>
+            <h3 class="font-display text-2xl" style="color:var(--orange)" x-text="section.title"></h3>
+          </div>
+          <div class="space-y-3">
+            <template x-for="(item, i) in (normativaTemp[section.key] || [])" :key="i">
+              <div class="flex gap-2 items-start">
+                <!-- Indicador warning (vermell/taronja) -->
+                <button @click="item.warning = !item.warning"
+                  :style="item.warning ? 'color:var(--loss);border-color:var(--loss)' : 'color:var(--orange);border-color:rgba(245,166,35,0.3)'"
+                  style="flex-shrink:0;margin-top:8px;width:24px;height:24px;border-radius:4px;border:1px solid;background:transparent;cursor:pointer;font-size:12px"
+                  title="Canvia color (taronja/vermell)">▸</button>
+                <!-- Text -->
+                <textarea x-model="item.text" rows="2"
+                  class="font-body text-sm flex-1 rounded-lg px-3 py-2"
+                  style="background:var(--bg-card-2);border:1px solid var(--border);color:var(--cream);resize:vertical;line-height:1.6"></textarea>
+                <!-- Eliminar -->
+                <button @click="removeNormativaItem(section.key, i)"
+                  style="flex-shrink:0;margin-top:8px;color:var(--loss);background:transparent;border:none;cursor:pointer;font-size:16px">✕</button>
+              </div>
+            </template>
+            <!-- Afegir ítem -->
+            <button @click="addNormativaItem(section.key)"
+              class="text-xs mt-1 px-3 py-1.5 rounded"
+              style="background:rgba(245,166,35,0.08);border:1px dashed rgba(245,166,35,0.3);color:var(--orange);cursor:pointer">
+              + Afegir punt
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <!-- Botó guardar al final -->
+      <div class="flex gap-3 justify-end pt-2">
+        <button @click="normativaEdit=false" class="text-sm px-4 py-2 rounded" style="background:var(--bg-card-2);color:var(--muted);border:1px solid var(--border)">Cancel·lar</button>
+        <button @click="saveNormativa()" class="btn-orange">💾 Guardar canvis</button>
+      </div>
+    </div>
+
   </div>
 
 </main>
@@ -1806,6 +1749,9 @@ function app() {
         });
         onValue(ref(db, 'playoffs'), (snap) => {
           this.playoffs = snap.val() || {};
+        });
+        onValue(ref(db, 'normativa'), (snap) => {
+          this.normativa = snap.val() || this.normativaDefault();
         });
 
         // Escoltar canvis d'autenticació Firebase
@@ -2102,6 +2048,9 @@ function app() {
 
     playoffs: {},
     playoffInput: { sf1:{score1:0,score2:0}, sf2:{score1:0,score2:0}, final:{score1:0,score2:0}, third:{score1:0,score2:0} },
+    normativa: {},
+    normativaEdit: false,
+    normativaTemp: {},
 
     matchModal: false,
     modalMatch: {},
@@ -2810,6 +2759,65 @@ function app() {
       if (!confirm('Reiniciar TOTS els playoffs? Es perdran tots els resultats i els emparellaments.')) return;
       window._set(window._ref(window._db, 'playoffs'), { active: false });
       this.logActivity('Playoffs reiniciats', 'Tots els resultats eliminats');
+    },
+
+    // ===== NORMATIVA =====
+    normativaDefault() {
+      return {
+        generals: [
+          { text: 'Camp enrere: Una vegada la pilota passa la meitat del camp, no pot tornar cap enrere fins que canviï la possessió.', warning: false },
+          { text: 'No presentació: Si un equip no es presenta abans de les 12:05, es donarà el partit com a perdut i es donarà el punt a l\'altre equip.', warning: false },
+          { text: 'Eliminació: Si un equip no es presenta a jugar per tres partits, quedarà eliminat del torneig.', warning: true },
+        ],
+        reglament: [
+          { text: 'Quan un equip encesta, l\'altre equip treu la pilota des de la seva línia de fons.', warning: false },
+          { text: 'Dobles o passos: Es donarà la pilota a l\'equip contrari; l\'àrbitre xiula i l\'equip contrari treu des de la lateral més propera.', warning: false },
+          { text: 'Falta: La pilota torna a l\'equip al qual li han fet falta. Es treu des de la línia de banda més propera.', warning: false },
+          { text: 'Fora: Si un jugador trepitja la línia o la pilota bota fora, passa immediatament a l\'equip contrari. Es treu del mateix lloc.', warning: false },
+          { text: 'Canvis: Es realitzen durant el partit sense parar el joc. Màxim 2 canvis per equip.', warning: false },
+          { text: 'Fi del partit: Els partits acaben quan sona el timbre del pati.', warning: false },
+          { text: '6 faltes: El jugador serà obligat a sortir del partit.', warning: true },
+          { text: 'Faltes de respecte o actes violents: Expulsió del partit. En cas de violència intencionada, expulsió del campionat.', warning: true },
+        ],
+        jugadors: [
+          { text: 'Partits de 5 vs 5.', warning: false },
+          { text: 'Mínim 5 jugadors per jugar, amb 2 o 3 suplents recomanats.', warning: false },
+          { text: 'Poden participar alumnes i professors.', warning: false },
+          { text: 'Terreny de joc: tot el camp de bàsquet.', warning: false },
+        ],
+        format: [
+          { text: 'Fase regular: Tots contra tots.', warning: false },
+          { text: 'Playoffs: Els 4 millors equips passen a semifinals i final.', warning: false },
+          { text: 'Els perdedors de semifinal juguen el 3r i 4t lloc.', warning: false },
+        ],
+        arbitres: [
+          { text: 'Els àrbitres supervisaran els partits, xiularan infraccions i gestionaran el temps.', warning: false },
+          { text: 'Les decisions es prendran conjuntament. No s\'escoltarà el públic.', warning: true },
+          { text: 'Les queixes es podran debatre al final del partit si es considera molt rellevant.', warning: false },
+        ],
+      };
+    },
+    startEditNormativa() {
+      this.normativaTemp = JSON.parse(JSON.stringify(
+        Object.keys(this.normativa).length ? this.normativa : this.normativaDefault()
+      ));
+      this.normativaEdit = true;
+    },
+    saveNormativa() {
+      window._set(window._ref(window._db, 'normativa'), this.normativaTemp);
+      this.logActivity('Normativa editada', 'Actualitzada');
+      this.normativaEdit = false;
+    },
+    addNormativaItem(section) {
+      if (!this.normativaTemp[section]) this.normativaTemp[section] = [];
+      this.normativaTemp[section].push({ text: '', warning: false });
+    },
+    removeNormativaItem(section, idx) {
+      this.normativaTemp[section].splice(idx, 1);
+    },
+    getNormativa(section) {
+      const n = Object.keys(this.normativa).length ? this.normativa : this.normativaDefault();
+      return n[section] || [];
     },
   }
 }
