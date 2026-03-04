@@ -353,13 +353,13 @@
       <!-- Table header -->
       <div class="grid grid-cols-12 px-5 py-3" style="background:linear-gradient(90deg,rgba(249,115,22,0.06),transparent);border-bottom:1px solid var(--border)">
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">#</span>
-        <span class="col-span-4 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
+        <span class="col-span-5 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PJ</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PG</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PP</span>
-        <span class="col-span-2 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">+/-</span>
-        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--loss);opacity:0.8">NP</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">+/-</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--orange);opacity:0.8">PTS</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--loss);opacity:0.8">NP</span>
       </div>
       <template x-if="standings.length===0">
         <div class="px-5 py-12 text-center font-condensed" style="color:#333">Encara no hi ha equips registrats</div>
@@ -372,7 +372,7 @@
               <span x-text="idx+1"></span>
             </div>
           </div>
-          <div class="col-span-4 flex items-center gap-3">
+          <div class="col-span-5 flex items-center gap-3">
             <span class="text-2xl" x-text="team.emoji||'🏀'"></span>
             <div class="flex flex-col gap-1">
               <span class="font-condensed font-600 uppercase" :style="(team.noShows||0)>=3?'color:#EF476F;font-size:15px;letter-spacing:0.05em':'color:white;font-size:15px;letter-spacing:0.05em'" x-text="team.name"></span>
@@ -384,17 +384,26 @@
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="team.pj||0"></span>
           <span class="col-span-1 font-body text-sm text-center font-medium" style="color:var(--win)" x-text="team.pg||0"></span>
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--loss)" x-text="team.pp||0"></span>
-          <span class="col-span-2 font-body text-sm text-center" style="color:var(--muted)" x-text="(team.pf||0)-(team.pc||0)>0?'+'+(team.pf-team.pc):(team.pf||0)-(team.pc||0)"></span>
-          <div class="col-span-1 text-center">
-            <span class="font-body text-sm font-600" :style="(team.noShows||0)>=3?'color:#EF476F':(team.noShows||0)>=2?'color:#F5A623':'color:var(--muted)'" x-text="team.noShows||0"></span>
-          </div>
+          <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="(team.pf||0)-(team.pc||0)>0?'+'+(team.pf-team.pc):(team.pf||0)-(team.pc||0)"></span>
           <div class="col-span-1 text-center">
             <span class="font-score text-2xl" style="color:var(--orange)" x-text="team.pts||0"></span>
+          </div>
+          <div class="col-span-1 text-center">
+            <span class="font-body text-sm font-600" :style="(team.noShows||0)>=3?'color:#EF476F':(team.noShows||0)>=2?'color:#F5A623':'color:var(--muted)'" x-text="team.noShows||0"></span>
           </div>
         </div>
       </template>
     </div>
-    <p class="font-condensed text-xs mt-3" style="color:var(--faint);letter-spacing:0.06em">PJ · PG · PP · +/- · NP · PTS</p>
+
+    <!-- LLEGENDA -->
+    <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--muted)">PJ</span> Partits Jugats</span>
+      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--win)">PG</span> Partits Guanyats</span>
+      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--loss)">PP</span> Partits Perduts</span>
+      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--muted)">+/-</span> Diferència de cistelles</span>
+      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--orange)">PTS</span> Punts a la classificació</span>
+      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--loss)">NP</span> No Presentacions</span>
+    </div>
 
     <!-- ===== FASE ELIMINATÒRIA ===== -->
     <div class="mt-12">
@@ -2047,7 +2056,21 @@ function app() {
         const elimA = (a.noShows||0) >= 3, elimB = (b.noShows||0) >= 3;
         if (elimA && !elimB) return 1;
         if (!elimA && elimB) return -1;
-        return b.pts !== a.pts ? b.pts-a.pts : (b.pf-b.pc)-(a.pf-a.pc);
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        // Desempat 1: diferència de cistelles
+        const diffA = a.pf - a.pc, diffB = b.pf - b.pc;
+        if (diffB !== diffA) return diffB - diffA;
+        // Desempat 2: resultat directe
+        const h2h = this.results.find(r =>
+          (r.team1 === a.name && r.team2 === b.name) ||
+          (r.team1 === b.name && r.team2 === a.name)
+        );
+        if (h2h) {
+          const aWon = (h2h.team1 === a.name && Number(h2h.score1) > Number(h2h.score2)) ||
+                       (h2h.team2 === a.name && Number(h2h.score2) > Number(h2h.score1));
+          return aWon ? -1 : 1;
+        }
+        return 0;
       });
     },
 
@@ -2323,6 +2346,21 @@ function app() {
     addUpcoming() {
       const { team1, team2, date, time, location, refereeArr, jornada } = this.newUpcoming;
       if (!team1 || !team2 || team1 === team2 || !jornada) return;
+
+      // Comprova si ja existeix aquest enfrontament (upcoming o results)
+      const duplicatUpcoming = this.upcoming.some(u =>
+        (u.team1 === team1 && u.team2 === team2) ||
+        (u.team1 === team2 && u.team2 === team1)
+      );
+      const duplicatResult = this.results.some(r =>
+        (r.team1 === team1 && r.team2 === team2) ||
+        (r.team1 === team2 && r.team2 === team1)
+      );
+      if (duplicatUpcoming || duplicatResult) {
+        alert(`⚠️ Aquest enfrontament (${team1} vs ${team2}) ja existeix!`);
+        return;
+      }
+
       const refereeStr = refereeArr && refereeArr.length ? refereeArr.map(m => m.split(' ')[0]).join(', ') : '';
       const dateVal = date || '';
       window._push(window._ref(window._db, 'upcoming'), { team1, team2, date: dateVal, time, location, jornada,
