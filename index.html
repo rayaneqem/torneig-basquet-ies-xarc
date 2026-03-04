@@ -357,9 +357,9 @@
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PJ</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PG</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PP</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--loss);opacity:0.8">NP</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">+/-</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--orange);opacity:0.8">PTS</span>
-        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--loss);opacity:0.8">NP</span>
       </div>
       <template x-if="standings.length===0">
         <div class="px-5 py-12 text-center font-condensed" style="color:#333">Encara no hi ha equips registrats</div>
@@ -384,12 +384,12 @@
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="team.pj||0"></span>
           <span class="col-span-1 font-body text-sm text-center font-medium" style="color:var(--win)" x-text="team.pg||0"></span>
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--loss)" x-text="team.pp||0"></span>
+          <div class="col-span-1 text-center">
+            <span class="font-body text-sm font-600" :style="(team.noShows||0)>=3?'color:#EF476F':(team.noShows||0)>=2?'color:#F5A623':'color:var(--muted)'" x-text="team.noShows||0"></span>
+          </div>
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="(team.pf||0)-(team.pc||0)>0?'+'+(team.pf-team.pc):(team.pf||0)-(team.pc||0)"></span>
           <div class="col-span-1 text-center">
             <span class="font-score text-2xl" style="color:var(--orange)" x-text="team.pts||0"></span>
-          </div>
-          <div class="col-span-1 text-center">
-            <span class="font-body text-sm font-600" :style="(team.noShows||0)>=3?'color:#EF476F':(team.noShows||0)>=2?'color:#F5A623':'color:var(--muted)'" x-text="team.noShows||0"></span>
           </div>
         </div>
       </template>
@@ -2040,9 +2040,13 @@ function app() {
         if (ns2) stats[r.team2].noShows++;
 
         if (ns1 && ns2) {
-          // Tots dos no presentats — compten com a derrota sense punts
-          stats[r.team1].pj++; stats[r.team2].pj++;
-          stats[r.team1].pp++; stats[r.team2].pp++;
+          // Tots dos no presentats — no compten com PJ ni PP
+        } else if (ns1) {
+          // Equip 1 no presentat — l'equip 2 guanya però el NP no compta com PJ per a ningú
+          stats[r.team2].pj++; stats[r.team2].pg++; stats[r.team2].pts+=3;
+        } else if (ns2) {
+          // Equip 2 no presentat — l'equip 1 guanya però el NP no compta com PJ per a ningú
+          stats[r.team1].pj++; stats[r.team1].pg++; stats[r.team1].pts+=3;
         } else {
           stats[r.team1].pj++; stats[r.team2].pj++;
           stats[r.team1].pf += s1; stats[r.team1].pc += s2;
