@@ -177,6 +177,8 @@
   .btn-red:hover { background:#991b1b; }
 
   /* ANIMATIONS */
+  @keyframes tabIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .tab-content { animation: tabIn .18s ease forwards; }
 
 
   .scoreboard { font-family:'Bebas Neue'; letter-spacing:.05em; }
@@ -282,7 +284,7 @@
 <nav class="sticky top-0 z-40 scrollbar-hide overflow-x-auto" style="background:rgba(8,18,38,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);">
   <div class="max-w-5xl mx-auto px-4 flex gap-0">
     <template x-for="tab in publicTabs" :key="tab.id">
-      <button @click="activeTab=tab.id; window.location.hash=tab.id"
+      <button @click="activeTab=tab.id; window.location.hash=tab.id; $nextTick(()=>{ const el=document.getElementById('tab-main'); if(el){el.classList.remove('tab-content'); void el.offsetWidth; el.classList.add('tab-content');} })"
         :class="activeTab===tab.id ? 'tab-active' : 'tab-inactive'"
         class="font-condensed uppercase tracking-widest text-sm px-6 py-4 whitespace-nowrap transition-all"
         style="font-weight:600;font-size:13px;letter-spacing:0.12em">
@@ -293,7 +295,7 @@
   </div>
 </nav>
 
-<main class="max-w-5xl mx-auto px-4 py-8" style="min-height:60vh">
+<main id="tab-main" class="max-w-5xl mx-auto px-4 py-8 tab-content" style="min-height:60vh">
 
   <!-- ════ SKELETON LOADING ════ -->
   <div x-show="loading">
@@ -1643,6 +1645,7 @@
   const db = getDatabase(firebaseApp);
   const auth = getAuth(firebaseApp);
   const googleProvider = new GoogleAuthProvider();
+  googleProvider.setCustomParameters({ prompt: 'select_account' });
 
   window._db = db;
   window._ref = ref;
