@@ -2272,10 +2272,11 @@ function app() {
         }
       });
 
-      return Object.values(jornadaMap).sort((a,b) => {
-        // Jornada 1 primer, 7 al final
-        return a.num - b.num;
-      });
+      return Object.values(jornadaMap).sort((a,b) => a.num - b.num).map(j => ({
+        ...j,
+        results:  j.results.sort((a,b)  => b.date > a.date ? 1 : b.date < a.date ? -1 : 0),
+        upcoming: j.upcoming.sort((a,b) => b.date > a.date ? 1 : b.date < a.date ? -1 : 0),
+      }));
     },
 
     getMatchStats(match) {
