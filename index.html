@@ -353,10 +353,11 @@
       <!-- Table header -->
       <div class="grid grid-cols-12 px-5 py-3" style="background:linear-gradient(90deg,rgba(249,115,22,0.06),transparent);border-bottom:1px solid var(--border)">
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">#</span>
-        <span class="col-span-5 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
+        <span class="col-span-3 font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">Equip</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PJ</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PG</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">PP</span>
+        <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--muted);opacity:0.8">PE</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--loss);opacity:0.8">NP</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--faint)">+/-</span>
         <span class="col-span-1 font-condensed text-xs uppercase tracking-widest text-center" style="color:var(--orange);opacity:0.8">PTS</span>
@@ -372,18 +373,19 @@
               <span x-text="idx+1"></span>
             </div>
           </div>
-          <div class="col-span-5 flex items-center gap-3">
-            <span class="text-2xl" x-text="team.emoji||'🏀'"></span>
-            <div class="flex flex-col gap-1">
-              <span class="font-condensed font-600 uppercase" :style="(team.noShows||0)>=3?'color:#EF476F;font-size:15px;letter-spacing:0.05em':'color:white;font-size:15px;letter-spacing:0.05em'" x-text="team.name"></span>
+          <div class="col-span-3 flex items-center gap-2">
+            <span class="text-xl" x-text="team.emoji||'🏀'"></span>
+            <div class="flex flex-col gap-1 min-w-0">
+              <span class="font-condensed font-600 uppercase truncate" :style="(team.noShows||0)>=3?'color:#EF476F;font-size:13px;letter-spacing:0.05em':'color:white;font-size:13px;letter-spacing:0.05em'" x-text="team.name"></span>
               <template x-if="(team.noShows||0)>=3">
-                <span class="font-condensed uppercase font-700" style="color:#EF476F;font-size:10px;letter-spacing:0.15em">⛔ ELIMINAT</span>
+                <span class="font-condensed uppercase font-700" style="color:#EF476F;font-size:9px;letter-spacing:0.1em">⛔ ELIMINAT</span>
               </template>
             </div>
           </div>
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="team.pj||0"></span>
           <span class="col-span-1 font-body text-sm text-center font-medium" style="color:var(--win)" x-text="team.pg||0"></span>
           <span class="col-span-1 font-body text-sm text-center" style="color:var(--loss)" x-text="team.pp||0"></span>
+          <span class="col-span-1 font-body text-sm text-center" style="color:var(--muted)" x-text="team.pe||0"></span>
           <div class="col-span-1 text-center">
             <span class="font-body text-sm font-600" :style="(team.noShows||0)>=3?'color:#EF476F':(team.noShows||0)>=2?'color:#F5A623':'color:var(--muted)'" x-text="team.noShows||0"></span>
           </div>
@@ -400,9 +402,10 @@
       <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--muted)">PJ</span> Partits Jugats</span>
       <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--win)">PG</span> Partits Guanyats</span>
       <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--loss)">PP</span> Partits Perduts</span>
+      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--muted)">PE</span> Partits Empatats</span>
+      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--loss)">NP</span> No Presentacions</span>
       <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--muted)">+/-</span> Diferència de cistelles</span>
       <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--orange)">PTS</span> Punts a la classificació</span>
-      <span class="font-condensed text-xs" style="color:var(--faint)"><span style="color:var(--loss)">NP</span> No Presentacions</span>
     </div>
 
     <!-- ===== FASE ELIMINATÒRIA ===== -->
@@ -2030,7 +2033,7 @@ function app() {
 
     recalcStandings() {
       const stats = {};
-      this.teams.forEach(t => { stats[t.name] = { ...t, pj:0, pg:0, pp:0, pf:0, pc:0, pts:0, noShows:0 }; });
+      this.teams.forEach(t => { stats[t.name] = { ...t, pj:0, pg:0, pe:0, pp:0, pf:0, pc:0, pts:0, noShows:0 }; });
       this.results.forEach(r => {
         if (!stats[r.team1] || !stats[r.team2]) return;
         const s1 = Number(r.score1), s2 = Number(r.score2);
@@ -2053,7 +2056,7 @@ function app() {
           stats[r.team2].pf += s2; stats[r.team2].pc += s1;
           if (s1 > s2) { stats[r.team1].pg++; stats[r.team1].pts+=3; stats[r.team2].pp++; }
           else if (s2 > s1) { stats[r.team2].pg++; stats[r.team2].pts+=3; stats[r.team1].pp++; }
-          else { stats[r.team1].pts+=1; stats[r.team2].pts+=1; }
+          else { stats[r.team1].pe++; stats[r.team1].pts+=1; stats[r.team2].pe++; stats[r.team2].pts+=1; }
         }
       });
       this.standings = Object.values(stats).sort((a,b) => {
