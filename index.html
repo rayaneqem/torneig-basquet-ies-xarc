@@ -1644,7 +1644,7 @@
 <!-- Firebase SDKs -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, set, onValue, remove, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, set, onValue, get, remove, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
@@ -1666,6 +1666,7 @@
   window._db = db;
   window._ref = ref;
   window._set = set;
+  window._get = get;
   window._onValue = onValue;
   window._remove = remove;
   window._push = push;
@@ -1745,32 +1746,62 @@ function app() {
 
     init() {
       const setup = () => {
-        const { _db: db, _ref: ref, _onValue: onValue } = window;
-        onValue(ref(db, 'teams'), (snap) => {
-          const val = snap.val();
-          this.teams = val ? Object.entries(val).map(([id, t]) => ({ ...t, id })) : [];
-          this.recalcStandings();
-          this.loading = false;
-        });
-        onValue(ref(db, 'results'), (snap) => {
-          const val = snap.val();
-          this.results = val ? Object.entries(val).map(([id, r]) => ({ ...r, id })) : [];
-          this.recalcStandings();
-        });
-        onValue(ref(db, 'upcoming'), (snap) => {
-          const val = snap.val();
-          this.upcoming = val ? Object.entries(val).map(([id, u]) => ({ ...u, id })) : [];
-        });
-        onValue(ref(db, 'activityLog'), (snap) => {
-          const val = snap.val();
-          this.activityLog = val ? Object.entries(val).map(([id, a]) => ({ ...a, id })).sort((a,b) => b.ts - a.ts) : [];
-        });
-        onValue(ref(db, 'playoffs'), (snap) => {
-          this.playoffs = snap.val() || {};
-        });
-        onValue(ref(db, 'normativa'), (snap) => {
-          this.normativa = snap.val() || this.normativaDefault();
-        });
+        const { _db: db, _ref: ref, _onValue: onValue, _get: get } = window;
+
+        // Funció per carregar dades — get() per a visitants, onValue() per a admins
+        const loadData = (isAdmin) => {
+          if (isAdmin) {
+            // Admins: temps real amb onValue
+            onValue(ref(db, 'teams'), (snap) => {
+              const val = snap.val();
+              this.teams = val ? Object.entries(val).map(([id, t]) => ({ ...t, id })) : [];
+              this.recalcStandings();
+              this.loading = false;
+            });
+            onValue(ref(db, 'results'), (snap) => {
+              const val = snap.val();
+              this.results = val ? Object.entries(val).map(([id, r]) => ({ ...r, id })) : [];
+              this.recalcStandings();
+            });
+            onValue(ref(db, 'upcoming'), (snap) => {
+              const val = snap.val();
+              this.upcoming = val ? Object.entries(val).map(([id, u]) => ({ ...u, id })) : [];
+            });
+            onValue(ref(db, 'activityLog'), (snap) => {
+              const val = snap.val();
+              this.activityLog = val ? Object.entries(val).map(([id, a]) => ({ ...a, id })).sort((a,b) => b.ts - a.ts) : [];
+            });
+            onValue(ref(db, 'playoffs'), (snap) => {
+              this.playoffs = snap.val() || {};
+            });
+            onValue(ref(db, 'normativa'), (snap) => {
+              this.normativa = snap.val() || this.normativaDefault();
+            });
+          } else {
+            // Visitants: consulta única get() — no manté connexió oberta
+            const fetchAll = async () => {
+              const [teams, results, upcoming, playoffs, normativa] = await Promise.all([
+                get(ref(db, 'teams')),
+                get(ref(db, 'results')),
+                get(ref(db, 'upcoming')),
+                get(ref(db, 'playoffs')),
+                get(ref(db, 'normativa')),
+              ]);
+              this.teams    = teams.val()    ? Object.entries(teams.val()).map(([id, t])    => ({ ...t, id })) : [];
+              this.results  = results.val()  ? Object.entries(results.val()).map(([id, r])  => ({ ...r, id })) : [];
+              this.upcoming = upcoming.val() ? Object.entries(upcoming.val()).map(([id, u]) => ({ ...u, id })) : [];
+              this.playoffs = playoffs.val() || {};
+              this.normativa = normativa.val() || this.normativaDefault();
+              this.recalcStandings();
+              this.loading = false;
+            };
+            fetchAll();
+          }
+        };
+
+        this._loadData = loadData;
+        // Carrega inicialment com a visitant
+        loadData(false);
 
         // Escoltar canvis d'autenticació Firebase
         window._onAuthStateChanged((firebaseUser) => {
@@ -1790,8 +1821,9 @@ function app() {
                 const ownerLabel = email === this.OWNER_EMAIL ? '🔒 Rayan' : '🔒 Esteve';
                 this.publicTabs.push({ id: 'owner', label: ownerLabel });
               }
+              // Admin logejat — canvia a temps real
+              this._loadData(true);
             } else {
-              // Email no autoritzat — tanca sessió i mostra error
               window._signOut();
               this.loginError = firebaseUser.email + ' no està autoritzat per accedir.';
             }
