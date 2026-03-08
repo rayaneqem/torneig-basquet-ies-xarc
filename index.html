@@ -717,7 +717,7 @@
         <div class="jornada-header">
           <span class="font-display text-2xl leading-none" style="color:var(--orange);letter-spacing:0.04em;font-size:1.4rem" x-text="'JORNADA ' + jornada.num"></span>
           <div style="width:1px;height:20px;background:rgba(255,107,0,0.3)"></div>
-          <span class="font-condensed uppercase tracking-[0.15em] text-sm" style="color:var(--muted)" x-text="jornada.dateLabel"></span>
+          <span class="font-condensed uppercase tracking-[0.15em] text-sm" style="color:var(--muted)" x-text="fmtDate(jornada.dateLabel)"></span>
         </div>
         <div class="space-y-2">
           <!-- Partits jugats -->
@@ -760,7 +760,7 @@
                   <span x-text="match.team2"></span>
                 </div>
                 <div class="flex items-center gap-3 flex-wrap mt-1.5">
-                  <span class="font-condensed text-sm" :style="(!match.date || match.date==='per-decidir')?'color:var(--faint)':'color:var(--muted)'" x-text="(!match.date || match.date==='per-decidir')?'📅 No confirmat':match.date"></span>
+                  <span class="font-condensed text-sm" :style="(!match.date || match.date==='per-decidir')?'color:var(--faint)':'color:var(--muted)'" x-text="(!match.date || match.date==='per-decidir')?'📅 No confirmat':fmtDate(match.date)"></span>
                   <template x-if="match.time">
                     <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="match.time"></span>
                   </template>
@@ -1139,7 +1139,7 @@
                   x-text="entry.action"></span>
               </div>
               <p class="font-body text-sm mt-0.5" style="color:var(--cream)" x-text="entry.detail"></p>
-              <p class="font-condensed text-xs mt-0.5" style="color:var(--faint)" x-text="entry.date"></p>
+              <p class="font-condensed text-xs mt-0.5" style="color:var(--faint)" x-text="fmtDate(entry.date)"></p>
             </div>
           </div>
         </template>
@@ -1182,7 +1182,7 @@
                 <span x-text="match.team2"></span>
               </div>
               <div class="flex items-center gap-3 mt-1 flex-wrap">
-                <span class="font-condensed text-sm" style="color:var(--muted)" x-text="match.date"></span>
+                <span class="font-condensed text-sm" style="color:var(--muted)" x-text="fmtDate(match.date)"></span>
                 <template x-if="match.score1 !== undefined">
                   <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="(match.noShow1?'NP':match.score1) + ' - ' + (match.noShow2?'NP':match.score2)"></span>
                 </template>
@@ -1218,7 +1218,7 @@
                 <span style="color:var(--faint);margin:0 6px">vs</span>
                 <span x-text="match.team2"></span>
               </div>
-              <span class="font-condensed text-xs" style="color:var(--faint)" x-text="match.date"></span>
+              <span class="font-condensed text-xs" style="color:var(--faint)" x-text="fmtDate(match.date)"></span>
             </div>
             <div class="flex items-center gap-2">
               <span class="font-condensed text-xs" style="color:var(--win)">✓ Confirmat</span>
@@ -1243,7 +1243,7 @@
     <div class="px-6 pt-5 pb-5 border-b border-white/5" style="background:linear-gradient(135deg,var(--bg-card-2) 0%,var(--bg-card) 100%)">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
-          <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)" x-text="modalMatch.date"></span>
+          <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)" x-text="fmtDate(modalMatch.date)"></span>
           <template x-if="modalMatch.jornada">
             <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange)">J<span x-text="modalMatch.jornada"></span></span>
           </template>
@@ -2438,7 +2438,7 @@ function app() {
         if (!jornadaMap[key]) {
           jornadaMap[key] = {
             num: r.jornada || null,
-            dateLabel: r.date,
+            dateLabel: r.date ? r.date : '',
             key,
             matches: []
           };
@@ -2987,6 +2987,12 @@ function app() {
     },
 
     // ===== NORMATIVA =====
+    fmtDate(d) {
+      if (!d || d === 'per-decidir') return d;
+      const [y, m, day] = d.split('-');
+      return `${day}/${m}/${y}`;
+    },
+
     normativaDefault() {
       return {
         generals: [
