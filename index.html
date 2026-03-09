@@ -2503,17 +2503,47 @@ function app() {
         }
       });
 
-      // Ordena jornades: primer per la data mínima dels seus partits, després per número
-      return Object.values(jornadaMap).sort((a,b) => {
-        const minDateA = [...a.results, ...a.upcoming].map(m => m.date).filter(Boolean).sort()[0] || '';
-        const minDateB = [...b.results, ...b.upcoming].map(m => m.date).filter(Boolean).sort()[0] || '';
-        if (minDateA && minDateB && minDateA !== minDateB) return minDateA < minDateB ? -1 : 1;
-        return a.num - b.num;
-      }).map(j => ({
+      // Ordena jornades per número però els partits individuals per data global
+      const jornades = Object.values(jornadaMap).sort((a,b) => a.num - b.num).map(j => ({
         ...j,
         results:  j.results.sort((a,b)  => a.date > b.date ? 1 : a.date < b.date ? -1 : 0),
         upcoming: j.upcoming.sort((a,b) => a.date > b.date ? 1 : a.date < b.date ? -1 : 0),
       }));
+
+      // Treure els partits avançats (data anterior a la data mínima de jornades anteriors)
+      // Aplanar tots els partits amb la seva jornada i ordenar per data
+      const allFlat = [];
+      jornades.forEach(j => {
+        [...j.results, ...j.upcoming].forEach(m => {
+          allFlat.push({ ...m, _jornada: j });
+        });
+      });
+      allFlat.sort((a,b) => {
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
+      });
+
+      // Re-agrupar en blocs: si un partit trenca l'ordre de jornada, el separem
+      const result = [];
+      let lastJornada = null;
+      let currentBlock = null;
+
+      allFlat.forEach(m => {
+        const j = m._jornada;
+        if (!currentBlock || currentBlock.num !== j.num) {
+          currentBlock = { ...j, results: [], upcoming: [] };
+          result.push(currentBlock);
+          lastJornada = j.num;
+        }
+        if (m.score1 !== undefined || m.noShow1) {
+          currentBlock.results.push(m);
+        } else {
+          currentBlock.upcoming.push(m);
+        }
+      });
+
+      return result;
     },
 
     getMatchStats(match) {
