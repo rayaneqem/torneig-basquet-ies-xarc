@@ -2503,7 +2503,13 @@ function app() {
         }
       });
 
-      return Object.values(jornadaMap).sort((a,b) => a.num - b.num).map(j => ({
+      // Ordena jornades: primer per la data mínima dels seus partits, després per número
+      return Object.values(jornadaMap).sort((a,b) => {
+        const minDateA = [...a.results, ...a.upcoming].map(m => m.date).filter(Boolean).sort()[0] || '';
+        const minDateB = [...b.results, ...b.upcoming].map(m => m.date).filter(Boolean).sort()[0] || '';
+        if (minDateA && minDateB && minDateA !== minDateB) return minDateA < minDateB ? -1 : 1;
+        return a.num - b.num;
+      }).map(j => ({
         ...j,
         results:  j.results.sort((a,b)  => a.date > b.date ? 1 : a.date < b.date ? -1 : 0),
         upcoming: j.upcoming.sort((a,b) => a.date > b.date ? 1 : a.date < b.date ? -1 : 0),
