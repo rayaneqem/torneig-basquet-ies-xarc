@@ -10,22 +10,22 @@ const SUPORT_EMAIL = 'z118324@iesxarc.es';
 const ORGANITZADORS = ['z118324@iesxarc.es', 'ecanovas@iesxarc.es'];
 
 const EMAIL_ARBITRES = {
-  'Rayan':    'z118324@iesxarc.es',
-  'Thibault': 'z201085@iesxarc.es',
-  'Lluc':     'z133120@iesxarc.es',
-  'Pere':     'z133138@iesxarc.es',
-  'Raul':     'z131932@iesxarc.es',
-  'Didac':    'z168689@iesxarc.es',
-  'Sergio':   'z133122@iesxarc.es',
-  'Joel':     'z118343@iesxarc.es',
-  'Carlos':   'z133143@iesxarc.es',
-  'Esteve':   'ecanovas@iesxarc.es',
+  'Rayan El Qoraychy El Meskini': 'z118324@iesxarc.es',
+  'Thibault Ferrari Catalá':      'z201085@iesxarc.es',
+  'Lluc Cardona Marí':            'z133120@iesxarc.es',
+  'Pere Nolasc Luis Roselló':     'z133138@iesxarc.es',
+  'Raúl Castillo Benito':         'z131932@iesxarc.es',
+  'Didac Fernández Ruiz':         'z168689@iesxarc.es',
+  'Sergio Ferrer Chaler':         'z133122@iesxarc.es',
+  'Joel Rohra Kelani':            'z118343@iesxarc.es',
+  'Carlos Planells Planells':     'z133143@iesxarc.es',
+  'Esteve Cánovas Mas':           'ecanovas@iesxarc.es',
 };
 
 const REFEREE_GROUPS = {
-  'Grup 1': ['Raul', 'Joel', 'Thibault'],
-  'Grup 2': ['Sergio', 'Lluc', 'Carlos'],
-  'Grup 3': ['Pere', 'Rayan', 'Didac'],
+  'Grup 1': ['Raúl Castillo Benito', 'Joel Rohra Kelani', 'Thibault Ferrari Catalá'],
+  'Grup 2': ['Sergio Ferrer Chaler', 'Lluc Cardona Marí', 'Carlos Planells Planells'],
+  'Grup 3': ['Pere Nolasc Luis Roselló', 'Rayan El Qoraychy El Meskini', 'Didac Fernández Ruiz'],
 };
 
 const transporter = nodemailer.createTransport({
@@ -62,16 +62,18 @@ function resolveRefereeNames(referee) {
 
 function getRefereeEmails(referee, emailMap) {
   if (!referee) return [];
-  const names = REFEREE_GROUPS[referee] || referee.split(/[,\s]+/).map(n => n.trim()).filter(Boolean);
-  return names.map(n => emailMap[n] || EMAIL_ARBITRES[n]).filter(Boolean);
+  const names = REFEREE_GROUPS[referee]
+    ? REFEREE_GROUPS[referee]
+    : referee.split(',').map(n => n.trim()).filter(Boolean);
+
+  return names.map(n => EMAIL_ARBITRES[n] || emailMap[n]).filter(Boolean);
 }
 
 function buildEmailMap(teams) {
-  const map = { ...EMAIL_ARBITRES };
+  const map = {};
   teams.forEach(team => {
     (team.players || []).forEach(player => {
       if (player.email && player.name) {
-        map[player.name.split(' ')[0]] = player.email;
         map[player.name] = player.email;
       }
     });
@@ -273,7 +275,7 @@ async function main() {
     const { team1, team2, date, time = '--', location = 'Pista de basquet', referee = '' } = match;
     const players1      = getTeamPlayers(teams, team1);
     const players2      = getTeamPlayers(teams, team2);
-    const playerEmails  = unique([...players1, ...players2].map(p => p.email || emailMap[p.name?.split(' ')[0]] || emailMap[p.name]));
+    const playerEmails  = unique([...players1, ...players2].map(p => p.email).filter(Boolean));
     const refereeEmails = getRefereeEmails(referee, emailMap);
     const refereeStr    = resolveRefereeNames(referee);
     const subject       = `🏀 Recordatori: ${team1} vs ${team2} — Demà ${formatDate(date)}`;
@@ -314,7 +316,7 @@ async function main() {
 
       const totalNP    = noShowCount[teamName] || 0;
       const players    = getTeamPlayers(teams, teamName);
-      const emails     = unique(players.map(p => p.email || emailMap[p.name?.split(' ')[0]] || emailMap[p.name]));
+      const emails     = unique(players.map(p => p.email).filter(Boolean));
 
       console.log(`NP avís: ${teamName} (${totalNP}/3) → ${emails.length} jugadors`);
 
