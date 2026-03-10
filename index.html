@@ -711,72 +711,70 @@
     <template x-if="results.length===0 && upcoming.length===0">
       <div class="card px-6 py-12 text-center font-condensed text-lg" style="color:#333">Encara no hi ha partits registrats</div>
     </template>
-    <template x-for="(jornada, ji) in allMatchesByJornada()" :key="ji">
-      <div class="mb-8">
-        <!-- Jornada header NBA-style -->
-        <div class="jornada-header">
-          <span class="font-display text-2xl leading-none" style="color:var(--orange);letter-spacing:0.04em;font-size:1.4rem" x-text="'JORNADA ' + jornada.num"></span>
-          <div style="width:1px;height:20px;background:rgba(255,107,0,0.3)"></div>
-          <span class="font-condensed uppercase tracking-[0.15em] text-sm" style="color:var(--muted)" x-text="fmtDate(jornada.dateLabel)"></span>
-        </div>
-        <div class="space-y-2">
-          <!-- Partits jugats -->
-          <template x-for="match in jornada.results" :key="'r-'+match.id">
-            <div class="card-match px-6 py-5 cursor-pointer" @click="openMatchModal(match, 'result')">
-              <div class="flex items-center gap-4">
-                <div class="flex-1 flex items-center justify-end gap-3">
-                  <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team1"></span>
-                  <span class="text-xl" x-text="getTeamEmoji(match.team1)"></span>
-                </div>
-                <div class="flex items-center gap-0 min-w-[110px] justify-center">
-                  <span class="font-score text-4xl leading-none" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--muted)'" x-text="match.noShow1 ? 'NP' : match.score1"></span>
-                  <span class="font-score text-2xl mx-2" style="color:var(--border-mid)">:</span>
-                  <span class="font-score text-4xl leading-none" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--muted)'" x-text="match.noShow2 ? 'NP' : match.score2"></span>
-                </div>
-                <div class="flex-1 flex items-center gap-3">
-                  <span class="text-xl" x-text="getTeamEmoji(match.team2)"></span>
-                  <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team2"></span>
-                </div>
+    <div class="space-y-2">
+      <template x-for="match in allMatchesSorted()" :key="match._uid">
+        <!-- Partit jugat -->
+        <template x-if="match._type==='result'">
+          <div class="card-match px-6 py-5 cursor-pointer" @click="openMatchModal(match, 'result')">
+            <div class="flex items-center gap-4">
+              <div class="flex-1 flex items-center justify-end gap-3">
+                <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team1"></span>
+                <span class="text-xl" x-text="getTeamEmoji(match.team1)"></span>
               </div>
-              <div class="flex justify-center items-center gap-3 mt-2">
-                <template x-if="match.referee">
-                  <span class="font-condensed text-xs" style="color:var(--muted)">🏁 <span x-text="refereeDisplay(match.referee)"></span></span>
+              <div class="flex items-center gap-0 min-w-[110px] justify-center">
+                <span class="font-score text-4xl leading-none" :style="Number(match.score1)>Number(match.score2)?'color:var(--orange)':'color:var(--muted)'" x-text="match.noShow1 ? 'NP' : match.score1"></span>
+                <span class="font-score text-2xl mx-2" style="color:var(--border-mid)">:</span>
+                <span class="font-score text-4xl leading-none" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--muted)'" x-text="match.noShow2 ? 'NP' : match.score2"></span>
+              </div>
+              <div class="flex-1 flex items-center gap-3">
+                <span class="text-xl" x-text="getTeamEmoji(match.team2)"></span>
+                <span class="font-condensed uppercase font-600 text-base md:text-lg" :style="Number(match.score2)>Number(match.score1)?'color:var(--orange)':'color:var(--cream)'" style="letter-spacing:0.04em" x-text="match.team2"></span>
+              </div>
+            </div>
+            <div class="flex justify-center items-center gap-3 mt-2">
+              <template x-if="match.jornada">
+                <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange);border:1px solid rgba(245,166,35,0.25)" x-text="'J'+match.jornada"></span>
+              </template>
+              <template x-if="match.referee">
+                <span class="font-condensed text-xs" style="color:var(--muted)">🏁 <span x-text="refereeDisplay(match.referee)"></span></span>
+              </template>
+              <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">toca per detalls</span>
+            </div>
+          </div>
+        </template>
+        <!-- Pròxim partit -->
+        <template x-if="match._type==='upcoming'">
+          <div class="card-upcoming px-6 py-5 flex items-center gap-4 cursor-pointer" @click="openMatchModal(match, 'upcoming')">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:42px">
+              <span style="font-size:22px">🗓</span>
+              <span class="font-condensed text-xs uppercase" style="color:var(--orange-dim);letter-spacing:0.1em;font-size:9px">PRÒXIM</span>
+            </div>
+            <div class="flex-1">
+              <div class="font-condensed font-600 uppercase" style="color:var(--cream);font-size:16px;letter-spacing:0.05em">
+                <span x-text="match.team1"></span>
+                <span style="color:var(--border-mid);margin:0 8px;font-weight:400">VS</span>
+                <span x-text="match.team2"></span>
+              </div>
+              <div class="flex items-center gap-3 flex-wrap mt-1.5">
+                <span class="font-condensed text-sm" :style="(!match.date || match.date==='per-decidir')?'color:var(--faint)':'color:var(--muted)'" x-text="(!match.date || match.date==='per-decidir')?'📅 No confirmat':fmtDate(match.date)"></span>
+                <template x-if="match.time">
+                  <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="match.time"></span>
                 </template>
-                <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--faint)">toca per detalls</span>
+                <template x-if="match.location">
+                  <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--muted)" x-text="match.location"></span>
+                </template>
+                <template x-if="match.jornada">
+                  <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange);border:1px solid rgba(245,166,35,0.25)" x-text="'J'+match.jornada"></span>
+                </template>
+                <template x-if="match.referee">
+                  <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="refereeDisplay(match.referee)"></span></span>
+                </template>
               </div>
             </div>
-          </template>
-          <!-- Pròxims partits -->
-          <template x-for="match in jornada.upcoming" :key="'u-'+match.id">
-            <div class="card-upcoming px-6 py-5 flex items-center gap-4 cursor-pointer" @click="openMatchModal(match, 'upcoming')">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:42px">
-                <span style="font-size:22px">🗓</span>
-                <span class="font-condensed text-xs uppercase" style="color:var(--orange-dim);letter-spacing:0.1em;font-size:9px">PRÒXIM</span>
-              </div>
-              <div class="flex-1">
-                <div class="font-condensed font-600 uppercase" style="color:var(--cream);font-size:16px;letter-spacing:0.05em">
-                  <span x-text="match.team1"></span>
-                  <span style="color:var(--border-mid);margin:0 8px;font-weight:400">VS</span>
-                  <span x-text="match.team2"></span>
-                </div>
-                <div class="flex items-center gap-3 flex-wrap mt-1.5">
-                  <span class="font-condensed text-sm" :style="(!match.date || match.date==='per-decidir')?'color:var(--faint)':'color:var(--muted)'" x-text="(!match.date || match.date==='per-decidir')?'📅 No confirmat':fmtDate(match.date)"></span>
-                  <template x-if="match.time">
-                    <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="match.time"></span>
-                  </template>
-                  <template x-if="match.location">
-                    <span class="font-condensed text-xs uppercase tracking-widest" style="color:var(--muted)" x-text="match.location"></span>
-                  </template>
-                  <template x-if="match.referee">
-                    <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="refereeDisplay(match.referee)"></span></span>
-                  </template>
-                </div>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-    </template>
+          </div>
+        </template>
+      </template>
+    </div>
 
     <!-- ADMIN: controls de partits -->
     <template x-if="isAdmin">
@@ -1327,6 +1325,13 @@
                   <div>
                     <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Lloc</label>
                     <input type="text" x-model="modalDetailsData.location" placeholder="Pavelló, pista..."/>
+                  </div>
+                  <div>
+                    <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Jornada</label>
+                    <select x-model.number="modalDetailsData.jornada">
+                      <option value="">— Sense jornada —</option>
+                      <template x-for="n in 7" :key="n"><option :value="n" x-text="'Jornada ' + n"></option></template>
+                    </select>
                   </div>
                   <div>
                     <label class="font-condensed text-xs uppercase mb-2 block" style="color:var(--muted)">Àrbitres <span class="normal-case" style="color:var(--faint)">(màx. 3)</span></label>
@@ -2156,6 +2161,7 @@ function app() {
           date: (match.date && match.date !== 'per-decidir') ? match.date : '',
           time: match.time || '12:00',
           location: match.location || 'Pista de bàsquet',
+          jornada: match.jornada || '',
           refereeArr: match.referee ? match.referee.split(', ').flatMap(name => this.allRefereeMembers().filter(m => m.split(' ')[0] === name)) : [],
         };
         this.modalResultData = {
@@ -2170,8 +2176,8 @@ function app() {
 
     // Guardar data/hora/lloc/àrbitres d'un upcoming sense posar resultat
     saveUpcomingDetails() {
-      const { date, time, location, refereeArr } = this.modalDetailsData;
-      const { id, team1, team2, jornada } = this.modalMatch;
+      const { date, time, location, refereeArr, jornada } = this.modalDetailsData;
+      const { id, team1, team2 } = this.modalMatch;
       if (!id) return;
       const refereeStr = refereeArr && refereeArr.length ? refereeArr.map(m => m.split(' ')[0]).join(', ') : '';
       const update = {
@@ -2410,6 +2416,12 @@ function app() {
         return;
       }
 
+      // Màxim 4 partits per jornada
+      if (jornada && this.jornadaMatchCount(Number(jornada)) >= 4) {
+        alert(`⚠️ La Jornada ${jornada} ja té 4 partits (màxim permès).`);
+        return;
+      }
+
       const refereeStr = refereeArr && refereeArr.length ? refereeArr.map(m => m.split(' ')[0]).join(', ') : '';
       const dateVal = date || '';
       window._push(window._ref(window._db, 'upcoming'), { team1, team2, date: dateVal, time, location, jornada,
@@ -2455,95 +2467,22 @@ function app() {
       return Object.values(jornadaMap).sort((a,b) => b.num - a.num);
     },
 
-    allMatchesByJornada() {
-      // Combine results and upcoming into jornada groups, sorted by date/jornada
-      const jornadaMap = {};
-
-      const getOrCreate = (key, num, dateLabel) => {
-        if (!jornadaMap[key]) jornadaMap[key] = { num, dateLabel, key, results: [], upcoming: [] };
-        return jornadaMap[key];
-      };
-
-      // Add results
-      const sortedResults = [...this.results].sort((a,b) => {
-        const ja = a.jornada || 999, jb = b.jornada || 999;
-        if (ja !== jb) return ja - jb;
-        return a.date > b.date ? 1 : -1;
+    allMatchesSorted() {
+      const all = [
+        ...this.results.map(m => ({ ...m, _type: 'result',   _uid: 'r-' + m.id })),
+        ...this.upcoming.map(m => ({ ...m, _type: 'upcoming', _uid: 'u-' + m.id })),
+      ];
+      all.sort((a, b) => {
+        const da = a.date || '9999', db = b.date || '9999';
+        if (da !== db) return da < db ? -1 : 1;
+        return (a.jornada || 99) - (b.jornada || 99);
       });
-      // First pass: assign jornada numbers to date-grouped results
-      let autoNum = 0;
-      const usedNums = sortedResults.filter(r => r.jornada).map(r => r.jornada);
-      const maxUsed = usedNums.length ? Math.max(...usedNums) : 0;
-      const dateToJornada = {};
-      sortedResults.forEach(r => {
-        if (r.jornada) {
-          const key = 'J' + r.jornada;
-          getOrCreate(key, r.jornada, r.date).results.push(r);
-        } else {
-          if (!dateToJornada[r.date]) { autoNum++; dateToJornada[r.date] = maxUsed + autoNum; }
-          const key = 'D' + r.date;
-          getOrCreate(key, dateToJornada[r.date], r.date).results.push(r);
-        }
-      });
+      return all;
+    },
 
-      // Add upcoming
-      this.upcoming.forEach(u => {
-        const jNum = u.jornada || null;
-        if (jNum) {
-          const key = 'J' + jNum;
-          // For dateLabel, use date if set, else empty string (no date)
-          const dateLabel = (u.date && u.date !== 'per-decidir') ? u.date : '';
-          const existing = jornadaMap[key];
-          getOrCreate(key, jNum, existing ? existing.dateLabel : dateLabel).upcoming.push(u);
-        } else {
-          // Group by date, reuse existing date jornada if exists
-          const key = 'D' + u.date;
-          if (!jornadaMap[key]) { autoNum++; getOrCreate(key, maxUsed + autoNum, u.date); }
-          jornadaMap[key].upcoming.push(u);
-        }
-      });
-
-      // Ordena jornades per número però els partits individuals per data global
-      const jornades = Object.values(jornadaMap).sort((a,b) => a.num - b.num).map(j => ({
-        ...j,
-        results:  j.results.sort((a,b)  => a.date > b.date ? 1 : a.date < b.date ? -1 : 0),
-        upcoming: j.upcoming.sort((a,b) => a.date > b.date ? 1 : a.date < b.date ? -1 : 0),
-      }));
-
-      // Treure els partits avançats (data anterior a la data mínima de jornades anteriors)
-      // Aplanar tots els partits amb la seva jornada i ordenar per data
-      const allFlat = [];
-      jornades.forEach(j => {
-        [...j.results, ...j.upcoming].forEach(m => {
-          allFlat.push({ ...m, _jornada: j });
-        });
-      });
-      allFlat.sort((a,b) => {
-        if (!a.date) return 1;
-        if (!b.date) return -1;
-        return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
-      });
-
-      // Re-agrupar en blocs: si un partit trenca l'ordre de jornada, el separem
-      const result = [];
-      let lastJornada = null;
-      let currentBlock = null;
-
-      allFlat.forEach(m => {
-        const j = m._jornada;
-        if (!currentBlock || currentBlock.num !== j.num) {
-          currentBlock = { ...j, results: [], upcoming: [] };
-          result.push(currentBlock);
-          lastJornada = j.num;
-        }
-        if (m.score1 !== undefined || m.noShow1) {
-          currentBlock.results.push(m);
-        } else {
-          currentBlock.upcoming.push(m);
-        }
-      });
-
-      return result;
+    jornadaMatchCount(jornada) {
+      const all = [...this.results, ...this.upcoming];
+      return all.filter(m => m.jornada === jornada).length;
     },
 
     getMatchStats(match) {
@@ -2912,13 +2851,12 @@ function app() {
       Object.keys(byJornada).sort((a,b) => Number(a)-Number(b)).forEach(j => {
         rows += `<tr><td colspan="6" class="jornada-header">JORNADA ${j}</td></tr>`;
         byJornada[j].sort((a,b) => (a.date > b.date ? 1 : -1)).forEach(m => {
-          const refs = (m.referee || '').split(',').map(r => r.trim()).filter(Boolean);
-          const refCells = [0,1,2].map(i => `<td class="check-cell">${refs[i] ? `<span class="check-box">☐</span> ${refs[i]}` : ''}</td>`).join('');
+          const refs = (m.referee || '').split(',').map(r => r.trim()).filter(Boolean).join(', ');
           rows += `<tr>
             <td>${formatDate(m.date)}</td>
             <td>${m.time || '—'}</td>
             <td><strong>${m.team1}</strong> vs <strong>${m.team2}</strong></td>
-            ${refCells}
+            <td>${refs || '—'}</td>
           </tr>`;
         });
       });
@@ -2927,14 +2865,14 @@ function app() {
         <title>Partits — Torneig Bàsquet IES Xarc</title>
         <style>
           * { margin:0; padding:0; box-sizing:border-box; }
-          body { font-family: Arial, sans-serif; color: #000; font-size: 11px; }
+          body { font-family: Arial, sans-serif; color: #000; font-size: 13px; }
           .header { padding: 14px 20px 10px; border-bottom: 2px solid #000; }
           .header h1 { font-size: 18px; letter-spacing: 1px; text-transform: uppercase; }
           .header p { font-size: 10px; color: #444; margin-top: 2px; }
           .section { margin: 0 20px; }
           table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10px; }
-          th { background: #000; color: #fff; padding: 5px 8px; text-align: left; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
-          td { padding: 5px 8px; border-bottom: 1px solid #ccc; vertical-align: middle; }
+          th { background: #000; color: #fff; padding: 6px 10px; text-align: left; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+          td { padding: 7px 10px; border-bottom: 1px solid #ccc; vertical-align: middle; font-size: 12px; }
           tr:nth-child(even) td { background: #f5f5f5; }
           .jornada-header { background: #333 !important; color: #fff; font-weight: bold; font-size: 9px; letter-spacing: 2px; padding: 4px 8px; }
           .check-box { font-size: 13px; margin-right: 4px; }
@@ -2949,8 +2887,7 @@ function app() {
         <div class="section">
           <table>
             <thead><tr>
-              <th>Data</th><th>Hora</th><th>Enfrontament</th>
-              <th>Àrbitre 1</th><th>Àrbitre 2</th><th>Àrbitre 3</th>
+              <th>Data</th><th>Hora</th><th>Enfrontament</th><th>Àrbitres</th>
             </tr></thead>
             <tbody>${rows}</tbody>
           </table>
@@ -2974,7 +2911,7 @@ function app() {
       const teamCard = (team) => {
         const players = (team.players || []);
         const rows = players.map(p =>
-          `<tr><td>${p.name || '—'}</td></tr>`
+          `<tr><td>${p.name || '—'}</td><td style="color:#555">${p.class || p.classe || ''}</td></tr>`
         ).join('');
         return `
           <div class="team-card">
@@ -2991,7 +2928,7 @@ function app() {
         <title>Equips — Torneig Bàsquet IES Xarc</title>
         <style>
           * { margin:0; padding:0; box-sizing:border-box; }
-          body { font-family: Arial, sans-serif; color: #000; font-size: 10px; }
+          body { font-family: Arial, sans-serif; color: #000; font-size: 12px; }
           .header { padding: 12px 20px 8px; border-bottom: 2px solid #000; }
           .header h1 { font-size: 16px; letter-spacing: 1px; text-transform: uppercase; }
           .header p { font-size: 9px; color: #444; margin-top: 2px; }
@@ -3000,7 +2937,7 @@ function app() {
           .team-title { background: #000; color: #fff; font-weight: bold; font-size: 10px;
             letter-spacing: 1px; text-transform: uppercase; padding: 5px 8px; }
           table { width: 100%; border-collapse: collapse; }
-          td { padding: 3px 8px; border-bottom: 1px solid #ddd; font-size: 9px; }
+          td { padding: 4px 8px; border-bottom: 1px solid #ddd; font-size: 11px; }
           tr:last-child td { border-bottom: none; }
           .footer { padding: 6px 20px; font-size: 9px; color: #666; border-top: 1px solid #ccc; text-align: center; }
           @media print {
