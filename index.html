@@ -713,6 +713,7 @@
     </template>
     <div class="space-y-2">
       <template x-for="match in allMatchesSorted()" :key="match._uid">
+        <div>
         <!-- Partit jugat -->
         <template x-if="match._type==='result'">
           <div class="card-match px-6 py-5 cursor-pointer" @click="openMatchModal(match, 'result')">
@@ -773,6 +774,7 @@
             </div>
           </div>
         </template>
+        </div>
       </template>
     </div>
 
