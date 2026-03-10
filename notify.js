@@ -184,7 +184,7 @@ function buildNoShowHtml(teamName, totalNP, date, isEliminated) {
   const dots = [1, 2, 3].map(i => {
     const filled = i <= totalNP;
     const bg = filled ? color : 'rgba(255,255,255,0.08)';
-    return `<div style="width:28px;height:28px;border-radius:50%;background:${bg};display:inline-flex;align-items:center;justify-content:center;margin:0 4px;font-size:12px;font-weight:900;color:${filled ? '#0A1628' : '#444'};">${i}</div>`;
+    return `<div style="width:28px;height:28px;border-radius:50%;background:${bg};margin:0 4px;display:inline-block;"></div>`;
   }).join('');
 
   return `<!DOCTYPE html>
