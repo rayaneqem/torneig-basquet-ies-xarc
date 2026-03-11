@@ -60,13 +60,22 @@ function resolveRefereeNames(referee) {
   return REFEREE_GROUPS[referee] ? REFEREE_GROUPS[referee].join(', ') : referee;
 }
 
+// Índex per primer nom per compatibilitat amb dades guardades a Firebase
+const EMAIL_ARBITRES_BY_FIRST = Object.fromEntries(
+  Object.entries(EMAIL_ARBITRES).map(([fullName, email]) => [fullName.split(' ')[0], email])
+);
+
 function getRefereeEmails(referee, emailMap) {
   if (!referee) return [];
   const names = REFEREE_GROUPS[referee]
     ? REFEREE_GROUPS[referee]
     : referee.split(',').map(n => n.trim()).filter(Boolean);
 
-  return names.map(n => EMAIL_ARBITRES[n] || emailMap[n]).filter(Boolean);
+  return names.map(n =>
+    EMAIL_ARBITRES[n] ||            // nom complet
+    EMAIL_ARBITRES_BY_FIRST[n] ||   // primer nom (com es guarda a Firebase)
+    emailMap[n]
+  ).filter(Boolean);
 }
 
 function buildEmailMap(teams) {
