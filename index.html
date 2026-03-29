@@ -1154,80 +1154,34 @@
   <div x-show="activeTab==='arbitres' && isAdmin">
     <div class="flex items-center gap-4 mb-6">
       <div>
-        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(48,209,88,0.7)">Els teus partits</p>
+        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(48,209,88,0.7)">Estadístiques</p>
         <h2 class="font-display text-5xl leading-none" style="color:var(--cream)">ÀRBITRES</h2>
       </div>
       <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(48,209,88,0.4),transparent);margin-left:8px;margin-top:20px"></div>
     </div>
 
-    <!-- Partits pendents de confirmar -->
-    <div class="card p-6 mb-4">
-      <h3 class="font-condensed font-700 uppercase tracking-widest mb-1" style="color:var(--cream);font-size:16px">⏳ Pendents de confirmar</h3>
-      <p class="font-condensed text-xs mb-4" style="color:var(--faint)">Partits ja jugats on has arbitrat però encara no has confirmat la teva assistència</p>
-
-      <template x-if="myPendingRefereeMatches().length === 0">
-        <div class="py-8 text-center">
-          <div class="text-4xl mb-2">✅</div>
-          <p class="font-condensed" style="color:var(--win)">Tot confirmat! No tens partits pendents.</p>
-        </div>
-      </template>
-
-      <div class="space-y-3">
-        <template x-for="match in myPendingRefereeMatches()" :key="match.id">
-          <div class="px-5 py-4 rounded-xl flex items-center justify-between gap-4 flex-wrap" style="background:var(--bg-surface);border:1px solid rgba(239,71,111,0.25)">
-            <div>
-              <div class="font-condensed font-600 uppercase" style="color:var(--cream);font-size:15px;letter-spacing:0.05em">
-                <span x-text="match.team1"></span>
-                <span style="color:var(--faint);margin:0 8px">vs</span>
-                <span x-text="match.team2"></span>
-              </div>
-              <div class="flex items-center gap-3 mt-1 flex-wrap">
-                <span class="font-condensed text-sm" style="color:var(--muted)" x-text="fmtDate(match.date)"></span>
-                <template x-if="match.score1 !== undefined">
-                  <span class="font-condensed text-sm font-600" style="color:var(--orange)" x-text="(match.noShow1?'NP':match.score1) + ' - ' + (match.noShow2?'NP':match.score2)"></span>
-                </template>
-                <template x-if="match.score1 === undefined">
-                  <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(245,166,35,0.1);color:var(--orange)">Pendent de jugar</span>
-                </template>
-                <span class="font-condensed text-xs" style="color:var(--faint)">🏁 <span x-text="refereeDisplay(match.referee)"></span></span>
-              </div>
-            </div>
-            <button @click="confirmRefereeFromTab(match)"
-              class="font-condensed text-sm px-5 py-2.5 rounded-lg flex-shrink-0"
-              style="background:rgba(48,209,88,0.15);color:var(--win);border:1px solid rgba(48,209,88,0.35);cursor:pointer"
-              onmouseover="this.style.background='rgba(48,209,88,0.25)'" onmouseout="this.style.background='rgba(48,209,88,0.15)'">
-              ✓ Confirmar assistència
-            </button>
-          </div>
-        </template>
-      </div>
-    </div>
-
-    <!-- Partits ja confirmats -->
+    <!-- Rànquing d'arbitratges -->
     <div class="card p-6">
-      <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">✅ Ja confirmats</h3>
-      <template x-if="myConfirmedRefereeMatches().length === 0">
-        <p class="font-condensed" style="color:var(--faint)">Encara no has confirmat cap partit</p>
-      </template>
-      <div class="space-y-2">
-        <template x-for="match in myConfirmedRefereeMatches()" :key="match.id">
-          <div class="px-5 py-3 rounded-xl flex items-center justify-between gap-4" style="background:rgba(48,209,88,0.05);border:1px solid rgba(48,209,88,0.15)">
-            <div>
-              <div class="font-condensed font-600 uppercase text-sm" style="color:var(--cream);letter-spacing:0.04em">
-                <span x-text="match.team1"></span>
-                <span style="color:var(--faint);margin:0 6px">vs</span>
-                <span x-text="match.team2"></span>
+      <h3 class="font-condensed font-700 uppercase tracking-widest mb-4" style="color:var(--cream);font-size:16px">🏁 Arbitratges realitzats</h3>
+      <p class="font-condensed text-xs mb-5" style="color:var(--faint)">Partits ja jugats amb resultat</p>
+      <div class="space-y-3">
+        <template x-for="(entry, idx) in refereeStats()" :key="entry.name">
+          <div class="px-5 py-4 rounded-xl flex items-center gap-4" style="background:var(--bg-surface);border:1px solid var(--border)">
+            <span class="font-display text-2xl leading-none w-8 text-center" style="color:var(--orange)" x-text="idx+1"></span>
+            <div class="flex-1">
+              <div class="font-condensed font-600 uppercase" style="color:var(--cream);font-size:15px;letter-spacing:0.04em" x-text="entry.name"></div>
+              <div class="flex gap-3 mt-1 flex-wrap">
+                <template x-for="match in entry.matches" :key="match.id">
+                  <span class="font-condensed text-xs px-2 py-0.5 rounded" style="background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border)">
+                    <span x-text="match.team1 + ' vs ' + match.team2"></span>
+                    <span style="color:var(--faint);margin-left:4px" x-text="fmtDate(match.date)"></span>
+                  </span>
+                </template>
               </div>
-              <span class="font-condensed text-xs" style="color:var(--faint)" x-text="fmtDate(match.date)"></span>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="font-condensed text-xs" style="color:var(--win)">✓ Confirmat</span>
-              <button @click="unconfirmRefereeFromTab(match)"
-                class="font-condensed text-xs px-3 py-1.5 rounded-lg"
-                style="background:rgba(239,71,111,0.1);color:var(--loss);border:1px solid rgba(239,71,111,0.25);cursor:pointer"
-                onmouseover="this.style.background='rgba(239,71,111,0.2)'" onmouseout="this.style.background='rgba(239,71,111,0.1)'">
-                ✕ Desconfirmar
-              </button>
+            <div class="text-right flex-shrink-0">
+              <div class="font-display text-3xl leading-none" style="color:var(--orange)" x-text="entry.count"></div>
+              <div class="font-condensed text-xs" style="color:var(--faint)">partits</div>
             </div>
           </div>
         </template>
@@ -1454,34 +1408,7 @@
       </div>
     </template>
 
-    <!-- Confirmació d'àrbitres — visible per àrbitres del partit, NOMÉS si ja ha estat jugat -->
-    <template x-if="modalMatch.referee && isRefereeOfMatch(modalMatch) && modalMatch.type === 'result'">
-      <div class="px-6 py-4 border-b border-white/5" style="background:rgba(48,209,88,0.04)">
-        <p class="font-condensed text-xs uppercase tracking-widest mb-2" style="color:var(--win)">✓ Confirmació d'àrbitre</p>
-        <p class="font-condensed text-sm mb-3" style="color:var(--muted)">
-          Àrbitres: <span x-text="refereeDisplay(modalMatch.referee)"></span>
-        </p>
-        <template x-if="!hasConfirmedReferee()">
-          <button @click="confirmAsReferee()" class="font-condensed text-sm px-4 py-2 rounded-lg" style="background:rgba(48,209,88,0.15);color:var(--win);border:1px solid rgba(48,209,88,0.3)">
-            ✓ Confirmo que he arbitrat aquest partit
-          </button>
-        </template>
-        <template x-if="hasConfirmedReferee()">
-          <div class="flex items-center gap-3">
-            <div class="font-condensed text-sm" style="color:var(--win)">✓ Ja has confirmat la teva participació</div>
-            <button @click="unconfirmAsReferee()" class="font-condensed text-xs px-3 py-1.5 rounded-lg"
-              style="background:rgba(239,71,111,0.1);color:var(--loss);border:1px solid rgba(239,71,111,0.25);cursor:pointer">
-              ✕ Desconfirmar
-            </button>
-          </div>
-        </template>
-        <template x-if="modalMatch.refereeConfirmed && Object.keys(modalMatch.refereeConfirmed||{}).length > 0">
-          <div class="mt-2 font-condensed text-xs" style="color:var(--faint)">
-            Confirmat per: <span x-text="Object.values(modalMatch.refereeConfirmed||{}).join(', ')"></span>
-          </div>
-        </template>
-      </div>
-    </template>
+
 
     <!-- Jugadors -->
     <div class="grid grid-cols-2 divide-x divide-white/5">
@@ -2527,55 +2454,19 @@ function app() {
     },
 
     // Retorna tots els partits JUGATS on l'usuari és àrbitre i NO ha confirmat
-    myPendingRefereeMatches() {
-      if (!this.currentUser) return [];
-      const myKey = this.currentUser.replace(/[@.]/g, '_');
-      // Només resultats (partits jugats), no upcoming
-      return this.results.filter(m => {
-        if (!m.referee) return false;
-        if (!this.isRefereeOfMatch(m)) return false;
-        const confirmed = m.refereeConfirmed || {};
-        return !confirmed[myKey];
-      }).sort((a,b) => (a.date > b.date ? 1 : -1));
-    },
-
-    myConfirmedRefereeMatches() {
-      if (!this.currentUser) return [];
-      const myKey = this.currentUser.replace(/[@.]/g, '_');
-      // Només resultats (partits jugats)
-      return this.results.filter(m => {
-        if (!m.referee) return false;
-        if (!this.isRefereeOfMatch(m)) return false;
-        const confirmed = m.refereeConfirmed || {};
-        return !!confirmed[myKey];
-      }).sort((a,b) => (a.date > b.date ? 1 : -1));
-    },
-
-    confirmRefereeFromTab(match) {
-      var myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
-      var myKey = this.currentUser.replace(/[@.]/g, '_');
-      // Always 'results' since we only show played matches now
-      window._set(window._ref(window._db, `results/${match.id}/refereeConfirmed/${myKey}`), myFirstName);
-      this.logActivity('Àrbitre confirmat', `${myFirstName} · ${match.team1} vs ${match.team2} (${match.date})`);
-    },
-
-    unconfirmRefereeFromTab(match) {
-      var myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
-      var myKey = this.currentUser.replace(/[@.]/g, '_');
-      // Always 'results' since we only show played matches now
-      window._remove(window._ref(window._db, `results/${match.id}/refereeConfirmed/${myKey}`));
-      this.logActivity('Àrbitre desconfirmat', `${myFirstName} · ${match.team1} vs ${match.team2} (${match.date})`);
-    },
-
-    unconfirmAsReferee() {
-      var id = this.modalMatch.id;
-      if (!id) return;
-      var myFirstName = (this.MEMBERS[this.currentUser]?.name || '').split(' ')[0];
-      var myKey = this.currentUser.replace(/[@.]/g, '_');
-      var collection = this.modalMatch.type === 'result' ? 'results' : 'upcoming';
-      window._remove(window._ref(window._db, `${collection}/${id}/refereeConfirmed/${myKey}`));
-      this.logActivity('Àrbitre desconfirmat', `${myFirstName} · ${this.modalMatch.team1} vs ${this.modalMatch.team2}`);
-      if (this.modalMatch.refereeConfirmed) delete this.modalMatch.refereeConfirmed[myKey];
+    refereeStats() {
+      // Compta arbitratges per àrbitre dels partits amb resultat
+      const stats = {};
+      this.results.forEach(m => {
+        if (!m.referee) return;
+        const names = m.referee.split(',').map(n => n.trim()).filter(Boolean);
+        names.forEach(firstName => {
+          if (!stats[firstName]) stats[firstName] = { name: firstName, count: 0, matches: [] };
+          stats[firstName].count++;
+          stats[firstName].matches.push(m);
+        });
+      });
+      return Object.values(stats).sort((a, b) => b.count - a.count);
     },
 
     // EmailJS — configura aquí els teus IDs (veure instruccions)
