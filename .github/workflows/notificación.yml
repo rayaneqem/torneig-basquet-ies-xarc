@@ -10,8 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
-    # Forzamos el uso de Node.js 24 para evitar el aviso de deprecación
     env:
+      # Forzamos Node 24 para cumplir con los requisitos de GitHub de mayo 2026
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
@@ -28,6 +28,6 @@ jobs:
 
       - name: Ejecutar script de envío
         env:
-          GMAIL_USER: 'torneigbasquetiesxarc@gmail.com'
           GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+        # Nombre del archivo actualizado sin tilde
         run: node notificacion.mjs
