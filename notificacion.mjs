@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
   auth: { user: GMAIL_USER, pass: GMAIL_PASS },
 });
 
-const subject = '🏀 Torneig de Bàsquet IES Xarc — Classificació final i Playoffs';
+const subject = '🏀 Torneig de Bàsquet IES Xarc — Comunicació important!!! - Classificació final i Playoffs';
 
 const html = `
 <!DOCTYPE html>
@@ -29,14 +29,14 @@ const html = `
     <p style="font-size:13px;color:#888;margin:4px 0 0;letter-spacing:0.12em;text-transform:uppercase">IES Xarc 2026</p>
   </div>
 
-  <!-- Descalificació ICE -->
+  <!-- Desqualificació ICE -->
   <div style="background:#1a0a0a;border:1px solid rgba(239,71,111,0.4);border-radius:12px;padding:20px 24px;margin-bottom:24px">
     <p style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#ef476f;margin:0 0 10px">⚠️ Comunicat important</p>
     <p style="margin:0 0 10px;line-height:1.6;color:#e8e0d0">
       Després del partit d'avui, preparant les semifinals, hem detectat que l'equip <strong style="color:#ef476f">I.C.E</strong> ha estat jugant durant tot el torneig amb jugadors <strong>no inscrits</strong> en el seu equip.
     </p>
     <p style="margin:0;line-height:1.6;color:#e8e0d0">
-      Per aquest motiu, s'ha decidit la seva <strong style="color:#ef476f">descalificació i eliminació</strong>. Tots els partits jugats per I.C.E queden amb resultat de <strong>3–0 en contra</strong>.
+      Per aquest motiu, s'ha decidit que l'ideal seria la seva <strong style="color:#ef476f">desqualificació i eliminació</strong>, ja que segons la normativa, no està permès, i tots els equips tenen l'accés per veure quins són els integrants dels seus equips a la web. D'igual manera, per incompliment de la normativa, s'ha decidit que els partits jugats per <strong style="color:#ef476f">I.C.E</strong> queden amb resultat de <strong>3–0 en contra</strong>.
     </p>
   </div>
 
@@ -74,7 +74,7 @@ const html = `
         </tr>
         <tr><td style="padding:8px 8px;color:#666">5</td><td style="padding:8px 8px;color:#666">🕺 LOS WI LIVE</td><td style="padding:8px 8px;text-align:center;color:#666">9</td></tr>
         <tr><td style="padding:8px 8px;color:#444">6</td><td style="padding:8px 8px;color:#444">☮️ PEACE AND LOVE — <span style="color:#ef476f;font-size:11px">ELIMINAT</span></td><td style="padding:8px 8px;text-align:center;color:#444">0</td></tr>
-        <tr><td style="padding:8px 8px;color:#444">7</td><td style="padding:8px 8px;color:#444">📊 I.C.E — <span style="color:#ef476f;font-size:11px">DESCALIFICAT</span></td><td style="padding:8px 8px;text-align:center;color:#444">0</td></tr>
+        <tr><td style="padding:8px 8px;color:#444">7</td><td style="padding:8px 8px;color:#444">🛃 I.C.E — <span style="color:#ef476f;font-size:11px">DEQUALIFICAT</span></td><td style="padding:8px 8px;text-align:center;color:#444">0</td></tr>
         <tr><td style="padding:8px 8px;color:#444">8</td><td style="padding:8px 8px;color:#444">🏀 LA SQUAD — <span style="color:#ef476f;font-size:11px">ELIMINAT</span></td><td style="padding:8px 8px;text-align:center;color:#444">0</td></tr>
       </tbody>
     </table>
@@ -121,30 +121,23 @@ const html = `
           <td style="padding:10px 8px;color:#aaa">Descans — comunicació als 4 primers classificats</td>
         </tr>
         <tr style="border-bottom:1px solid #1a2538">
-          <td style="padding:10px 8px;color:#f5a623;font-weight:700;white-space:nowrap">Dj 7/5 · Dv 8/5</td>
-          <td style="padding:10px 8px;color:#e8e0d0;font-weight:600">⚔️ Semifinal 1 — Partits 1 i 2<br><span style="color:#888;font-size:12px;font-weight:400">PROFESSORAT vs GOON SQUAD</span></td>
+          <td style="padding:10px 8px;color:#f5a623;font-weight:700;white-space:nowrap">Dj 7/5 (2n pati)· Dv 8/5 (2n pati)</td>
+          <td style="padding:10px 8px;color:#e8e0d0;font-weight:600">⚔️ Semifinal 1 — PROFESSORAT vs GOON SQUAD <br><span style="color:#888;font-size:12px;font-weight:400">PROFESSORAT vs GOON SQUAD</span></td>
         </tr>
         <tr style="border-bottom:1px solid #1a2538">
-          <td style="padding:10px 8px;color:#f5a623;font-weight:700;white-space:nowrap">Dl 11/5 · Dt 12/5</td>
-          <td style="padding:10px 8px;color:#e8e0d0;font-weight:600">⚔️ Semifinal 2 — Partits 1 i 2<br><span style="color:#888;font-size:12px;font-weight:400">ASTON BIRRAS vs BROS XD</span></td>
+          <td style="padding:10px 8px;color:#f5a623;font-weight:700;white-space:nowrap">Dl 11/5 (2n pati)· Dt 12/5 (2n pati)</td>
+          <td style="padding:10px 8px;color:#e8e0d0;font-weight:600">⚔️ Semifinal 2 — ASTON BIRRAS vs BROS XD <br><span style="color:#888;font-size:12px;font-weight:400">ASTON BIRRAS vs BROS XD</span></td>
         </tr>
         <tr style="border-bottom:1px solid #1a2538">
-          <td style="padding:10px 8px;color:#f5a623;font-weight:700;white-space:nowrap">Dc 13/5 · Dj 14/5</td>
+          <td style="padding:10px 8px;color:#f5a623;font-weight:700;white-space:nowrap">Dc 13/5 (2n pati)· Dj 14/5 (2n pati)</td>
           <td style="padding:10px 8px;color:#e8e0d0;font-weight:600">🥉 3r i 4t lloc — Partits 1 i 2</td>
         </tr>
         <tr>
           <td style="padding:10px 8px;color:#ffd700;font-weight:900;white-space:nowrap">Dv 15/5</td>
-          <td style="padding:10px 8px;color:#ffd700;font-weight:900">🏆 GRAN FINAL<br><span style="color:#f5a623;font-size:12px;font-weight:400">1r i 2n pati — format especial</span></td>
+          <td style="padding:10px 8px;color:#ffd700;font-weight:900">🏆 GRAN FINAL<br><span style="color:#f5a623;font-size:12px;font-weight:400">1r i 2n pati — format especial (es començarà al primer pati i es continuarà al segon pati.</span></td>
         </tr>
       </tbody>
     </table>
-
-    <div style="margin-top:16px;padding:12px 16px;background:rgba(245,166,35,0.06);border-left:3px solid #f5a623;border-radius:0 8px 8px 0">
-      <p style="margin:0;font-size:13px;color:#aaa;line-height:1.6;font-style:italic">
-        💬 <strong style="color:#e8e0d0">Proposta de format:</strong> Si teniu alguna altra idea sobre com fer els playoffs, compartiu-la! Aquesta és la nostra proposta però estem oberts a suggeriments.
-      </p>
-    </div>
-  </div>
 
   <!-- Peu -->
   <div style="text-align:center;margin-top:32px;padding-top:24px;border-top:1px solid #1e2d45">
