@@ -302,7 +302,39 @@ async function main() {
     }
   }
 
-  // ── 2. AVISOS DE NO PRESENTACIÓ D'AHIR ──────────────────
+  // ── 2. RECORDATORIS PLAYOFFS DE DEMÀ ────────────────────
+  const playoffs = data.playoffs || {};
+  const playoffPhases = [
+    { key: 'sf1',   label: 'Semifinal 1' },
+    { key: 'sf2',   label: 'Semifinal 2' },
+    { key: 'third', label: '3r i 4t lloc' },
+    { key: 'final', label: 'Gran Final'   },
+  ];
+
+  for (const phase of playoffPhases) {
+    const p = playoffs[phase.key];
+    if (!p || !p.team1 || !p.team2) continue;
+    for (const g of [1, 2]) {
+      const game = p['g' + g];
+      if (!game || game.done) continue;
+      if (game.date !== tomorrow) continue;
+
+      const pati        = game.pati || '';
+      const players1    = getTeamPlayers(teams, p.team1);
+      const players2    = getTeamPlayers(teams, p.team2);
+      const playerEmails = unique([...players1, ...players2].map(pl => pl.email).filter(Boolean));
+      const subject     = `🏆 Playoffs — ${phase.label} (Partit ${g}): ${p.team1} vs ${p.team2} — Demà ${formatDate(game.date)}`;
+      const location    = pati || 'Pista de bàsquet';
+
+      console.log(`Playoff demà: ${phase.label} G${g} — ${p.team1} vs ${p.team2}`);
+
+      for (const email of playerEmails) {
+        await sendEmail(email, subject, buildReminderHtml(p.team1, p.team2, game.date, '--', location, '', 'jugar', ''));
+      }
+    }
+  }
+
+  // ── 3. AVISOS DE NO PRESENTACIÓ D'AHIR ──────────────────
   const yesterdayNoShows = results.filter(r =>
     r.date === yesterday && (r.noShow1 || r.noShow2)
   );
