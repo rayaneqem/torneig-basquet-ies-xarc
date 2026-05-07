@@ -95,19 +95,40 @@
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius:12px; }
 
   /* BRACKET */
-  .bracket-card { background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;padding:14px; }
-  .bracket-label { font-family:var(--font-condensed);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--orange);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border); }
-  .bracket-game { background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px; }
-  .bracket-game-done { border-color:rgba(245,166,35,0.2); }
-  .bracket-game-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:8px; }
-  .bracket-teams { display:flex;flex-direction:column;gap:4px; }
-  .bracket-team { display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:6px;font-family:var(--font-condensed);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);background:transparent; }
-  .bracket-team-win { background:rgba(245,166,35,0.12);color:var(--cream); }
-  .bracket-team-loss { opacity:0.4; }
-  .bracket-score { font-size:16px;font-weight:900;color:var(--orange);min-width:22px;text-align:right; }
-  .bracket-total { display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:8px 12px;border-radius:8px;border:1px solid rgba(245,166,35,0.18);background:rgba(245,166,35,0.05);font-family:var(--font-condensed);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);gap:8px; }
-  .bracket-total-score { font-size:20px;font-weight:900;color:var(--orange);white-space:nowrap; }
-  .btn-outline { background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:8px 12px;cursor:pointer;font-family:inherit;font-size:13px; }
+  .bk-col-label { font-family:var(--font-condensed);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:rgba(245,166,35,0.55); }
+  .bk-phase { background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;padding:12px; }
+  .bk-connector { display:flex;align-items:flex-start;padding-top:0; }
+  .bk-game { border:1px solid var(--border);border-radius:10px;padding:10px 11px;margin-bottom:8px;transition:border-color 0.2s; }
+  .bk-game:last-of-type { margin-bottom:0; }
+  .bk-game-played { border-color:rgba(245,166,35,0.22); }
+  .bk-game-meta { display:flex;align-items:center;gap:6px;margin-bottom:7px; }
+  .bk-game-num { font-family:var(--font-condensed);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--faint);background:rgba(255,255,255,0.04);border-radius:4px;padding:2px 5px;border:1px solid var(--border); }
+  .bk-game-info { font-family:var(--font-condensed);font-size:10px;color:var(--faint);flex:1; }
+  .bk-edit-btn { font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,0.1);color:var(--orange);border:1px solid rgba(245,166,35,0.2);cursor:pointer;font-family:inherit;line-height:1.4; }
+  .bk-team { display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:7px;font-family:var(--font-condensed);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);transition:all 0.2s;margin-bottom:3px; }
+  .bk-team:last-child { margin-bottom:0; }
+  .bk-team-name { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .bk-team-score { font-size:17px;font-weight:900;color:var(--orange);min-width:24px;text-align:right;margin-left:8px; }
+  .bk-win { background:rgba(245,166,35,0.13);color:var(--cream); }
+  .bk-win .bk-team-score { color:var(--orange); }
+  .bk-win-gold { background:rgba(255,215,0,0.13);color:#ffd700; }
+  .bk-win-gold .bk-team-score { color:#ffd700; }
+  .bk-win-bronze { background:rgba(205,127,50,0.13);color:#e8a24a; }
+  .bk-win-bronze .bk-team-score { color:#cd7f32; }
+  .bk-loss { opacity:0.38; }
+  .bk-aggregate { margin-top:10px;border:1px solid rgba(245,166,35,0.12);border-radius:10px;padding:10px 11px;background:rgba(0,0,0,0.15); }
+  .bk-aggregate-active { border-color:rgba(245,166,35,0.28);background:rgba(245,166,35,0.05); }
+  .bk-aggregate-gold { border-color:rgba(255,215,0,0.28);background:rgba(255,215,0,0.05); }
+  .bk-aggregate-bronze { border-color:rgba(205,127,50,0.28);background:rgba(205,127,50,0.05); }
+  .bk-agg-label { font-family:var(--font-condensed);font-size:8px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,166,35,0.45);display:block;margin-bottom:6px; }
+  .bk-agg-row { display:flex;align-items:center;gap:6px; }
+  .bk-agg-team { font-family:var(--font-condensed);font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color 0.2s; }
+  .bk-agg-winner { color:var(--cream);font-weight:800; }
+  .bk-agg-winner-gold { color:#ffd700;font-weight:800; }
+  .bk-agg-winner-bronze { color:#cd7f32;font-weight:800; }
+  .bk-agg-score { font-size:18px;font-weight:900;color:var(--orange);white-space:nowrap;text-align:center;flex-shrink:0; }
+  .bk-agg-pending { font-family:var(--font-condensed);font-size:10px;color:var(--faint);font-style:italic; }
+
 
   .card-match {
     background: var(--bg-card);
@@ -357,23 +378,26 @@
 
   <!-- ===== PLAYOFFS TAB ===== -->
   <div x-show="activeTab==='playoffs' && !loading">
+
+    <!-- Header -->
     <div class="flex items-center gap-4 mb-6">
       <div>
-        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(245,166,35,0.6)">Post temporada</p>
-        <h2 class="font-display text-5xl leading-none" style="color:var(--cream);letter-spacing:0.02em">PLAYOFFS</h2>
+        <p class="font-condensed text-xs uppercase tracking-[0.18em] mb-1" style="color:rgba(245,166,35,0.5)">Post temporada</p>
+        <h2 class="font-display leading-none" style="color:var(--cream);font-size:clamp(2.2rem,6vw,3.5rem);letter-spacing:0.02em">PLAYOFFS</h2>
       </div>
-      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(245,166,35,0.3),transparent);margin-left:8px;margin-top:20px"></div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(245,166,35,0.3),transparent);margin-left:8px;margin-top:18px"></div>
       <template x-if="isAdmin && !(playoffs && playoffs.active)">
-        <button @click="activatePlayoffs()" class="btn-orange text-sm px-4 py-2">🏆 Activar Playoffs</button>
+        <button @click="activatePlayoffs()" class="btn-orange text-sm px-4 py-2">🏆 Activar</button>
       </template>
       <template x-if="isOwner && playoffs && playoffs.active">
-        <button @click="resetPlayoffs()" style="background:rgba(239,71,111,0.15);color:#ef476f;border:1px solid rgba(239,71,111,0.3);border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit">↺ Reiniciar</button>
+        <button @click="resetPlayoffs()" style="background:rgba(239,71,111,0.12);color:#ef476f;border:1px solid rgba(239,71,111,0.3);border-radius:8px;padding:5px 11px;font-size:11px;cursor:pointer;font-family:inherit">↺ Reiniciar</button>
       </template>
     </div>
 
+    <!-- Not started -->
     <template x-if="!(playoffs && playoffs.active)">
-      <div class="card px-6 py-12 text-center">
-        <div style="font-size:48px;margin-bottom:12px">🏆</div>
+      <div class="card px-6 py-14 text-center">
+        <div style="font-size:52px;margin-bottom:14px">🏆</div>
         <p class="font-condensed text-lg" style="color:var(--muted)">Fase eliminatòria pendent</p>
         <p class="font-condensed text-sm mt-2" style="color:var(--faint)">L'admin l'activarà al final de la fase regular.</p>
       </div>
@@ -382,249 +406,254 @@
     <template x-if="playoffs && playoffs.active">
       <div>
 
-        <!-- FORMAT INFO -->
-        <div class="card px-5 py-3 mb-6 flex items-center gap-3" style="border-color:rgba(245,166,35,0.2);background:rgba(245,166,35,0.04)">
-          <span style="font-size:18px">ℹ️</span>
-          <p class="font-condensed text-sm" style="color:var(--muted)">Cada eliminatòria a <strong style="color:var(--cream)">2 partits</strong> — guanya qui faci més punts en el còmput global.</p>
+        <!-- Format pill -->
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,166,35,0.07);border:1px solid rgba(245,166,35,0.18);border-radius:20px;padding:6px 14px;margin-bottom:20px">
+          <span style="font-size:13px">ℹ️</span>
+          <span class="font-condensed text-xs" style="color:var(--muted)">Cada eliminatòria a <strong style="color:var(--cream)">2 partits</strong> — guanya qui sumi més punts en l'agregat</span>
         </div>
 
-        <!-- BRACKET SVG + CARDS -->
-        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-        <div style="min-width:680px;position:relative;">
+        <!-- ======= BRACKET ======= -->
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px">
+        <div style="min-width:700px">
 
-          <!-- ===== BRACKET LAYOUT: SF1 | FINAL | SF2 ===== -->
-          <div style="display:grid;grid-template-columns:1fr 20px 1fr 20px 1fr;gap:0;align-items:start;padding-bottom:16px">
+          <!-- Row labels -->
+          <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;margin-bottom:8px">
+            <div class="bk-col-label">⚔️ Semifinal 1 · 1r vs 4t</div>
+            <div></div>
+            <div class="bk-col-label" style="color:#ffd700;text-align:center">🏆 Gran Final</div>
+            <div></div>
+            <div class="bk-col-label" style="text-align:right">⚔️ Semifinal 2 · 2n vs 3r</div>
+          </div>
 
-            <!-- COL 1: SF1 + 3r/4t -->
-            <div style="display:flex;flex-direction:column;gap:12px">
+          <!-- Main bracket row -->
+          <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;align-items:start;gap:0">
 
-              <!-- SF1 -->
-              <div class="bracket-card">
-                <div class="bracket-label">⚔️ Semifinal 1 <span style="color:rgba(245,166,35,0.4)">· 1r vs 4t</span></div>
-                <template x-for="g in [1,2]" :key="'sf1g'+g">
-                  <div class="bracket-game" :class="playoffGameDone('sf1',g) ? 'bracket-game-done' : ''">
-                    <div class="bracket-game-header">
-                      <span class="font-condensed text-xs" style="color:var(--faint)">Partit <span x-text="g"></span></span>
-                      <div class="flex items-center gap-2">
-                        <template x-if="playoffs.sf1 && playoffs.sf1['g'+g] && playoffs.sf1['g'+g].date">
-                          <span class="font-condensed text-xs" style="color:var(--muted)" x-text="fmtDate(playoffs.sf1['g'+g].date) + (playoffs.sf1['g'+g].pati ? ' · '+playoffs.sf1['g'+g].pati : '')"></span>
-                        </template>
-                        <template x-if="isAdmin && !playoffGameDone('sf1',g)">
-                          <button @click="openPlayoffEditor('sf1',g)" style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,0.12);color:var(--orange);border:1px solid rgba(245,166,35,0.2);cursor:pointer">✏️</button>
-                        </template>
-                        <template x-if="isAdmin && playoffGameDone('sf1',g)">
-                          <button @click="resetPlayoffGame('sf1',g)" style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(239,71,111,0.1);color:#ef476f;border:1px solid rgba(239,71,111,0.2);cursor:pointer">↺</button>
-                        </template>
-                      </div>
-                    </div>
-                    <div class="bracket-teams">
-                      <div class="bracket-team" :class="playoffTeamWon('sf1',g,1) ? 'bracket-team-win' : (playoffGameDone('sf1',g) ? 'bracket-team-loss' : '')">
-                        <span x-text="playoffs.sf1 && playoffs.sf1.team1 || '1r classificat'"></span>
-                        <span class="bracket-score" x-text="playoffGameDone('sf1',g) ? playoffs.sf1['g'+g].score1 : ''"></span>
-                      </div>
-                      <div class="bracket-team" :class="playoffTeamWon('sf1',g,2) ? 'bracket-team-win' : (playoffGameDone('sf1',g) ? 'bracket-team-loss' : '')">
-                        <span x-text="playoffs.sf1 && playoffs.sf1.team2 || '4t classificat'"></span>
-                        <span class="bracket-score" x-text="playoffGameDone('sf1',g) ? playoffs.sf1['g'+g].score2 : ''"></span>
-                      </div>
-                    </div>
+            <!-- SF1 -->
+            <div class="bk-phase">
+              <template x-for="g in [1,2]" :key="'sf1g'+g">
+                <div class="bk-game" :class="playoffGameDone('sf1',g)?'bk-game-played':''">
+                  <div class="bk-game-meta">
+                    <span class="bk-game-num" x-text="'P'+g"></span>
+                    <span class="bk-game-info" x-text="(playoffs.sf1&&playoffs.sf1['g'+g]&&playoffs.sf1['g'+g].date ? fmtDate(playoffs.sf1['g'+g].date) : '') + (playoffs.sf1&&playoffs.sf1['g'+g]&&playoffs.sf1['g'+g].pati ? ' · '+playoffs.sf1['g'+g].pati : '')"></span>
+                    <template x-if="isAdmin">
+                      <button @click="openPlayoffEditor('sf1',g)" class="bk-edit-btn" x-text="playoffGameDone('sf1',g)?'↺':'✏️'"></button>
+                    </template>
                   </div>
-                </template>
-                <!-- Còmput SF1 -->
+                  <div class="bk-team" :class="playoffTeamWon('sf1',g,1)?'bk-win':(playoffGameDone('sf1',g)?'bk-loss':'')">
+                    <span class="bk-team-name" x-text="playoffs.sf1&&playoffs.sf1.team1||'1r classificat'"></span>
+                    <span class="bk-team-score" x-text="playoffGameDone('sf1',g)?playoffs.sf1['g'+g].score1:''"></span>
+                  </div>
+                  <div class="bk-team" :class="playoffTeamWon('sf1',g,2)?'bk-win':(playoffGameDone('sf1',g)?'bk-loss':'')">
+                    <span class="bk-team-name" x-text="playoffs.sf1&&playoffs.sf1.team2||'4t classificat'"></span>
+                    <span class="bk-team-score" x-text="playoffGameDone('sf1',g)?playoffs.sf1['g'+g].score2:''"></span>
+                  </div>
+                </div>
+              </template>
+              <!-- Agregat SF1 -->
+              <div class="bk-aggregate" :class="playoffBothDone('sf1')?'bk-aggregate-active':''">
+                <span class="bk-agg-label">AGREGAT</span>
                 <template x-if="playoffBothDone('sf1')">
-                  <div class="bracket-total">
-                    <span x-text="playoffs.sf1.team1"></span>
-                    <span class="bracket-total-score" x-text="playoffTotal('sf1',1)+' – '+playoffTotal('sf1',2)"></span>
-                    <span x-text="playoffs.sf1.team2"></span>
+                  <div class="bk-agg-row">
+                    <span class="bk-agg-team" :class="playoffTotal('sf1',1)>playoffTotal('sf1',2)?'bk-agg-winner':''" x-text="playoffs.sf1.team1"></span>
+                    <span class="bk-agg-score" x-text="playoffTotal('sf1',1)+' – '+playoffTotal('sf1',2)"></span>
+                    <span class="bk-agg-team" :class="playoffTotal('sf1',2)>playoffTotal('sf1',1)?'bk-agg-winner':''" style="text-align:right" x-text="playoffs.sf1.team2"></span>
                   </div>
+                </template>
+                <template x-if="!playoffBothDone('sf1')">
+                  <div class="bk-agg-pending">Pendent de tots dos partits</div>
                 </template>
               </div>
-
-              <!-- 3r/4t LLOC -->
-              <div class="bracket-card" style="border-color:rgba(205,127,50,0.25);margin-top:24px">
-                <div class="bracket-label" style="color:#cd7f32">🥉 3r i 4t lloc</div>
-                <template x-for="g in [1,2]" :key="'thirdg'+g">
-                  <div class="bracket-game" :class="playoffGameDone('third',g) ? 'bracket-game-done' : ''">
-                    <div class="bracket-game-header">
-                      <span class="font-condensed text-xs" style="color:var(--faint)">Partit <span x-text="g"></span></span>
-                      <div class="flex items-center gap-2">
-                        <template x-if="playoffs.third && playoffs.third['g'+g] && playoffs.third['g'+g].date">
-                          <span class="font-condensed text-xs" style="color:var(--muted)" x-text="fmtDate(playoffs.third['g'+g].date) + (playoffs.third['g'+g].pati ? ' · '+playoffs.third['g'+g].pati : '')"></span>
-                        </template>
-                        <template x-if="isAdmin && !playoffGameDone('third',g)">
-                          <button @click="openPlayoffEditor('third',g)" style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,0.12);color:var(--orange);border:1px solid rgba(245,166,35,0.2);cursor:pointer">✏️</button>
-                        </template>
-                        <template x-if="isAdmin && playoffGameDone('third',g)">
-                          <button @click="resetPlayoffGame('third',g)" style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(239,71,111,0.1);color:#ef476f;border:1px solid rgba(239,71,111,0.2);cursor:pointer">↺</button>
-                        </template>
-                      </div>
-                    </div>
-                    <div class="bracket-teams">
-                      <div class="bracket-team" :class="playoffTeamWon('third',g,1) ? 'bracket-team-win' : (playoffGameDone('third',g) ? 'bracket-team-loss' : '')">
-                        <span x-text="playoffs.third && playoffs.third.team1 || 'Perdedor SF1'"></span>
-                        <span class="bracket-score" x-text="playoffGameDone('third',g) ? playoffs.third['g'+g].score1 : ''"></span>
-                      </div>
-                      <div class="bracket-team" :class="playoffTeamWon('third',g,2) ? 'bracket-team-win' : (playoffGameDone('third',g) ? 'bracket-team-loss' : '')">
-                        <span x-text="playoffs.third && playoffs.third.team2 || 'Perdedor SF2'"></span>
-                        <span class="bracket-score" x-text="playoffGameDone('third',g) ? playoffs.third['g'+g].score2 : ''"></span>
-                      </div>
-                    </div>
-                  </div>
-                </template>
-                <template x-if="playoffBothDone('third')">
-                  <div class="bracket-total" style="border-color:rgba(205,127,50,0.2)">
-                    <span x-text="playoffs.third.team1"></span>
-                    <span class="bracket-total-score" style="color:#cd7f32" x-text="playoffTotal('third',1)+' – '+playoffTotal('third',2)"></span>
-                    <span x-text="playoffs.third.team2"></span>
-                  </div>
-                </template>
-              </div>
-
             </div>
 
-            <!-- COL 2: connector left -->
-            <div style="position:relative;align-self:stretch">
-              <svg width="20" height="100%" style="position:absolute;top:0;left:0;overflow:visible" preserveAspectRatio="none">
-                <line x1="0" y1="60" x2="20" y2="60" stroke="rgba(245,166,35,0.25)" stroke-width="1.5" stroke-dasharray="3,3"/>
+            <!-- Connector L -->
+            <div class="bk-connector">
+              <svg viewBox="0 0 32 120" preserveAspectRatio="none" style="width:100%;height:120px">
+                <path d="M 0 40 Q 32 40 32 60" fill="none" stroke="rgba(245,166,35,0.2)" stroke-width="1.5" stroke-dasharray="4,3"/>
               </svg>
             </div>
 
-            <!-- COL 3: GRAN FINAL (centrada) -->
-            <div style="padding-top:20px">
-              <div class="bracket-card" style="border-color:rgba(255,215,0,0.35);background:rgba(255,215,0,0.03)">
-                <div class="bracket-label" style="color:#ffd700;font-size:13px;letter-spacing:0.15em">🏆 Gran Final</div>
-                <template x-for="g in [1,2]" :key="'finalg'+g">
-                  <div class="bracket-game" :class="playoffGameDone('final',g) ? 'bracket-game-done' : ''" style="border-color:rgba(255,215,0,0.1)">
-                    <div class="bracket-game-header">
-                      <span class="font-condensed text-xs" style="color:var(--faint)">Partit <span x-text="g"></span></span>
-                      <div class="flex items-center gap-2">
-                        <template x-if="playoffs.final && playoffs.final['g'+g] && playoffs.final['g'+g].date">
-                          <span class="font-condensed text-xs" style="color:var(--muted)" x-text="fmtDate(playoffs.final['g'+g].date) + (playoffs.final['g'+g].pati ? ' · '+playoffs.final['g'+g].pati : '')"></span>
-                        </template>
-                        <template x-if="isAdmin && !playoffGameDone('final',g)">
-                          <button @click="openPlayoffEditor('final',g)" style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(255,215,0,0.12);color:#ffd700;border:1px solid rgba(255,215,0,0.25);cursor:pointer">✏️</button>
-                        </template>
-                        <template x-if="isAdmin && playoffGameDone('final',g)">
-                          <button @click="resetPlayoffGame('final',g)" style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(239,71,111,0.1);color:#ef476f;border:1px solid rgba(239,71,111,0.2);cursor:pointer">↺</button>
-                        </template>
-                      </div>
-                    </div>
-                    <div class="bracket-teams">
-                      <div class="bracket-team" :class="playoffTeamWon('final',g,1) ? 'bracket-team-win' : (playoffGameDone('final',g) ? 'bracket-team-loss' : '')">
-                        <span x-text="playoffs.final && playoffs.final.team1 || 'Guanyador SF1'"></span>
-                        <span class="bracket-score" x-text="playoffGameDone('final',g) ? playoffs.final['g'+g].score1 : ''"></span>
-                      </div>
-                      <div class="bracket-team" :class="playoffTeamWon('final',g,2) ? 'bracket-team-win' : (playoffGameDone('final',g) ? 'bracket-team-loss' : '')">
-                        <span x-text="playoffs.final && playoffs.final.team2 || 'Guanyador SF2'"></span>
-                        <span class="bracket-score" x-text="playoffGameDone('final',g) ? playoffs.final['g'+g].score2 : ''"></span>
-                      </div>
-                    </div>
+            <!-- FINAL -->
+            <div class="bk-phase" style="border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.02)">
+              <template x-for="g in [1,2]" :key="'finalg'+g">
+                <div class="bk-game" :class="playoffGameDone('final',g)?'bk-game-played':''" style="border-color:rgba(255,215,0,0.12)">
+                  <div class="bk-game-meta">
+                    <span class="bk-game-num" x-text="'P'+g"></span>
+                    <span class="bk-game-info" x-text="(playoffs.final&&playoffs.final['g'+g]&&playoffs.final['g'+g].date ? fmtDate(playoffs.final['g'+g].date) : '') + (playoffs.final&&playoffs.final['g'+g]&&playoffs.final['g'+g].pati ? ' · '+playoffs.final['g'+g].pati : '')"></span>
+                    <template x-if="isAdmin">
+                      <button @click="openPlayoffEditor('final',g)" class="bk-edit-btn" style="color:#ffd700;border-color:rgba(255,215,0,0.25)" x-text="playoffGameDone('final',g)?'↺':'✏️'"></button>
+                    </template>
                   </div>
-                </template>
+                  <div class="bk-team" :class="playoffTeamWon('final',g,1)?'bk-win-gold':(playoffGameDone('final',g)?'bk-loss':'')">
+                    <span class="bk-team-name" x-text="playoffs.final&&playoffs.final.team1||'Guanyador SF1'"></span>
+                    <span class="bk-team-score" x-text="playoffGameDone('final',g)?playoffs.final['g'+g].score1:''"></span>
+                  </div>
+                  <div class="bk-team" :class="playoffTeamWon('final',g,2)?'bk-win-gold':(playoffGameDone('final',g)?'bk-loss':'')">
+                    <span class="bk-team-name" x-text="playoffs.final&&playoffs.final.team2||'Guanyador SF2'"></span>
+                    <span class="bk-team-score" x-text="playoffGameDone('final',g)?playoffs.final['g'+g].score2:''"></span>
+                  </div>
+                </div>
+              </template>
+              <!-- Agregat Final -->
+              <div class="bk-aggregate" :class="playoffBothDone('final')?'bk-aggregate-gold':''" style="border-color:rgba(255,215,0,0.2)">
+                <span class="bk-agg-label" style="color:rgba(255,215,0,0.6)">AGREGAT</span>
                 <template x-if="playoffBothDone('final')">
-                  <div class="bracket-total" style="border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.05)">
-                    <span x-text="playoffs.final.team1"></span>
-                    <span class="bracket-total-score" style="color:#ffd700" x-text="playoffTotal('final',1)+' – '+playoffTotal('final',2)"></span>
-                    <span x-text="playoffs.final.team2"></span>
+                  <div class="bk-agg-row">
+                    <span class="bk-agg-team" :class="playoffTotal('final',1)>playoffTotal('final',2)?'bk-agg-winner-gold':''" x-text="playoffs.final.team1"></span>
+                    <span class="bk-agg-score" style="color:#ffd700" x-text="playoffTotal('final',1)+' – '+playoffTotal('final',2)"></span>
+                    <span class="bk-agg-team" :class="playoffTotal('final',2)>playoffTotal('final',1)?'bk-agg-winner-gold':''" style="text-align:right" x-text="playoffs.final.team2"></span>
                   </div>
                 </template>
-                <!-- Campió -->
-                <template x-if="playoffWinner('final')">
-                  <div style="text-align:center;padding:16px 0 4px">
-                    <div style="font-size:36px" x-text="getTeamEmoji(playoffWinner('final'))"></div>
-                    <div class="font-display text-2xl mt-1" style="color:#ffd700" x-text="playoffWinner('final')"></div>
-                    <div class="font-condensed text-xs mt-1" style="color:rgba(255,215,0,0.5);letter-spacing:0.15em">CAMPIÓ 2026</div>
-                  </div>
+                <template x-if="!playoffBothDone('final')">
+                  <div class="bk-agg-pending">Pendent de tots dos partits</div>
                 </template>
               </div>
+              <!-- Campio -->
+              <template x-if="playoffWinner('final')">
+                <div style="text-align:center;padding:18px 8px 6px;border-top:1px solid rgba(255,215,0,0.15);margin-top:12px">
+                  <div style="font-size:40px" x-text="getTeamEmoji(playoffWinner('final'))"></div>
+                  <div class="font-display" style="color:#ffd700;font-size:1.6rem;margin-top:6px;letter-spacing:0.04em" x-text="playoffWinner('final')"></div>
+                  <div class="font-condensed text-xs" style="color:rgba(255,215,0,0.45);letter-spacing:0.18em;margin-top:4px">🥇 CAMPIÓ IES XARC 2026</div>
+                </div>
+              </template>
             </div>
 
-            <!-- COL 4: connector right -->
-            <div style="position:relative;align-self:stretch">
-              <svg width="20" height="100%" style="position:absolute;top:0;left:0;overflow:visible" preserveAspectRatio="none">
-                <line x1="20" y1="60" x2="0" y2="60" stroke="rgba(245,166,35,0.25)" stroke-width="1.5" stroke-dasharray="3,3"/>
+            <!-- Connector R -->
+            <div class="bk-connector">
+              <svg viewBox="0 0 32 120" preserveAspectRatio="none" style="width:100%;height:120px">
+                <path d="M 32 40 Q 0 40 0 60" fill="none" stroke="rgba(245,166,35,0.2)" stroke-width="1.5" stroke-dasharray="4,3"/>
               </svg>
             </div>
 
-            <!-- COL 5: SF2 -->
-            <div>
-              <div class="bracket-card">
-                <div class="bracket-label">⚔️ Semifinal 2 <span style="color:rgba(245,166,35,0.4)">· 2n vs 3r</span></div>
-                <template x-for="g in [1,2]" :key="'sf2g'+g">
-                  <div class="bracket-game" :class="playoffGameDone('sf2',g) ? 'bracket-game-done' : ''">
-                    <div class="bracket-game-header">
-                      <span class="font-condensed text-xs" style="color:var(--faint)">Partit <span x-text="g"></span></span>
-                      <div class="flex items-center gap-2">
-                        <template x-if="playoffs.sf2 && playoffs.sf2['g'+g] && playoffs.sf2['g'+g].date">
-                          <span class="font-condensed text-xs" style="color:var(--muted)" x-text="fmtDate(playoffs.sf2['g'+g].date) + (playoffs.sf2['g'+g].pati ? ' · '+playoffs.sf2['g'+g].pati : '')"></span>
-                        </template>
-                        <template x-if="isAdmin && !playoffGameDone('sf2',g)">
-                          <button @click="openPlayoffEditor('sf2',g)" style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,0.12);color:var(--orange);border:1px solid rgba(245,166,35,0.2);cursor:pointer">✏️</button>
-                        </template>
-                        <template x-if="isAdmin && playoffGameDone('sf2',g)">
-                          <button @click="resetPlayoffGame('sf2',g)" style="font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(239,71,111,0.1);color:#ef476f;border:1px solid rgba(239,71,111,0.2);cursor:pointer">↺</button>
-                        </template>
-                      </div>
-                    </div>
-                    <div class="bracket-teams">
-                      <div class="bracket-team" :class="playoffTeamWon('sf2',g,1) ? 'bracket-team-win' : (playoffGameDone('sf2',g) ? 'bracket-team-loss' : '')">
-                        <span x-text="playoffs.sf2 && playoffs.sf2.team1 || '2n classificat'"></span>
-                        <span class="bracket-score" x-text="playoffGameDone('sf2',g) ? playoffs.sf2['g'+g].score1 : ''"></span>
-                      </div>
-                      <div class="bracket-team" :class="playoffTeamWon('sf2',g,2) ? 'bracket-team-win' : (playoffGameDone('sf2',g) ? 'bracket-team-loss' : '')">
-                        <span x-text="playoffs.sf2 && playoffs.sf2.team2 || '3r classificat'"></span>
-                        <span class="bracket-score" x-text="playoffGameDone('sf2',g) ? playoffs.sf2['g'+g].score2 : ''"></span>
-                      </div>
-                    </div>
+            <!-- SF2 -->
+            <div class="bk-phase">
+              <template x-for="g in [1,2]" :key="'sf2g'+g">
+                <div class="bk-game" :class="playoffGameDone('sf2',g)?'bk-game-played':''">
+                  <div class="bk-game-meta">
+                    <span class="bk-game-num" x-text="'P'+g"></span>
+                    <span class="bk-game-info" x-text="(playoffs.sf2&&playoffs.sf2['g'+g]&&playoffs.sf2['g'+g].date ? fmtDate(playoffs.sf2['g'+g].date) : '') + (playoffs.sf2&&playoffs.sf2['g'+g]&&playoffs.sf2['g'+g].pati ? ' · '+playoffs.sf2['g'+g].pati : '')"></span>
+                    <template x-if="isAdmin">
+                      <button @click="openPlayoffEditor('sf2',g)" class="bk-edit-btn" x-text="playoffGameDone('sf2',g)?'↺':'✏️'"></button>
+                    </template>
+                  </div>
+                  <div class="bk-team" :class="playoffTeamWon('sf2',g,1)?'bk-win':(playoffGameDone('sf2',g)?'bk-loss':'')">
+                    <span class="bk-team-name" x-text="playoffs.sf2&&playoffs.sf2.team1||'2n classificat'"></span>
+                    <span class="bk-team-score" x-text="playoffGameDone('sf2',g)?playoffs.sf2['g'+g].score1:''"></span>
+                  </div>
+                  <div class="bk-team" :class="playoffTeamWon('sf2',g,2)?'bk-win':(playoffGameDone('sf2',g)?'bk-loss':'')">
+                    <span class="bk-team-name" x-text="playoffs.sf2&&playoffs.sf2.team2||'3r classificat'"></span>
+                    <span class="bk-team-score" x-text="playoffGameDone('sf2',g)?playoffs.sf2['g'+g].score2:''"></span>
+                  </div>
+                </div>
+              </template>
+              <!-- Agregat SF2 -->
+              <div class="bk-aggregate" :class="playoffBothDone('sf2')?'bk-aggregate-active':''">
+                <span class="bk-agg-label">AGREGAT</span>
+                <template x-if="playoffBothDone('sf2')">
+                  <div class="bk-agg-row">
+                    <span class="bk-agg-team" :class="playoffTotal('sf2',1)>playoffTotal('sf2',2)?'bk-agg-winner':''" x-text="playoffs.sf2.team1"></span>
+                    <span class="bk-agg-score" x-text="playoffTotal('sf2',1)+' – '+playoffTotal('sf2',2)"></span>
+                    <span class="bk-agg-team" :class="playoffTotal('sf2',2)>playoffTotal('sf2',1)?'bk-agg-winner':''" style="text-align:right" x-text="playoffs.sf2.team2"></span>
                   </div>
                 </template>
-                <template x-if="playoffBothDone('sf2')">
-                  <div class="bracket-total">
-                    <span x-text="playoffs.sf2.team1"></span>
-                    <span class="bracket-total-score" x-text="playoffTotal('sf2',1)+' – '+playoffTotal('sf2',2)"></span>
-                    <span x-text="playoffs.sf2.team2"></span>
-                  </div>
+                <template x-if="!playoffBothDone('sf2')">
+                  <div class="bk-agg-pending">Pendent de tots dos partits</div>
                 </template>
               </div>
             </div>
 
-          </div><!-- end grid -->
+          </div><!-- end bracket grid -->
+
+          <!-- 3r/4t LLOC — row below -->
+          <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px">
+            <div class="bk-col-label" style="margin-bottom:8px">🥉 3r i 4t lloc</div>
+            <div style="display:grid;grid-template-columns:1fr 32px 1fr;max-width:calc(66% + 32px)">
+              <div class="bk-phase" style="border-color:rgba(205,127,50,0.25)">
+                <template x-for="g in [1,2]" :key="'thirdg'+g">
+                  <div class="bk-game" :class="playoffGameDone('third',g)?'bk-game-played':''">
+                    <div class="bk-game-meta">
+                      <span class="bk-game-num" x-text="'P'+g"></span>
+                      <span class="bk-game-info" x-text="(playoffs.third&&playoffs.third['g'+g]&&playoffs.third['g'+g].date ? fmtDate(playoffs.third['g'+g].date) : '') + (playoffs.third&&playoffs.third['g'+g]&&playoffs.third['g'+g].pati ? ' · '+playoffs.third['g'+g].pati : '')"></span>
+                      <template x-if="isAdmin">
+                        <button @click="openPlayoffEditor('third',g)" class="bk-edit-btn" style="color:#cd7f32;border-color:rgba(205,127,50,0.25)" x-text="playoffGameDone('third',g)?'↺':'✏️'"></button>
+                      </template>
+                    </div>
+                    <div class="bk-team" :class="playoffTeamWon('third',g,1)?'bk-win-bronze':(playoffGameDone('third',g)?'bk-loss':'')">
+                      <span class="bk-team-name" x-text="playoffs.third&&playoffs.third.team1||'Perdedor SF1'"></span>
+                      <span class="bk-team-score" x-text="playoffGameDone('third',g)?playoffs.third['g'+g].score1:''"></span>
+                    </div>
+                    <div class="bk-team" :class="playoffTeamWon('third',g,2)?'bk-win-bronze':(playoffGameDone('third',g)?'bk-loss':'')">
+                      <span class="bk-team-name" x-text="playoffs.third&&playoffs.third.team2||'Perdedor SF2'"></span>
+                      <span class="bk-team-score" x-text="playoffGameDone('third',g)?playoffs.third['g'+g].score2:''"></span>
+                    </div>
+                  </div>
+                </template>
+                <div class="bk-aggregate" :class="playoffBothDone('third')?'bk-aggregate-bronze':''" style="border-color:rgba(205,127,50,0.2)">
+                  <span class="bk-agg-label" style="color:rgba(205,127,50,0.6)">AGREGAT</span>
+                  <template x-if="playoffBothDone('third')">
+                    <div class="bk-agg-row">
+                      <span class="bk-agg-team" :class="playoffTotal('third',1)>playoffTotal('third',2)?'bk-agg-winner-bronze':''" x-text="playoffs.third.team1"></span>
+                      <span class="bk-agg-score" style="color:#cd7f32" x-text="playoffTotal('third',1)+' – '+playoffTotal('third',2)"></span>
+                      <span class="bk-agg-team" :class="playoffTotal('third',2)>playoffTotal('third',1)?'bk-agg-winner-bronze':''" style="text-align:right" x-text="playoffs.third.team2"></span>
+                    </div>
+                  </template>
+                  <template x-if="!playoffBothDone('third')">
+                    <div class="bk-agg-pending">Pendent de tots dos partits</div>
+                  </template>
+                </div>
+              </div>
+              <div></div>
+              <div style="display:flex;align-items:center;justify-content:center">
+                <template x-if="playoffWinner('third')">
+                  <div style="text-align:center;padding:12px">
+                    <div style="font-size:32px" x-text="getTeamEmoji(playoffWinner('third'))"></div>
+                    <div class="font-condensed font-700 uppercase mt-1" style="color:#cd7f32;font-size:14px" x-text="playoffWinner('third')"></div>
+                    <div class="font-condensed text-xs mt-1" style="color:rgba(205,127,50,0.5)">🥉 3r lloc</div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
         </div><!-- end min-width -->
         </div><!-- end overflow -->
 
-        <!-- MODAL EDITOR PLAYOFF (admin) -->
+        <!-- MODAL EDITOR -->
         <template x-if="playoffEditor.open">
-          <div style="position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px" @click.self="playoffEditor.open=false">
-            <div class="card p-6" style="width:100%;max-width:340px">
+          <div style="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px" @click.self="playoffEditor.open=false">
+            <div class="card p-6" style="width:100%;max-width:360px">
               <div class="flex items-center justify-between mb-5">
                 <div>
-                  <p class="font-condensed text-xs uppercase tracking-widest mb-0.5" style="color:var(--faint)" x-text="playoffEditor.phaseLabel + ' · Partit ' + playoffEditor.g"></p>
-                  <p class="font-condensed font-700 uppercase" style="color:var(--cream);font-size:15px" x-text="(playoffs[playoffEditor.phase]&&playoffs[playoffEditor.phase].team1||'?') + ' vs ' + (playoffs[playoffEditor.phase]&&playoffs[playoffEditor.phase].team2||'?')"></p>
+                  <p class="font-condensed text-xs uppercase tracking-widest mb-0.5" style="color:var(--faint)" x-text="playoffEditor.phaseLabel+' · Partit '+playoffEditor.g"></p>
+                  <p class="font-condensed font-700 uppercase" style="color:var(--cream);font-size:14px" x-text="(playoffs[playoffEditor.phase]&&playoffs[playoffEditor.phase].team1||'?')+' vs '+(playoffs[playoffEditor.phase]&&playoffs[playoffEditor.phase].team2||'?')"></p>
                 </div>
-                <button @click="playoffEditor.open=false" style="font-size:20px;color:var(--faint);background:none;border:none;cursor:pointer">✕</button>
+                <button @click="playoffEditor.open=false" style="font-size:20px;color:var(--faint);background:none;border:none;cursor:pointer;line-height:1">✕</button>
               </div>
-              <!-- Data -->
-              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
-              <input type="date" x-model="playoffEditor.date" style="width:100%;margin-bottom:12px"/>
-              <!-- Pati -->
-              <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Pati</label>
-              <div class="flex gap-2 mb-4">
-                <button @click="playoffEditor.pati='1r pati'" :style="playoffEditor.pati==='1r pati' ? 'background:var(--orange);color:#000;border-color:var(--orange)' : ''" class="btn-outline flex-1 font-condensed">1r pati</button>
-                <button @click="playoffEditor.pati='2n pati'" :style="playoffEditor.pati==='2n pati' ? 'background:var(--orange);color:#000;border-color:var(--orange)' : ''" class="btn-outline flex-1 font-condensed">2n pati</button>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Data</label>
+                  <input type="date" x-model="playoffEditor.date" style="width:100%"/>
+                </div>
+                <div>
+                  <label class="font-condensed text-xs uppercase mb-1 block" style="color:var(--muted)">Pati</label>
+                  <div class="flex gap-1">
+                    <button @click="playoffEditor.pati='1r pati'" :style="playoffEditor.pati==='1r pati'?'background:var(--orange);color:#000;border-color:var(--orange)':''" style="flex:1;padding:6px 4px;font-size:11px;border-radius:6px;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:inherit">1r</button>
+                    <button @click="playoffEditor.pati='2n pati'" :style="playoffEditor.pati==='2n pati'?'background:var(--orange);color:#000;border-color:var(--orange)':''" style="flex:1;padding:6px 4px;font-size:11px;border-radius:6px;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:inherit">2n</button>
+                  </div>
+                </div>
               </div>
-              <!-- Marcadors -->
               <label class="font-condensed text-xs uppercase mb-2 block" style="color:var(--muted)">Marcador</label>
               <div class="flex items-center gap-3 mb-5">
-                <div class="flex-1">
+                <div style="flex:1;text-align:center">
                   <p class="font-condensed text-xs mb-1 truncate" style="color:var(--faint)" x-text="playoffs[playoffEditor.phase]&&playoffs[playoffEditor.phase].team1||'Equip 1'"></p>
-                  <input type="number" x-model.number="playoffEditor.score1" min="0" placeholder="0" style="width:100%;text-align:center;font-size:22px;padding:8px"/>
+                  <input type="number" x-model.number="playoffEditor.score1" min="0" placeholder="0" style="width:100%;text-align:center;font-size:24px;font-weight:900;padding:8px 4px"/>
                 </div>
-                <span class="font-condensed text-xl" style="color:var(--border-mid)">–</span>
-                <div class="flex-1">
+                <span class="font-condensed text-xl" style="color:var(--border-mid);margin-top:18px">–</span>
+                <div style="flex:1;text-align:center">
                   <p class="font-condensed text-xs mb-1 truncate" style="color:var(--faint)" x-text="playoffs[playoffEditor.phase]&&playoffs[playoffEditor.phase].team2||'Equip 2'"></p>
-                  <input type="number" x-model.number="playoffEditor.score2" min="0" placeholder="0" style="width:100%;text-align:center;font-size:22px;padding:8px"/>
+                  <input type="number" x-model.number="playoffEditor.score2" min="0" placeholder="0" style="width:100%;text-align:center;font-size:24px;font-weight:900;padding:8px 4px"/>
                 </div>
               </div>
-              <button @click="savePlayoffFromEditor()" class="btn-orange w-full">✓ Guardar</button>
+              <button @click="savePlayoffFromEditor()" class="btn-orange w-full" style="font-size:14px">✓ Guardar</button>
             </div>
           </div>
         </template>
