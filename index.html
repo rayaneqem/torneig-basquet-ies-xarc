@@ -87,39 +87,151 @@
 
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius:12px; }
 
-  .bk-col-label { font-family:var(--font-condensed);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:rgba(245,166,35,0.55); }
-  .bk-phase { background:var(--bg-surface);border:1px solid var(--border);border-radius:14px;padding:12px; }
-  .bk-connector { display:flex;align-items:flex-start;padding-top:0; }
-  .bk-game { border:1px solid var(--border);border-radius:10px;padding:10px 11px;margin-bottom:8px;transition:border-color 0.2s; }
-  .bk-game:last-of-type { margin-bottom:0; }
-  .bk-game-played { border-color:rgba(245,166,35,0.22); }
-  .bk-game-meta { display:flex;align-items:center;gap:6px;margin-bottom:7px; }
-  .bk-game-num { font-family:var(--font-condensed);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--faint);background:rgba(255,255,255,0.04);border-radius:4px;padding:2px 5px;border:1px solid var(--border); }
-  .bk-game-info { font-family:var(--font-condensed);font-size:10px;color:var(--faint);flex:1; }
-  .bk-edit-btn { font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(245,166,35,0.1);color:var(--orange);border:1px solid rgba(245,166,35,0.2);cursor:pointer;font-family:inherit;line-height:1.4; }
-  .bk-team { display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:7px;font-family:var(--font-condensed);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);transition:all 0.2s;margin-bottom:3px; }
+  /* ===== BRACKET STYLES (redissenyat) ===== */
+  .bk-col-label {
+    font-family:'Oswald'; font-size:10px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.16em;
+    color:rgba(245,166,35,0.5); margin-bottom:10px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .bk-col-label-gold { color:rgba(255,215,0,0.6); }
+  .bk-col-label-bronze { color:rgba(205,127,50,0.55); }
+
+  .bk-phase {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    position: relative;
+  }
+  .bk-phase-final {
+    background: linear-gradient(160deg, rgba(255,215,0,0.06) 0%, var(--bg-surface) 60%);
+    border-color: rgba(255,215,0,0.25);
+  }
+  .bk-phase-bronze {
+    background: linear-gradient(160deg, rgba(205,127,50,0.06) 0%, var(--bg-surface) 60%);
+    border-color: rgba(205,127,50,0.2);
+  }
+
+  .bk-connector { display:flex; align-items:flex-start; padding-top:0; }
+
+  /* Partido individual */
+  .bk-game {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    transition: border-color 0.2s, background 0.2s;
+    background: rgba(0,0,0,0.15);
+  }
+  .bk-game:last-of-type { margin-bottom: 0; }
+  .bk-game-played {
+    border-color: rgba(245,166,35,0.28);
+    background: rgba(245,166,35,0.04);
+  }
+  .bk-game-played-gold {
+    border-color: rgba(255,215,0,0.28);
+    background: rgba(255,215,0,0.04);
+  }
+  .bk-game-played-bronze {
+    border-color: rgba(205,127,50,0.28);
+    background: rgba(205,127,50,0.04);
+  }
+  .bk-game-meta {
+    display:flex; align-items:center; gap:6px; margin-bottom:8px;
+  }
+  .bk-game-num {
+    font-family:'Oswald'; font-size:9px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.12em;
+    color:var(--faint); background:rgba(255,255,255,0.04);
+    border-radius:4px; padding:2px 6px; border:1px solid var(--border);
+  }
+  .bk-game-info {
+    font-family:'Oswald'; font-size:10px; color:var(--faint); flex:1;
+  }
+  .bk-edit-btn {
+    font-size:11px; padding:2px 8px; border-radius:5px;
+    background:rgba(245,166,35,0.1); color:var(--orange);
+    border:1px solid rgba(245,166,35,0.2); cursor:pointer;
+    font-family:'Oswald'; line-height:1.5; letter-spacing:0.04em;
+    transition: background 0.15s;
+  }
+  .bk-edit-btn:hover { background:rgba(245,166,35,0.2); }
+
+  .bk-team {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:7px 9px; border-radius:7px;
+    font-family:'Oswald'; font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--muted); transition:all 0.2s; margin-bottom:3px;
+  }
   .bk-team:last-child { margin-bottom:0; }
-  .bk-team-name { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .bk-team-score { font-size:17px;font-weight:900;color:var(--orange);min-width:24px;text-align:right;margin-left:8px; }
-  .bk-win { background:rgba(245,166,35,0.13);color:var(--cream); }
+  .bk-team-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bk-team-score {
+    font-size:18px; font-weight:900; min-width:26px;
+    text-align:right; margin-left:8px; font-family:'Bebas Neue';
+    letter-spacing:0.03em;
+  }
+  .bk-win { background:rgba(245,166,35,0.14); color:var(--cream); }
   .bk-win .bk-team-score { color:var(--orange); }
-  .bk-win-gold { background:rgba(255,215,0,0.13);color:#ffd700; }
+  .bk-win-gold { background:rgba(255,215,0,0.14); color:#ffe566; }
   .bk-win-gold .bk-team-score { color:#ffd700; }
-  .bk-win-bronze { background:rgba(205,127,50,0.13);color:#e8a24a; }
+  .bk-win-bronze { background:rgba(205,127,50,0.14); color:#e8a24a; }
   .bk-win-bronze .bk-team-score { color:#cd7f32; }
-  .bk-loss { opacity:0.38; }
-  .bk-aggregate { margin-top:10px;border:1px solid rgba(245,166,35,0.12);border-radius:10px;padding:10px 11px;background:rgba(0,0,0,0.15); }
-  .bk-aggregate-active { border-color:rgba(245,166,35,0.28);background:rgba(245,166,35,0.05); }
-  .bk-aggregate-gold { border-color:rgba(255,215,0,0.28);background:rgba(255,215,0,0.05); }
-  .bk-aggregate-bronze { border-color:rgba(205,127,50,0.28);background:rgba(205,127,50,0.05); }
-  .bk-agg-label { font-family:var(--font-condensed);font-size:8px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:rgba(245,166,35,0.45);display:block;margin-bottom:6px; }
-  .bk-agg-row { display:flex;align-items:center;gap:6px; }
-  .bk-agg-team { font-family:var(--font-condensed);font-size:10px;font-weight:600;text-transform:uppercase;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color 0.2s; }
-  .bk-agg-winner { color:var(--cream);font-weight:800; }
-  .bk-agg-winner-gold { color:#ffd700;font-weight:800; }
-  .bk-agg-winner-bronze { color:#cd7f32;font-weight:800; }
-  .bk-agg-score { font-size:18px;font-weight:900;color:var(--orange);white-space:nowrap;text-align:center;flex-shrink:0; }
-  .bk-agg-pending { font-family:var(--font-condensed);font-size:10px;color:var(--faint);font-style:italic; }
+  .bk-loss { opacity:0.32; }
+
+  /* Agregat (SF i Final) */
+  .bk-aggregate {
+    margin-top:10px; border:1px solid rgba(245,166,35,0.1);
+    border-radius:10px; padding:10px 12px; background:rgba(0,0,0,0.12);
+  }
+  .bk-aggregate-active { border-color:rgba(245,166,35,0.3); background:rgba(245,166,35,0.05); }
+  .bk-aggregate-gold { border-color:rgba(255,215,0,0.3); background:rgba(255,215,0,0.05); }
+  .bk-agg-label {
+    font-family:'Oswald'; font-size:8px; font-weight:700;
+    letter-spacing:0.18em; text-transform:uppercase;
+    color:rgba(245,166,35,0.45); display:block; margin-bottom:6px;
+  }
+  .bk-agg-row { display:flex; align-items:center; gap:6px; }
+  .bk-agg-team {
+    font-family:'Oswald'; font-size:10px; font-weight:600;
+    text-transform:uppercase; color:var(--muted); flex:1;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    transition:color 0.2s;
+  }
+  .bk-agg-winner { color:var(--cream); font-weight:800; }
+  .bk-agg-winner-gold { color:#ffd700; font-weight:800; }
+  .bk-agg-score {
+    font-size:20px; font-weight:900; color:var(--orange);
+    white-space:nowrap; text-align:center; flex-shrink:0;
+    font-family:'Bebas Neue'; letter-spacing:0.04em;
+  }
+  .bk-agg-pending {
+    font-family:'Oswald'; font-size:10px; color:var(--faint); font-style:italic;
+  }
+
+  /* 3r lloc — partido único */
+  .bk-third-game {
+    border: 1px solid rgba(205,127,50,0.2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.15);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .bk-third-game-played {
+    border-color: rgba(205,127,50,0.35);
+    background: rgba(205,127,50,0.05);
+  }
+
+  /* Campió / 3r lloc resultado banners */
+  .bk-winner-banner {
+    text-align:center; padding:16px 8px 6px;
+    border-top:1px solid rgba(255,215,0,0.15); margin-top:12px;
+  }
+  .bk-third-banner {
+    text-align:center; padding:12px 8px 4px;
+    border-top:1px solid rgba(205,127,50,0.15); margin-top:10px;
+  }
 
   .card-match {
     background: var(--bg-card);
@@ -377,34 +489,37 @@
     <template x-if="playoffs && playoffs.active">
       <div>
 
-        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,166,35,0.07);border:1px solid rgba(245,166,35,0.18);border-radius:20px;padding:6px 14px;margin-bottom:20px">
+        <!-- Info pill -->
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,166,35,0.07);border:1px solid rgba(245,166,35,0.18);border-radius:20px;padding:6px 14px;margin-bottom:24px">
           <span style="font-size:13px">ℹ️</span>
-          <span class="font-condensed text-xs" style="color:var(--muted)">Cada eliminatòria a <strong style="color:var(--cream)">2 partits</strong> — guanya qui sumi més punts en l'agregat · Els guanyadors passen automàticament a la Final i els perdedors al 3r i 4t lloc</span>
+          <span class="font-condensed text-xs" style="color:var(--muted)">Semifinals a <strong style="color:var(--cream)">2 partits</strong> (agregat) · Final a <strong style="color:var(--cream)">2 partits</strong> · 3r lloc a <strong style="color:var(--cream)">1 únic partit</strong></span>
         </div>
 
         <!-- BRACKET -->
         <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px">
-        <div style="min-width:700px">
+        <div style="min-width:720px">
 
-          <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;margin-bottom:8px">
-            <div class="bk-col-label">⚔️ Semifinal 1 · 1r vs 4t</div>
+          <!-- Column headers -->
+          <div style="display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;margin-bottom:10px;align-items:end">
+            <div class="bk-col-label">⚔️ Semifinal 1 <span style="opacity:0.5;font-weight:400">· 1r vs 4t</span></div>
             <div></div>
-            <div class="bk-col-label" style="color:#ffd700;text-align:center">🏆 Gran Final</div>
+            <div class="bk-col-label bk-col-label-gold" style="justify-content:center">🏆 Gran Final</div>
             <div></div>
-            <div class="bk-col-label" style="text-align:right">⚔️ Semifinal 2 · 2n vs 3r</div>
+            <div class="bk-col-label" style="justify-content:flex-end">⚔️ Semifinal 2 <span style="opacity:0.5;font-weight:400">· 2n vs 3r</span></div>
           </div>
 
-          <div style="display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;align-items:start;gap:0">
+          <!-- Bracket main row -->
+          <div style="display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;align-items:start;gap:0">
 
-            <!-- SF1 -->
+            <!-- ── SF1 ── -->
             <div class="bk-phase">
               <template x-for="g in [1,2]" :key="'sf1g'+g">
                 <div class="bk-game" :class="playoffGameDone('sf1',g)?'bk-game-played':''">
                   <div class="bk-game-meta">
-                    <span class="bk-game-num" x-text="'P'+g"></span>
+                    <span class="bk-game-num" x-text="'Partit '+g"></span>
                     <span class="bk-game-info" x-text="(playoffs.sf1&&playoffs.sf1['g'+g]&&playoffs.sf1['g'+g].date ? fmtDate(playoffs.sf1['g'+g].date) : '') + (playoffs.sf1&&playoffs.sf1['g'+g]&&playoffs.sf1['g'+g].pati ? ' · '+playoffs.sf1['g'+g].pati : '')"></span>
                     <template x-if="isAdmin">
-                      <button @click="openPlayoffEditor('sf1',g)" class="bk-edit-btn" x-text="playoffGameDone('sf1',g)?'↺':'✏️'"></button>
+                      <button @click="openPlayoffEditor('sf1',g)" class="bk-edit-btn" x-text="playoffGameDone('sf1',g)?'↺ Editar':'✏ Anotar'"></button>
                     </template>
                   </div>
                   <div class="bk-team" :class="playoffTeamWon('sf1',g,1)?'bk-win':(playoffGameDone('sf1',g)?'bk-loss':'')">
@@ -419,7 +534,7 @@
               </template>
               <!-- Agregat SF1 -->
               <div class="bk-aggregate" :class="playoffBothDone('sf1')?'bk-aggregate-active':''">
-                <span class="bk-agg-label">AGREGAT</span>
+                <span class="bk-agg-label">Agregat total</span>
                 <template x-if="playoffBothDone('sf1')">
                   <div>
                     <div class="bk-agg-row">
@@ -435,27 +550,27 @@
                   </div>
                 </template>
                 <template x-if="!playoffBothDone('sf1')">
-                  <div class="bk-agg-pending">Pendent de tots dos partits</div>
+                  <div class="bk-agg-pending">Pendent dels dos partits</div>
                 </template>
               </div>
             </div>
 
             <!-- Connector L -->
             <div class="bk-connector">
-              <svg viewBox="0 0 32 120" preserveAspectRatio="none" style="width:100%;height:120px">
-                <path d="M 0 40 Q 32 40 32 60" fill="none" stroke="rgba(245,166,35,0.2)" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <svg viewBox="0 0 36 130" preserveAspectRatio="none" style="width:100%;height:130px">
+                <path d="M 0 44 Q 36 44 36 65" fill="none" stroke="rgba(245,166,35,0.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
               </svg>
             </div>
 
-            <!-- FINAL -->
-            <div class="bk-phase" style="border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.02)">
+            <!-- ── FINAL ── -->
+            <div class="bk-phase bk-phase-final">
               <template x-for="g in [1,2]" :key="'finalg'+g">
-                <div class="bk-game" :class="playoffGameDone('final',g)?'bk-game-played':''" style="border-color:rgba(255,215,0,0.12)">
+                <div class="bk-game" :class="playoffGameDone('final',g)?'bk-game-played-gold':''">
                   <div class="bk-game-meta">
-                    <span class="bk-game-num" x-text="'P'+g"></span>
+                    <span class="bk-game-num" style="color:rgba(255,215,0,0.5);border-color:rgba(255,215,0,0.15)" x-text="'Partit '+g"></span>
                     <span class="bk-game-info" x-text="(playoffs.final&&playoffs.final['g'+g]&&playoffs.final['g'+g].date ? fmtDate(playoffs.final['g'+g].date) : '') + (playoffs.final&&playoffs.final['g'+g]&&playoffs.final['g'+g].pati ? ' · '+playoffs.final['g'+g].pati : '')"></span>
                     <template x-if="isAdmin">
-                      <button @click="openPlayoffEditor('final',g)" class="bk-edit-btn" style="color:#ffd700;border-color:rgba(255,215,0,0.25)" x-text="playoffGameDone('final',g)?'↺':'✏️'"></button>
+                      <button @click="openPlayoffEditor('final',g)" class="bk-edit-btn" style="color:#ffd700;border-color:rgba(255,215,0,0.25);background:rgba(255,215,0,0.08)" x-text="playoffGameDone('final',g)?'↺ Editar':'✏ Anotar'"></button>
                     </template>
                   </div>
                   <div class="bk-team" :class="playoffTeamWon('final',g,1)?'bk-win-gold':(playoffGameDone('final',g)?'bk-loss':'')">
@@ -469,8 +584,8 @@
                 </div>
               </template>
               <!-- Agregat Final -->
-              <div class="bk-aggregate" :class="playoffBothDone('final')?'bk-aggregate-gold':''" style="border-color:rgba(255,215,0,0.2)">
-                <span class="bk-agg-label" style="color:rgba(255,215,0,0.6)">AGREGAT</span>
+              <div class="bk-aggregate" :class="playoffBothDone('final')?'bk-aggregate-gold':''" style="border-color:rgba(255,215,0,0.15)">
+                <span class="bk-agg-label" style="color:rgba(255,215,0,0.55)">Agregat total</span>
                 <template x-if="playoffBothDone('final')">
                   <div class="bk-agg-row">
                     <span class="bk-agg-team" :class="playoffTotal('final',1)>playoffTotal('final',2)?'bk-agg-winner-gold':''" x-text="playoffs.final.team1"></span>
@@ -479,35 +594,35 @@
                   </div>
                 </template>
                 <template x-if="!playoffBothDone('final')">
-                  <div class="bk-agg-pending">Pendent de tots dos partits</div>
+                  <div class="bk-agg-pending">Pendent dels dos partits</div>
                 </template>
               </div>
-              <!-- Campió -->
+              <!-- Campió banner -->
               <template x-if="playoffWinner('final')">
-                <div style="text-align:center;padding:18px 8px 6px;border-top:1px solid rgba(255,215,0,0.15);margin-top:12px">
-                  <div style="font-size:40px" x-text="getTeamEmoji(playoffWinner('final'))"></div>
-                  <div class="font-display" style="color:#ffd700;font-size:1.6rem;margin-top:6px;letter-spacing:0.04em" x-text="playoffWinner('final')"></div>
-                  <div class="font-condensed text-xs" style="color:rgba(255,215,0,0.45);letter-spacing:0.18em;margin-top:4px">🥇 CAMPIÓ IES XARC 2026</div>
+                <div class="bk-winner-banner">
+                  <div style="font-size:40px;margin-bottom:6px" x-text="getTeamEmoji(playoffWinner('final'))"></div>
+                  <div class="font-display" style="color:#ffd700;font-size:1.7rem;letter-spacing:0.04em" x-text="playoffWinner('final')"></div>
+                  <div class="font-condensed text-xs mt-1" style="color:rgba(255,215,0,0.4);letter-spacing:0.2em">🥇 CAMPIÓ IES XARC 2026</div>
                 </div>
               </template>
             </div>
 
             <!-- Connector R -->
             <div class="bk-connector">
-              <svg viewBox="0 0 32 120" preserveAspectRatio="none" style="width:100%;height:120px">
-                <path d="M 32 40 Q 0 40 0 60" fill="none" stroke="rgba(245,166,35,0.2)" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <svg viewBox="0 0 36 130" preserveAspectRatio="none" style="width:100%;height:130px">
+                <path d="M 36 44 Q 0 44 0 65" fill="none" stroke="rgba(245,166,35,0.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
               </svg>
             </div>
 
-            <!-- SF2 -->
+            <!-- ── SF2 ── -->
             <div class="bk-phase">
               <template x-for="g in [1,2]" :key="'sf2g'+g">
                 <div class="bk-game" :class="playoffGameDone('sf2',g)?'bk-game-played':''">
                   <div class="bk-game-meta">
-                    <span class="bk-game-num" x-text="'P'+g"></span>
+                    <span class="bk-game-num" x-text="'Partit '+g"></span>
                     <span class="bk-game-info" x-text="(playoffs.sf2&&playoffs.sf2['g'+g]&&playoffs.sf2['g'+g].date ? fmtDate(playoffs.sf2['g'+g].date) : '') + (playoffs.sf2&&playoffs.sf2['g'+g]&&playoffs.sf2['g'+g].pati ? ' · '+playoffs.sf2['g'+g].pati : '')"></span>
                     <template x-if="isAdmin">
-                      <button @click="openPlayoffEditor('sf2',g)" class="bk-edit-btn" x-text="playoffGameDone('sf2',g)?'↺':'✏️'"></button>
+                      <button @click="openPlayoffEditor('sf2',g)" class="bk-edit-btn" x-text="playoffGameDone('sf2',g)?'↺ Editar':'✏ Anotar'"></button>
                     </template>
                   </div>
                   <div class="bk-team" :class="playoffTeamWon('sf2',g,1)?'bk-win':(playoffGameDone('sf2',g)?'bk-loss':'')">
@@ -522,7 +637,7 @@
               </template>
               <!-- Agregat SF2 -->
               <div class="bk-aggregate" :class="playoffBothDone('sf2')?'bk-aggregate-active':''">
-                <span class="bk-agg-label">AGREGAT</span>
+                <span class="bk-agg-label">Agregat total</span>
                 <template x-if="playoffBothDone('sf2')">
                   <div>
                     <div class="bk-agg-row">
@@ -538,74 +653,79 @@
                   </div>
                 </template>
                 <template x-if="!playoffBothDone('sf2')">
-                  <div class="bk-agg-pending">Pendent de tots dos partits</div>
+                  <div class="bk-agg-pending">Pendent dels dos partits</div>
                 </template>
               </div>
             </div>
 
           </div><!-- end bracket grid -->
 
-          <!-- 3r/4t LLOC -->
-          <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px">
-            <div class="bk-col-label" style="margin-bottom:8px">🥉 3r i 4t lloc</div>
-            <div style="display:grid;grid-template-columns:1fr 32px 1fr;max-width:calc(66% + 32px)">
-              <div class="bk-phase" style="border-color:rgba(205,127,50,0.25)">
-                <template x-for="g in [1,2]" :key="'thirdg'+g">
-                  <div class="bk-game" :class="playoffGameDone('third',g)?'bk-game-played':''">
-                    <div class="bk-game-meta">
-                      <span class="bk-game-num" x-text="'P'+g"></span>
-                      <span class="bk-game-info" x-text="(playoffs.third&&playoffs.third['g'+g]&&playoffs.third['g'+g].date ? fmtDate(playoffs.third['g'+g].date) : '') + (playoffs.third&&playoffs.third['g'+g]&&playoffs.third['g'+g].pati ? ' · '+playoffs.third['g'+g].pati : '')"></span>
-                      <template x-if="isAdmin">
-                        <button @click="openPlayoffEditor('third',g)" class="bk-edit-btn" style="color:#cd7f32;border-color:rgba(205,127,50,0.25)" x-text="playoffGameDone('third',g)?'↺':'✏️'"></button>
-                      </template>
-                    </div>
-                    <div class="bk-team" :class="playoffTeamWon('third',g,1)?'bk-win-bronze':(playoffGameDone('third',g)?'bk-loss':'')">
-                      <span class="bk-team-name" x-text="playoffs.third&&playoffs.third.team1||'Perdedor SF1'"></span>
-                      <span class="bk-team-score" x-text="playoffGameDone('third',g)?playoffs.third['g'+g].score1:''"></span>
-                    </div>
-                    <div class="bk-team" :class="playoffTeamWon('third',g,2)?'bk-win-bronze':(playoffGameDone('third',g)?'bk-loss':'')">
-                      <span class="bk-team-name" x-text="playoffs.third&&playoffs.third.team2||'Perdedor SF2'"></span>
-                      <span class="bk-team-score" x-text="playoffGameDone('third',g)?playoffs.third['g'+g].score2:''"></span>
-                    </div>
+          <!-- ── 3r i 4t LLOC — 1 ÚNIC PARTIT ── -->
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(245,166,35,0.1)">
+            <div style="display:grid;grid-template-columns:1fr 36px 1fr;max-width:calc(66% + 36px);align-items:start">
+
+              <div class="bk-phase bk-phase-bronze">
+                <div class="bk-col-label bk-col-label-bronze" style="margin-bottom:12px">🥉 3r i 4t lloc — Únic partit</div>
+
+                <div class="bk-third-game" :class="playoffGameDone('third',1)?'bk-third-game-played':''">
+                  <div class="bk-game-meta">
+                    <span class="bk-game-num" style="color:rgba(205,127,50,0.6);border-color:rgba(205,127,50,0.2)">Partit únic</span>
+                    <span class="bk-game-info" x-text="(playoffs.third&&playoffs.third['g1']&&playoffs.third['g1'].date ? fmtDate(playoffs.third['g1'].date) : '') + (playoffs.third&&playoffs.third['g1']&&playoffs.third['g1'].pati ? ' · '+playoffs.third['g1'].pati : '')"></span>
+                    <template x-if="isAdmin">
+                      <button @click="openPlayoffEditor('third',1)" class="bk-edit-btn" style="color:#cd7f32;border-color:rgba(205,127,50,0.3);background:rgba(205,127,50,0.08)" x-text="playoffGameDone('third',1)?'↺ Editar':'✏ Anotar'"></button>
+                    </template>
                   </div>
-                </template>
-                <div class="bk-aggregate" :class="playoffBothDone('third')?'bk-aggregate-bronze':''" style="border-color:rgba(205,127,50,0.2)">
-                  <span class="bk-agg-label" style="color:rgba(205,127,50,0.6)">AGREGAT</span>
-                  <template x-if="playoffBothDone('third')">
-                    <div class="bk-agg-row">
-                      <span class="bk-agg-team" :class="playoffTotal('third',1)>playoffTotal('third',2)?'bk-agg-winner-bronze':''" x-text="playoffs.third.team1"></span>
-                      <span class="bk-agg-score" style="color:#cd7f32" x-text="playoffTotal('third',1)+' – '+playoffTotal('third',2)"></span>
-                      <span class="bk-agg-team" :class="playoffTotal('third',2)>playoffTotal('third',1)?'bk-agg-winner-bronze':''" style="text-align:right" x-text="playoffs.third.team2"></span>
-                    </div>
-                  </template>
-                  <template x-if="!playoffBothDone('third')">
-                    <div class="bk-agg-pending">Pendent de tots dos partits</div>
-                  </template>
+                  <div class="bk-team" :class="playoffTeamWon('third',1,1)?'bk-win-bronze':(playoffGameDone('third',1)?'bk-loss':'')">
+                    <span class="bk-team-name" x-text="playoffs.third&&playoffs.third.team1||'Perdedor SF1'"></span>
+                    <span class="bk-team-score" x-text="playoffGameDone('third',1)?playoffs.third['g1'].score1:''"></span>
+                  </div>
+                  <div class="bk-team" :class="playoffTeamWon('third',1,2)?'bk-win-bronze':(playoffGameDone('third',1)?'bk-loss':'')">
+                    <span class="bk-team-name" x-text="playoffs.third&&playoffs.third.team2||'Perdedor SF2'"></span>
+                    <span class="bk-team-score" x-text="playoffGameDone('third',1)?playoffs.third['g1'].score2:''"></span>
+                  </div>
                 </div>
-              </div>
-              <div></div>
-              <div style="display:flex;align-items:center;justify-content:center">
+
+                <!-- 3r lloc result -->
                 <template x-if="playoffWinner('third')">
-                  <div style="text-align:center;padding:12px">
-                    <div style="font-size:32px" x-text="getTeamEmoji(playoffWinner('third'))"></div>
-                    <div class="font-condensed font-700 uppercase mt-1" style="color:#cd7f32;font-size:14px" x-text="playoffWinner('third')"></div>
-                    <div class="font-condensed text-xs mt-1" style="color:rgba(205,127,50,0.5)">🥉 3r lloc</div>
+                  <div class="bk-third-banner">
+                    <div style="font-size:28px;margin-bottom:4px" x-text="getTeamEmoji(playoffWinner('third'))"></div>
+                    <div class="font-condensed font-700 uppercase" style="color:#cd7f32;font-size:14px;letter-spacing:0.05em" x-text="playoffWinner('third')"></div>
+                    <div class="font-condensed text-xs mt-1" style="color:rgba(205,127,50,0.45);letter-spacing:0.15em">🥉 3r lloc IES XARC 2026</div>
                   </div>
                 </template>
               </div>
+
+              <!-- Spacer i 4t lloc -->
+              <div></div>
+              <div style="display:flex;align-items:center;justify-content:center;padding:20px 0">
+                <template x-if="playoffGameDone('third',1) && !playoffWinner('third')">
+                  <!-- Empat -->
+                  <div style="text-align:center;padding:16px">
+                    <div class="font-condensed text-xs uppercase" style="color:var(--faint);letter-spacing:0.1em">Empat — decidit per...</div>
+                  </div>
+                </template>
+                <template x-if="playoffLoser('third')">
+                  <div style="text-align:center">
+                    <div style="font-size:24px;margin-bottom:4px" x-text="getTeamEmoji(playoffLoser('third'))"></div>
+                    <div class="font-condensed font-600 uppercase" style="color:var(--muted);font-size:12px" x-text="playoffLoser('third')"></div>
+                    <div class="font-condensed text-xs mt-1" style="color:var(--faint);letter-spacing:0.12em">4t lloc</div>
+                  </div>
+                </template>
+              </div>
+
             </div>
-          </div>
+          </div><!-- end 3r/4t lloc -->
 
         </div><!-- end min-width -->
         </div><!-- end overflow -->
 
-        <!-- MODAL EDITOR -->
+        <!-- MODAL EDITOR (sense canvis) -->
         <template x-if="playoffEditor.open">
           <div style="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px" @click.self="playoffEditor.open=false">
             <div class="card p-6" style="width:100%;max-width:360px">
               <div class="flex items-center justify-between mb-5">
                 <div>
-                  <p class="font-condensed text-xs uppercase tracking-widest mb-0.5" style="color:var(--faint)" x-text="playoffEditor.phaseLabel+' · Partit '+playoffEditor.g"></p>
+                  <p class="font-condensed text-xs uppercase tracking-widest mb-0.5" style="color:var(--faint)" x-text="playoffEditor.phaseLabel + (playoffEditor.phase==='third' ? '' : ' · Partit '+playoffEditor.g)"></p>
                   <p class="font-condensed font-700 uppercase" style="color:var(--cream);font-size:14px" x-text="(playoffs[playoffEditor.phase]&&playoffs[playoffEditor.phase].team1||'?')+' vs '+(playoffs[playoffEditor.phase]&&playoffs[playoffEditor.phase].team2||'?')"></p>
                 </div>
                 <button @click="playoffEditor.open=false" style="font-size:20px;color:var(--faint);background:none;border:none;cursor:pointer;line-height:1">✕</button>
@@ -1570,7 +1690,6 @@
 <script>
 function app() {
   return {
-    // ── Playoffs ara és la pestanya per defecte ──
     activeTab: window.location.hash.replace('#','') || 'playoffs',
     isAdmin: false,
     isOwner: false,
@@ -1624,7 +1743,6 @@ function app() {
     resultMsg: '',
     resultErr: '',
 
-    // ── Playoffs apareix primer ──
     publicTabs: [
       { id:'playoffs',  label:'⚔️ Playoffs' },
       { id:'standings', label:'🏆 Classificació' },
@@ -1699,7 +1817,6 @@ function app() {
               this.showAdminLogin = false;
               this.loginError = '';
               if (!this.publicTabs.find(t => t.id === 'arbitres')) {
-                // Insereix àrbitres després de playoffs (índex 1)
                 this.publicTabs.splice(1, 0, { id: 'arbitres', label: '🏁 Àrbitres' });
               }
               if (this.isOwner && !this.publicTabs.find(t => t.id === 'owner')) {
@@ -1930,7 +2047,6 @@ function app() {
         if (ns1) stats[r.team1].noShows++;
         if (ns2) stats[r.team2].noShows++;
         if (ns1 && ns2) {
-          // res
         } else if (ns1) {
           stats[r.team2].pj++; stats[r.team2].pg++; stats[r.team2].pts+=3;
         } else if (ns2) {
@@ -1965,7 +2081,6 @@ function app() {
     },
 
     playoffs: {},
-    playoffInput: { sf1:{score1:0,score2:0}, sf2:{score1:0,score2:0}, final:{score1:0,score2:0}, third:{score1:0,score2:0} },
     normativa: {},
     normativaEdit: false,
     normativaTemp: {},
@@ -2341,7 +2456,7 @@ function app() {
     },
 
     openPlayoffEditor(phase, g) {
-      const labels = { sf1:'Semifinal 1', sf2:'Semifinal 2', third:'3r i 4t', final:'Gran Final' };
+      const labels = { sf1:'Semifinal 1', sf2:'Semifinal 2', third:'3r i 4t lloc', final:'Gran Final' };
       const p = this.playoffs && this.playoffs[phase];
       const game = p && p['g'+g];
       this.playoffEditor = {
@@ -2353,7 +2468,6 @@ function app() {
       };
     },
 
-    // ── GUARDAR RESULTAT AMB PROPAGACIÓ AUTOMÀTICA ──────────────────
     savePlayoffFromEditor() {
       const { phase, g, date, pati, score1, score2 } = this.playoffEditor;
       const ref = window._ref(window._db, `playoffs/${phase}/g${g}`);
@@ -2377,7 +2491,6 @@ function app() {
       }
     },
 
-    // ── PROPAGACIÓ AUTOMÀTICA de guanyadors i perdedors ─────────────
     autoPropagate() {
       const sf1Done = this.playoffBothDone('sf1');
       const sf2Done = this.playoffBothDone('sf2');
@@ -2423,6 +2536,7 @@ function app() {
       }
     },
 
+    // ── 3r lloc: 1 únic partit (g1) ──────────────────────────────────
     playoffGameDone(phase, g) {
       const p = this.playoffs && this.playoffs[phase];
       const game = p && p['g'+g];
@@ -2430,16 +2544,41 @@ function app() {
     },
 
     playoffBothDone(phase) {
+      // Per al 3r lloc, només cal el g1 (partit únic)
+      if (phase === 'third') return this.playoffGameDone('third', 1);
       return this.playoffGameDone(phase, 1) && this.playoffGameDone(phase, 2);
     },
 
+    // Guanyador — per al 3r lloc usa g1 directament (no agregat)
     playoffWinner(phase) {
       const p = this.playoffs && this.playoffs[phase];
-      if (!p || !this.playoffBothDone(phase)) return null;
+      if (!p) return null;
+      if (phase === 'third') {
+        // Partit únic
+        if (!this.playoffGameDone('third', 1)) return null;
+        const g = p.g1;
+        if (Number(g.score1) === Number(g.score2)) return null;
+        return Number(g.score1) > Number(g.score2) ? p.team1 : p.team2;
+      }
+      // Semifinals i Final: agregat 2 partits
+      if (!this.playoffBothDone(phase)) return null;
       const t1 = ((p.g1&&p.g1.score1||0)*1 + (p.g2&&p.g2.score1||0)*1);
       const t2 = ((p.g1&&p.g1.score2||0)*1 + (p.g2&&p.g2.score2||0)*1);
       if (t1 === t2) return null;
       return t1 > t2 ? p.team1 : p.team2;
+    },
+
+    // Perdedor del 3r lloc → 4t lloc
+    playoffLoser(phase) {
+      const p = this.playoffs && this.playoffs[phase];
+      if (!p) return null;
+      if (phase === 'third') {
+        if (!this.playoffGameDone('third', 1)) return null;
+        const g = p.g1;
+        if (Number(g.score1) === Number(g.score2)) return null;
+        return Number(g.score1) > Number(g.score2) ? p.team2 : p.team1;
+      }
+      return null;
     },
 
     activatePlayoffs() {
@@ -2548,7 +2687,7 @@ function app() {
         format: [
           { text: 'Fase regular: Tots contra tots.', warning: false },
           { text: 'Playoffs: Els 4 millors equips passen a semifinals i final.', warning: false },
-          { text: 'Els perdedors de semifinal juguen el 3r i 4t lloc.', warning: false },
+          { text: 'Els perdedors de semifinal juguen el 3r i 4t lloc (1 únic partit).', warning: false },
         ],
         arbitres: [
           { text: 'Els àrbitres supervisaran els partits, xiularan infraccions i gestionaran el temps.', warning: false },
